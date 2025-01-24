@@ -1,6 +1,7 @@
 <%- include("../../views/partials/admin/header") %>
 <head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <style>
     body {
@@ -141,41 +142,80 @@
     #cropperModal {
         display: none;
         position: fixed;
-        z-index: 1000;
+        z-index: 1050;
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
         overflow: auto;
         background-color: rgba(0,0,0,0.5);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
     }
 
     .crop-modal-content {
         background-color: #fefefe;
-        margin: 10% auto;
-        padding: 20px;
         border-radius: 10px;
-        width: 80%;
-        max-width: 800px;
+        width: 100%;
+        max-width: 600px;
+        max-height: 80vh;
         position: relative;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .crop-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background-color: #f1f1f1;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .crop-modal-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .crop-modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+        transition: color 0.3s ease;
+    }
+
+    .crop-modal-close:hover {
+        color: #000;
+    }
+
+    .crop-modal-body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+        max-height: 500px;
+        overflow: hidden;
     }
 
     #cropperImage {
         max-width: 100%;
-        max-height: 500px;
+        max-height: 400px;
+        object-fit: contain;
     }
 
-    .crop-modal-buttons {
+    .crop-modal-footer {
         display: flex;
         justify-content: space-between;
-        margin-top: 15px;
-    }
-
-    #addedImagesContainer {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 15px;
+        padding: 15px;
+        background-color: #f1f1f1;
+        border-top: 1px solid #ddd;
     }
 
     #addedImagesContainer .thumbnail {
@@ -184,22 +224,12 @@
         object-fit: cover;
         border-radius: 10px;
         position: relative;
+        border: 2px solid #ddd;
+        transition: transform 0.3s ease;
     }
 
-    .remove-image-btn {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        background-color: red;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
+    #addedImagesContainer .thumbnail:hover {
+        transform: scale(1.05);
     }
 </style>
 <section class="content-main">
@@ -316,11 +346,14 @@
 <!-- Cropper Modal -->
 <div id="cropperModal" class="modal">
     <div class="crop-modal-content">
-        <h3>Crop Image</h3>
-        <div>
+        <div class="crop-modal-header">
+            <h3>Crop Image</h3>
+            <button class="crop-modal-close" onclick="closeCropperModal()">&times;</button>
+        </div>
+        <div class="crop-modal-body">
             <img id="cropperImage" src="" alt="Image to crop">
         </div>
-        <div class="crop-modal-buttons">
+        <div class="crop-modal-footer">
             <button type="button" class="btn btn-secondary" onclick="closeCropperModal()">Cancel</button>
             <button type="button" class="btn btn-primary" onclick="saveCroppedImage()">Complete Crop</button>
         </div>
@@ -340,7 +373,12 @@
         // Validate file type
         const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
         if (!validTypes.includes(file.type)) {
-            alert('Please upload a valid image (JPEG, PNG, or GIF)');
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid File Type',
+                text: 'Please upload a valid image (JPEG, PNG, or GIF)',
+                confirmButtonColor: '#3085d6'
+            });
             return;
         }
 
@@ -355,18 +393,46 @@
                 cropper.destroy();
             }
 
-            // Initialize Cropper
-            cropper = new Cropper(cropperImage, {
-                aspectRatio: 1, // Square crop
-                viewMode: 1,
-                minCropBoxWidth: 100,
-                minCropBoxHeight: 100
-            });
+            // Wait for image to load
+            cropperImage.onload = function() {
+                // Determine aspect ratio based on image dimensions
+                const aspectRatio = cropperImage.naturalWidth / cropperImage.naturalHeight;
 
-            // Show modal
-            document.getElementById('cropperModal').style.display = 'block';
+                // Initialize Cropper with dynamic aspect ratio
+                cropper = new Cropper(cropperImage, {
+                    aspectRatio: aspectRatio, // Use image's natural aspect ratio
+                    viewMode: 1,
+                    minCropBoxWidth: 100,
+                    minCropBoxHeight: 100,
+                    autoCropArea: 0.8, // Default crop area
+                    responsive: true,
+                    restore: true,
+                    guides: true,
+                    center: true,
+                    highlight: true,
+                    cropBoxMovable: true,
+                    cropBoxResizable: true,
+                });
+
+                // Show modal
+                document.getElementById('cropperModal').style.display = 'flex';
+            };
         };
         reader.readAsDataURL(file);
+    }
+
+    function closeCropperModal() {
+        // Hide modal
+        document.getElementById('cropperModal').style.display = 'none';
+
+        // Destroy cropper
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+
+        // Clear file input
+        document.getElementById('imageUpload').value = '';
     }
 
     function saveCroppedImage() {
@@ -374,14 +440,25 @@
 
         // Validate total images
         if (existingImages.length - deletedImages.length + croppedImagesCount >= 4) {
-            alert('Maximum 4 images allowed');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Image Limit Reached',
+                text: 'Maximum 4 images allowed',
+                confirmButtonColor: '#3085d6'
+            });
             closeCropperModal();
             return;
         }
 
         // Get cropped image
-        const croppedCanvas = cropper.getCroppedCanvas();
-        const croppedDataUrl = croppedCanvas.toDataURL('image/jpeg');
+        const croppedCanvas = cropper.getCroppedCanvas({
+            width: 440, // Consistent width for all images
+            height: 440, // Consistent height for all images
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high'
+        });
+
+        const croppedDataUrl = croppedCanvas.toDataURL('image/jpeg', 0.9); // High quality
 
         // Create thumbnail
         const thumbnailContainer = document.createElement('div');
@@ -417,58 +494,103 @@
         // Clear file input
         document.getElementById('imageUpload').value = '';
 
+        // Show success toast
+        Swal.fire({
+            icon: 'success',
+            title: 'Image Cropped',
+            text: 'Image has been successfully cropped and added',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+        });
+
         // Close modal
         closeCropperModal();
     }
 
     function removeCroppedImage(thumbnailContainer) {
-        // Remove thumbnail
-        thumbnailContainer.remove();
+        Swal.fire({
+            title: 'Remove Image',
+            text: 'Are you sure you want to remove this image?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, remove it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Remove thumbnail
+                thumbnailContainer.remove();
 
-        // Decrement cropped images count
-        croppedImagesCount--;
-    }
+                // Decrement cropped images count
+                croppedImagesCount--;
 
-    function closeCropperModal() {
-        // Hide modal
-        document.getElementById('cropperModal').style.display = 'none';
-
-        // Destroy cropper
-        if (cropper) {
-            cropper.destroy();
-            cropper = null;
-        }
-
-        // Clear file input
-        document.getElementById('imageUpload').value = '';
-    }
-
-    function deleteExistingImage(imageName, index) {
-        const container = document.getElementById(`existingImageContainer${index}`);
-        if (container) {
-            container.remove();
-        }
-        
-        // Add the image to deleted images if not already present
-        if (!deletedImages.includes(imageName)) {
-            deletedImages.push(imageName);
-        }
-        
-        // Update hidden input for deleted images
-        document.getElementById('deletedImagesInput').value = JSON.stringify(deletedImages);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Image Removed',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+        });
     }
 
     function validateForm() {
         const totalImages = existingImages.length - deletedImages.length + croppedImagesCount;
 
         if (totalImages < 3 || totalImages > 4) {
-            alert('You must have between 3 and 4 images in total');
+            Swal.fire({
+                icon: 'error',
+                title: 'Image Count Invalid',
+                text: 'You must have between 3 and 4 images in total',
+                confirmButtonColor: '#3085d6'
+            });
             return false;
         }
 
         return true;
     }
+
+    function deleteExistingImage(imageName, index) {
+        Swal.fire({
+            title: 'Remove Existing Image',
+            text: 'Are you sure you want to remove this image?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, remove it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const container = document.getElementById(`existingImageContainer${index}`);
+                if (container) {
+                    container.remove();
+                }
+                
+                // Add the image to deleted images if not already present
+                if (!deletedImages.includes(imageName)) {
+                    deletedImages.push(imageName);
+                }
+                
+                // Update hidden input for deleted images
+                document.getElementById('deletedImagesInput').value = JSON.stringify(deletedImages);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Image Removed',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+        });
+    }
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
 <%- include("../../views/partials/admin/footer") %>
