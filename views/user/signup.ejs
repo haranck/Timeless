@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | Timeless Aura</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .signup-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .signup-card {
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .btn-google {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-google img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .signup-title {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .btn-black {
+            background-color: #000;
+            color: #fff;
+        }
+
+        .btn-black:hover {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .login-link {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .login-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        .error-message{
+            display: none;
+            color: red;
+            font-size: 12px;
+        }
+        .message{
+            color: red;
+            font-size: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-card">
+            <h2 class="signup-title">Sign Up</h2>
+            <% if (typeof message !== 'undefined') { %>
+               <p class="message" style="color: red;"><%= message %></p>
+               <% } %>
+            <form id="signform" action="/signup" method="POST">
+                <div class="form-group">
+                    <label for="fullname">Full Name</label>
+                    <input type="text" class="form-control" id="name" name="name" >
+                    <div id="error1" class="error-message"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" >
+                    <div id="error2" class="error-message"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="mobile">Mobile</label>
+                    <input type="text" class="form-control" id="phone" name="phone" >
+                    <div id="error3" class="error-message"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" >
+                    <div id="error4" class="error-message"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirm-password" name="Cpassword" >
+                    <div id="error5" class="error-message"></div>
+                </div>
+
+                <button type="submit" class="btn btn-black w-100">Sign Up</button>
+
+                <div class="text-center mt-3">or</div>
+
+                <a href="/auth/google" class="btn btn-outline-dark btn-google w-100">
+                    <img src="https://banner2.cleanpng.com/20240111/qtv/transparent-google-logo-colorful-google-logo-with-bold-green-1710929465092.webp" alt="Google">
+                    Sign up with Google
+                </a>
+            </form>
+           
+            <div class="login-link">
+                Already registered? <a href="/login">Login</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+
+
+<script>
+
+   const nameid = document.getElementById('name')
+   const emailid = document.getElementById('email')
+   const phoneid = document.getElementById('phone')
+   const passid = document.getElementById('password')
+   const cpassid = document.getElementById('confirm-password')
+
+   const error1 = document.getElementById('error1')
+   const error2 = document.getElementById('error2')
+   const error3 = document.getElementById('error3')
+   const error4 = document.getElementById('error4')
+   const error5 = document.getElementById('error5')
+   const signform = document.getElementById('signform')
+
+   function nameValidateChecking(e){
+      const nameval =  nameid.value;
+      const namepattern = /^[a-zA-Z\s]{2,}$/;
+
+      if(nameval.trim() === ""){
+         error1.style.display = "block"
+         error1.innerHTML = "Please enter a valid name"
+      }else if(!namepattern.test(nameval)){
+         error1.style.display = 'block'
+         error1.innerHTML = "Name can only contain alphabets "
+      }else{
+         error1.style.display = "none"
+         error1.innerHTML=""
+      }
+   }
+
+   function emailValidateChecking(e){
+      const emailval = emailid.value;
+      const emailpattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+      if(!emailpattern.test(emailval)){
+         error2.style.display = "block"
+         error2.innerHTML = "Please enter a valid email"
+      }else{
+         error2.style.display = "none"
+         error2.innerHTML=""
+      }
+   }
+
+   function phoneValidateChecking(e){
+      const phoneval = phoneid.value;
+      const phonepattern = /^[0-9]{10}$/;
+
+      if(!phonepattern.test(phoneval)){
+         error3.style.display = "block"
+         error3.innerHTML = "Please enter a valid phone number"
+      }else{
+         error3.style.display = "none"
+         error3.innerHTML=""
+      }
+   }
+   function passValidateChecking(e){
+      const passval = passid.value;
+      const cpassval = cpassid.value;
+      const passpattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
+
+      if(!passpattern.test(passval)){
+         error4.style.display = "block"
+         error4.innerHTML = "Password must contain atleast one uppercase, one lowercase and one digit"
+      }else{
+         error4.style.display = "none"
+         error4.innerHTML=""
+      }
+
+      if(passval !== cpassval){
+         error5.style.display = "block"
+         error5.innerHTML = "Password does not match"
+      }else{
+         error5.style.display = "none"
+         error5.innerHTML=""
+      }
+   }
+
+   document.addEventListener("DOMContentLoaded",() =>{
+      signform.addEventListener('submit',(e) =>{
+         nameValidateChecking()
+         emailValidateChecking()
+         phoneValidateChecking()
+         passValidateChecking()
+
+         if(
+            !nameid||
+            !emailid||
+            !phoneid||
+            !passid||
+            !error1||
+            !error2||
+            !error3||
+            !error4||
+            !error5||
+            !signform
+         ){
+            console.log("one or more elements not found");
+         }
+         if(
+            error1.innerHTML||
+            error2.innerHTML||
+            error3.innerHTML||
+            error4.innerHTML||
+            error5.innerHTML
+         ){
+            e.preventDefault()
+         }
+
+      })
+   })
+
+</script>
+
+</html>

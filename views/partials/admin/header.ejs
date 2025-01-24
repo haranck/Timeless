@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeless Aura - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/css/admin/dashboard.css">
+    <link rel="stylesheet" href="/css/admin/customers.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <nav>
+            <a href="/admin/" class="nav-item" data-page="Dashboard">
+                <i class="fas fa-chart-line"></i>
+                Dashboard
+            </a>
+            <a href="/admin/products" class="nav-item" data-page="Products">
+                <i class="fas fa-box"></i>
+                Products
+            </a>
+            <a href="/admin/addProducts" class="nav-item" data-page="Products">
+                <i class="fas fa-box"></i>
+                Add Products
+            </a>
+            <a href="#" class="nav-item" data-page="Orders">
+                <i class="fas fa-shopping-cart"></i>
+                Orders
+            </a>
+            <a href="/admin/customers" class="nav-item" data-page="Customers">
+                <i class="fas fa-users"></i>
+                Customers
+            </a>
+            <a href="#" class="nav-item" data-page="Reviews">
+                <i class="fas fa-star"></i>
+                Reviews
+            </a>
+            <a href="#" class="nav-item" data-page="Offers">
+                <i class="fas fa-gift"></i>
+                Offers
+            </a>
+            <a href="#" class="nav-item" data-page="Coupon Management">
+                <i class="fas fa-ticket-alt"></i>
+                Coupon Management
+            </a>
+            <a href="#" class="nav-item" data-page="Banner Management">
+                <i class="fas fa-image"></i>
+                Banner Management
+            </a>
+            <a href="/admin/category" class="nav-item" data-page="Categories">
+                <i class="fas fa-list"></i>
+                Categories
+            </a>
+        </nav>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="brand">Timeless Aura</div>
+        <div class="header-right">
+            <div class="notification-icon">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">5</span>
+            </div>
+            <div class="profile-dropdown">
+                <div class="profile-img">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        Profile Settings
+                    </a>
+                    <a href="/admin/logout" class="dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>

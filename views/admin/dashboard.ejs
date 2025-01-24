@@ -1,0 +1,99 @@
+
+<%- include("../../views/partials/admin/header") %>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="breadcrumbs">
+            Admin <span>></span> <span id="currentPage">Dashboard</span>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Total Sales</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Customers</h3>  
+                </div>
+                <div class="chart-container">
+                    <canvas id="customersChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Total Orders</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="ordersChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card recent-orders">
+            <div class="card-header">
+                <h3 class="card-title">Recent Orders</h3>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Date</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Luxury Watch X1</td>
+                        <td>Jan 20, 2025</td>
+                        <td>$599.99</td>
+                        <td><span class="status completed">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>Classic Watch Y2</td>
+                        <td>Jan 19, 2025</td>
+                        <td>$399.99</td>
+                        <td><span class="status pending">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td>Smart Watch Z3</td>
+                        <td>Jan 19, 2025</td>
+                        <td>$299.99</td>
+                        <td><span class="status completed">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>Diamond Watch A4</td>
+                        <td>Jan 18, 2025</td>
+                        <td>$899.99</td>
+                        <td><span class="status completed">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>Sports Watch B5</td>
+                        <td>Jan 18, 2025</td>
+                        <td>$199.99</td>
+                        <td><span class="status pending">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td>Gold Watch C6</td>
+                        <td>Jan 17, 2025</td>
+                        <td>$799.99</td>
+                        <td><span class="status completed">Completed</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card best-selling">
+            <div class="card-header">
+                <h3 class="card-title">Best Selling This Month</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="bestSellingChart"></canvas>
+            </div>
+        </div>
+    </main>
+    <%- include("../../views/partials/admin/footer") %>
