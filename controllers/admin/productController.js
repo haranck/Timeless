@@ -173,69 +173,287 @@ const getEditProduct = async(req,res)=>{
    }
 }
 
-const editProduct = async (req,res) =>{
+const editProduct = async (req, res) => {
    try {
       const id = req.params.id
-      console.log(id)
-      const product = await Product.findOne({_id:id})
       const data = req.body
-      // const category =  await Category.findOne({name:data.category})
-      const existingProduct = await Product.findOne({
-         productName:data.productName,
-         _id:{$ne:id}
+      const files = req.files
+
+      console.log('Edit Product Request:', {
+         productId: id,
+         body: JSON.stringify(data),
+         files: files ? files.map(f => ({
+            fieldname: f.fieldname,
+            filename: f.filename, 
+            originalname: f.originalname,
+            mimetype: f.mimetype,
+            size: f.size
+         })) : 'No files',
+         fileCount: files ? files.length : 0
       })
-      if(existingProduct){
-         return res.status(400).json({error:"Product with this name already  exists"})
+
+      // Validate required fields
+      if (!data.productName || !data.category) {
+         return res.status(400).json({
+            status: false, 
+            message: 'Product Name and Category are required'
+         })
       }
 
-      const images = []
-      if(req.files && req.files.length>0){
-         for(let i=0 ;i<req.files.length;i++){
-            images.push(req.files[i].filename)
+      // Find the existing product
+      const existingProduct = await Product.findById(id)
+      if(!existingProduct){
+         return res.status(404).json({status:false, message:"Product not found"})
+      }
+
+      // Prepare update fields
+      const updateFields = {
+         productName: data.productName,
+         description: data.description || existingProduct.description,
+         category: data.category,
+         regularPrice: data.regularPrice || existingProduct.regularPrice,
+         salePrice: data.salePrice || existingProduct.salePrice,
+         quantity: data.quantity || existingProduct.quantity,
+      }
+
+      // Handle image uploads
+      if(files && files.length > 0){
+         // Validate file types and sizes
+         const validImageTypes = ['image/jpeg', 'image/png', 'image/gif']
+         const maxFileSize = 5 * 1024 * 1024 // 5MB
+
+         const validFiles = files.filter(file => {
+            const isValidType = validImageTypes.includes(file.mimetype)
+            const isValidSize = file.size <= maxFileSize
+            
+            if (!isValidType) {
+               console.warn(`Invalid file type: ${file.originalname}`)
+            }
+            if (!isValidSize) {
+               console.warn(`File too large: ${file.originalname}`)
+            }
+            
+            return isValidType && isValidSize
+         })
+
+         console.log('Image Validation:', {
+            totalFiles: files.length,
+            validFiles: validFiles.length,
+            validFileNames: validFiles.map(f => f.filename)
+         })
+
+         if (validFiles.length > 0) {
+            // Generate image names
+            const images = validFiles.map(file => file.filename)
+            
+            // Directly set or push images
+            if (!existingProduct.productImages || existingProduct.productImages.length === 0) {
+               updateFields.productImages = images;
+            } else {
+               // Ensure we don't exceed a reasonable number of images (e.g., 10)
+               const totalImages = existingProduct.productImages.length + images.length;
+               const maxAllowedImages = 10;
+               
+               if (totalImages > maxAllowedImages) {
+                  return res.status(400).json({
+                     status: false, 
+                     message: `Maximum ${maxAllowedImages} images allowed per product`
+                  })
+               }
+
+               // Push new images
+               updateFields.$push = { 
+                  productImages: { 
+                     $each: images,
+                     // Optional: limit total images if needed
+                     $slice: -maxAllowedImages 
+                  } 
+               }
+            }
+         } else {
+            return res.status(400).json({
+               status: false, 
+               message: 'No valid images uploaded. Check file types and sizes.'
+            })
          }
       }
-
-      const updateFields ={
-         productName:data.productName,
-         description:data.description,
-         category: data.category || product.category,
-         regularPrice:data.regularPrice,
-         salePrice:data.salePrice,
-         quantity:data.quantity,
-
-      }
-      if(req.files.length>0){
-         updateFields.$push={productImage:{$each:images}}
-      }
       
-      await Product.findByIdAndUpdate(id,updateFields,{new:true})
-      res.redirect("/admin/products")
+      // Update the product
+      const updatedProduct = await Product.findByIdAndUpdate(
+         id, 
+         updateFields, 
+         { 
+            new: true,  // Return the updated document
+            runValidators: true  // Run model validations
+         }
+      )
+      
+      console.log('Product Update Result:', {
+         productId: updatedProduct._id,
+         totalImages: updatedProduct.productImages ? updatedProduct.productImages.length : 0,
+         newImages: updateFields.$push ? updateFields.$push.productImages.$each : (updateFields.productImages || 'No new images')
+      })
+
+      // Always return JSON for AJAX requests
+      return res.status(200).json({
+         status: true, 
+         message: 'Product updated successfully', 
+         product: updatedProduct
+      })
 
    } catch (error) {
-      console.log(error)
-      res.redirect("/pageerror")
+      console.error('Comprehensive Error in editProduct:', {
+         name: error.name,
+         message: error.message,
+         stack: error.stack
+      })
+      
+      // Detailed JSON error response
+      return res.status(500).json({
+         status: false, 
+         message: error.message || 'Internal server error', 
+         errorDetails: {
+            name: error.name,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+         }
+      })
    }
 }
 
 const deleteSingleImage = async (req,res) =>{
    try {
-      const {imageNameToServer,productIdToServer} = req.body
-      console.log(imageNameToServer, productIdToServer)
-      const product = await Product.findByIdAndUpdate(productIdToServer,{$pull:{productImage:imageNameToServer}})
-      const imagePath = path.join("public","uploads","re-image",imageNameToServer)
-      if(fs.existsSync(imagePath)){
-         await fs.unlinkSync(imagePath)
-         console.log(`image ${imageNameToServer} deleted successfully`)
-      }else{
-         console.log(`image ${imageNameToServer} not found`)
+      const {imageNameToServer, productIdToServer} = req.body
+      console.log('Attempting to delete image:', imageNameToServer, 'for product:', productIdToServer)
+
+      // Find the existing product
+      const product = await Product.findById(productIdToServer)
+      if (!product) {
+         return res.status(404).send({status: false, message: 'Product not found'})
       }
 
-      res.send({status:true})
+      console.log('Current product images before deletion:', product.productImages)
+
+      // Remove the image from the product's images array
+      const imageRemoved = await Product.findByIdAndUpdate(
+         productIdToServer, 
+         { $pull: { productImages: imageNameToServer } }, 
+         { new: true }
+      )
+
+      if (!imageRemoved) {
+         console.error('Failed to remove image from product')
+         return res.status(400).send({status: false, message: 'Failed to remove image from product'})
+      }
+
+      console.log('Product images after deletion:', imageRemoved.productImages)
+
+      // Delete the image file from the server
+      // Try multiple potential paths
+      const imagePaths = [
+         path.join("public", "uploads", "re-image", imageNameToServer),
+         path.join("public", "uploads", "products", imageNameToServer),
+         path.join("uploads", "re-image", imageNameToServer),
+         path.join("uploads", "products", imageNameToServer)
+      ]
+
+      let imageDeleted = false
+      for (const imagePath of imagePaths) {
+         try {
+            if (fs.existsSync(imagePath)) {
+               fs.unlinkSync(imagePath)
+               console.log(`Image ${imageNameToServer} deleted from ${imagePath}`)
+               imageDeleted = true
+               break
+            }
+         } catch (fileError) {
+            console.error(`Error deleting image from ${imagePath}:`, fileError)
+         }
+      }
+
+      if (!imageDeleted) {
+         console.log(`Image file ${imageNameToServer} not found in any of the checked paths`)
+      }
+
+      res.send({
+         status: true, 
+         message: 'Image deleted successfully',
+         remainingImages: imageRemoved.productImages || []
+      })
    } catch (error) {
-      console.log(error)
-      res.redirect("/pageerror")
+      console.error('Comprehensive error in deleteSingleImage:', error)
+      console.error('Error details:', {
+         name: error.name,
+         message: error.message,
+         stack: error.stack
+      })
+      res.status(500).send({
+         status: false, 
+         message: 'Internal server error', 
+         errorDetails: error.message
+      })
    }
 }
+
+const deleteProduct = async (req, res) => {
+   try {
+      const productId = req.params.id;
+
+      // Find the product first to check if it exists
+      const product = await Product.findById(productId);
+      
+      if (!product) {
+         return res.status(404).json({
+            status: false,
+            message: 'Product not found'
+         });
+      }
+
+      // Delete product images from file system if they exist
+      if (product.productImages && product.productImages.length > 0) {
+         const fs = require('fs');
+         const path = require('path');
+         
+         product.productImages.forEach(imageName => {
+            const imagePath = path.join(__dirname, '../../public/uploads/products', imageName);
+            
+            // Check if file exists before attempting to delete
+            if (fs.existsSync(imagePath)) {
+               try {
+                  fs.unlinkSync(imagePath);
+                  console.log(`Deleted image: ${imageName}`);
+               } catch (error) {
+                  console.error(`Error deleting image ${imageName}:`, error);
+               }
+            }
+         });
+      }
+
+      // Delete the product from the database
+      await Product.findByIdAndDelete(productId);
+
+      // Return success response
+      return res.status(200).json({
+         status: true,
+         message: 'Product deleted successfully'
+      });
+
+   } catch (error) {
+      console.error('Error deleting product:', {
+         name: error.name,
+         message: error.message,
+         stack: error.stack
+      });
+
+      return res.status(500).json({
+         status: false,
+         message: error.message || 'Internal server error',
+         errorDetails: process.env.NODE_ENV === 'development' ? { 
+            name: error.name, 
+            stack: error.stack 
+         } : undefined
+      });
+   }
+};
 
 module.exports = {
    getProductAddPage,
@@ -244,5 +462,6 @@ module.exports = {
    toggleProductList,
    getEditProduct,
    editProduct,
-   deleteSingleImage
+   deleteSingleImage,
+   deleteProduct
 }                                             
