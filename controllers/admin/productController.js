@@ -179,144 +179,129 @@ const editProduct = async (req, res) => {
       const data = req.body
       const files = req.files
 
-      console.log('Edit Product Request:', {
-         productId: id,
-         body: JSON.stringify(data),
-         files: files ? files.map(f => ({
-            fieldname: f.fieldname,
-            filename: f.filename, 
-            originalname: f.originalname,
-            mimetype: f.mimetype,
-            size: f.size
-         })) : 'No files',
-         fileCount: files ? files.length : 0
-      })
+      // Parse deleted images
+      let deletedImages = [];
+      if (data.deletedImages) {
+         try {
+            deletedImages = JSON.parse(data.deletedImages);
+         } catch (parseError) {
+            console.error('Error parsing deleted images:', parseError);
+         }
+      }
 
       // Validate required fields
       if (!data.productName || !data.category) {
-         return res.status(400).json({
-            status: false, 
-            message: 'Product Name and Category are required'
-         })
+         return res.status(400).render('edit-product', {
+            message: 'Product Name and Category are required',
+            product: await Product.findById(id),
+            cat: await Category.find({})
+         });
       }
 
       // Find the existing product
-      const existingProduct = await Product.findById(id)
-      if(!existingProduct){
-         return res.status(404).json({status:false, message:"Product not found"})
+      const existingProduct = await Product.findById(id);
+      if (!existingProduct) {
+         return res.status(404).render('edit-product', {
+            message: 'Product not found',
+            product: null,
+            cat: await Category.find({})
+         });
       }
 
-      // Prepare update fields
-      const updateFields = {
-         productName: data.productName,
-         description: data.description || existingProduct.description,
-         category: data.category,
-         regularPrice: data.regularPrice || existingProduct.regularPrice,
-         salePrice: data.salePrice || existingProduct.salePrice,
-         quantity: data.quantity || existingProduct.quantity,
-      }
+      // Remove deleted images from existing product images
+      const remainingImages = existingProduct.productImages.filter(
+         image => !deletedImages.includes(image)
+      );
 
-      // Handle image uploads
-      if(files && files.length > 0){
-         // Validate file types and sizes
-         const validImageTypes = ['image/jpeg', 'image/png', 'image/gif']
-         const maxFileSize = 5 * 1024 * 1024 // 5MB
+      // Process new uploaded images
+      const newImages = [];
+      if (files && files.length > 0) {
+         for (let i = 0; i < files.length; i++) {
+            const originalImagePath = files[i].path;
+            const resizedImagePath = path.join("public", "uploads", "product-images", files[i].filename);
 
-         const validFiles = files.filter(file => {
-            const isValidType = validImageTypes.includes(file.mimetype)
-            const isValidSize = file.size <= maxFileSize
-            
-            if (!isValidType) {
-               console.warn(`Invalid file type: ${file.originalname}`)
-            }
-            if (!isValidSize) {
-               console.warn(`File too large: ${file.originalname}`)
-            }
-            
-            return isValidType && isValidSize
-         })
+            // Resize image
+            await sharp(originalImagePath)
+               .resize({ width: 440, height: 440 })
+               .toFile(resizedImagePath);
 
-         console.log('Image Validation:', {
-            totalFiles: files.length,
-            validFiles: validFiles.length,
-            validFileNames: validFiles.map(f => f.filename)
-         })
-
-         if (validFiles.length > 0) {
-            // Generate image names
-            const images = validFiles.map(file => file.filename)
-            
-            // Directly set or push images
-            if (!existingProduct.productImages || existingProduct.productImages.length === 0) {
-               updateFields.productImages = images;
-            } else {
-               // Ensure we don't exceed a reasonable number of images (e.g., 10)
-               const totalImages = existingProduct.productImages.length + images.length;
-               const maxAllowedImages = 10;
-               
-               if (totalImages > maxAllowedImages) {
-                  return res.status(400).json({
-                     status: false, 
-                     message: `Maximum ${maxAllowedImages} images allowed per product`
-                  })
-               }
-
-               // Push new images
-               updateFields.$push = { 
-                  productImages: { 
-                     $each: images,
-                     // Optional: limit total images if needed
-                     $slice: -maxAllowedImages 
-                  } 
-               }
-            }
-         } else {
-            return res.status(400).json({
-               status: false, 
-               message: 'No valid images uploaded. Check file types and sizes.'
-            })
+            newImages.push(files[i].filename);
          }
       }
-      
-      // Update the product
-      const updatedProduct = await Product.findByIdAndUpdate(
-         id, 
-         updateFields, 
-         { 
-            new: true,  // Return the updated document
-            runValidators: true  // Run model validations
-         }
-      )
-      
-      console.log('Product Update Result:', {
-         productId: updatedProduct._id,
-         totalImages: updatedProduct.productImages ? updatedProduct.productImages.length : 0,
-         newImages: updateFields.$push ? updateFields.$push.productImages.$each : (updateFields.productImages || 'No new images')
-      })
 
-      // Always return JSON for AJAX requests
-      return res.status(200).json({
-         status: true, 
-         message: 'Product updated successfully', 
-         product: updatedProduct
-      })
+      // Process cropped images from hidden inputs
+      const croppedImages = [];
+      for (let i = 1; i <= 3; i++) {
+         const croppedImageKey = `croppedImage${i}`;
+         if (data[croppedImageKey]) {
+            // Convert base64 to file
+            const base64Data = data[croppedImageKey].replace(/^data:image\/\w+;base64,/, '');
+            const buffer = Buffer.from(base64Data, 'base64');
+            const filename = `cropped-${Date.now()}-${i}.jpg`;
+            const filepath = path.join("public", "uploads", "product-images", filename);
+
+            // Save cropped image
+            await fs.promises.writeFile(filepath, buffer);
+            croppedImages.push(filename);
+         }
+      }
+
+      // Combine remaining and new images
+      const updatedImages = [...remainingImages, ...newImages, ...croppedImages];
+
+      // Validate total image count
+      if (updatedImages.length < 3 || updatedImages.length > 4) {
+         return res.status(400).render('edit-product', {
+            message: 'You must have between 3 and 4 images',
+            product: existingProduct,
+            cat: await Category.find({})
+         });
+      }
+
+      // Find category
+      const categoryId = await Category.findOne({ name: data.category });
+      if (!categoryId) {
+         return res.status(400).render('edit-product', {
+            message: 'Category not found',
+            product: existingProduct,
+            cat: await Category.find({})
+         });
+      }
+
+      // Update product details
+      existingProduct.productName = data.productName;
+      existingProduct.description = data.description;
+      existingProduct.category = categoryId._id;
+      existingProduct.regularPrice = data.regularPrice;
+      existingProduct.salePrice = data.salePrice;
+      existingProduct.quantity = data.quantity;
+      existingProduct.size = data.size;
+      existingProduct.isListed = data.isListed === 'true';
+      existingProduct.productImages = updatedImages;
+
+      // Save updated product
+      await existingProduct.save();
+
+      // Remove deleted image files
+      for (const imageName of deletedImages) {
+         try {
+            const imagePath = path.join("public", "uploads", "product-images", imageName);
+            await fs.promises.unlink(imagePath);
+         } catch (unlinkError) {
+            console.error(`Error deleting image ${imageName}:`, unlinkError);
+         }
+      }
+
+      // Redirect to products page
+      return res.redirect('/admin/products');
 
    } catch (error) {
-      console.error('Comprehensive Error in editProduct:', {
-         name: error.name,
-         message: error.message,
-         stack: error.stack
-      })
-      
-      // Detailed JSON error response
-      return res.status(500).json({
-         status: false, 
-         message: error.message || 'Internal server error', 
-         errorDetails: {
-            name: error.name,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-         }
-      })
+      console.error("Error editing product:", error);
+      return res.status(500).render('edit-product', {
+         message: 'An error occurred while updating the product',
+         product: null,
+         cat: await Category.find({})
+      });
    }
 }
 
