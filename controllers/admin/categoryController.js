@@ -22,7 +22,7 @@ const categoryInfo = async (req,res) =>{
 }
 const addCategory = async (req,res) =>{
    const {name,description} =req.body
-   console.log("req.body ", req.body)
+   
    try {
       const existingCategory = await Category.findOne({name})
       if(existingCategory){
@@ -57,10 +57,9 @@ const toggleCategory = async(req,res) =>{
 const getEditCategory = async (req,res) =>{
    try {
       const id = req.query.id
-      console.log(id);
-      
+     
       const category = await Category.findById({_id:id});
-      console.log("category",category)
+     
       res.render("edit-category",{category})
    } catch (error) {
       res.redirect('/pageerror')
@@ -69,7 +68,7 @@ const getEditCategory = async (req,res) =>{
 
 const  editCategory= async(req,res) =>{
    try {
-      console.log("editcat")
+     
       const id = req.params.id
       const {categoryName,description} =req.body
       const existingCategory = await Category.findOne({name:categoryName})
@@ -90,7 +89,7 @@ const  editCategory= async(req,res) =>{
       }
 
    } catch (error) {
-      console.log('error editing')
+    
       throw error
       res.status(500).json({error:"internal server error"})
    }

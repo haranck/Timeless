@@ -19,10 +19,10 @@ const loadHompage = async (req, res) => {
       // productData = productData.slice(0,4)   // for only displaying 4 products
 
 
-      console.log(productData)
+     
       if (user) {
          const userData = await User.findById(user);
-         console.log(userData);
+         
          return res.render('home', { user: userData , products: productData });
       }else{
          return res.render('home',{products:productData})
@@ -208,7 +208,7 @@ const login = async (req, res) => {
       }
 
       const passwordMatch = await bcrypt.compare(password, findUser.password);
-      console.log('Password Match:', passwordMatch);
+      
 
       if (!passwordMatch) {
          return res.render('login', { message: 'Password does not match' });
@@ -278,6 +278,7 @@ const loadShoppingPage = async (req,res) =>{
 
    } catch (error) {
       // console.log("loadShoppingPage error", error);
+      throw error
       res.redirect('/pageNotFound')
 
       

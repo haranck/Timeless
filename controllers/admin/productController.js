@@ -22,12 +22,12 @@ const getProductAddPage = async(req,res) =>{
                                                                                 
 const addProducts = async(req,res) =>{
    try {
-      console.log("product adding")
+     
       const products =req.body
       const productExists = await product.findOne({
          productName:products.productsName
       })
-      console.log("body", req.body)
+    
       if(!productExists){
          const images = []
          if(req.files&& req.files.length>0){
@@ -40,10 +40,7 @@ const addProducts = async(req,res) =>{
               images.push(req.files[i].filename)
             }
           }
-         // else{
-         //    console.log("yes")
-         // }     
-         // console.log("images saved")
+      
          const categoryId = await Category.findOne({name:products.category})                                  
          if(!categoryId){
             return res.status(400).json({message:"Category not found"})
@@ -163,7 +160,7 @@ const getEditProduct = async(req,res)=>{
       const id =req.query.id
       const product = await Product.findOne({_id:id})
       const category = await Category.find({})
-      // console.log(product)
+      
       res.render("edit-product",{
          product:product,
          cat:category
@@ -176,7 +173,7 @@ const getEditProduct = async(req,res)=>{
 const editProduct = async (req, res) => {
    try {
       const id = req.params.id
-      console.log('Product ID:', id);
+   
       const data = req.body
       const files = req.files
 
@@ -309,15 +306,13 @@ const editProduct = async (req, res) => {
 const deleteSingleImage = async (req,res) =>{
    try {
       const {imageNameToServer, productIdToServer} = req.body
-      console.log('Attempting to delete image:', imageNameToServer, 'for product:', productIdToServer)
-
-      // Find the existing product
+     r
+      //Finding  exist cheytha product
       const product = await Product.findById(productIdToServer)
       if (!product) {
          return res.status(404).send({status: false, message: 'Product not found'})
       }
 
-      console.log('Current product images before deletion:', product.productImages)
 
       // Remove the image from the product's images array
       const imageRemoved = await Product.findByIdAndUpdate(
