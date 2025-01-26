@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timeless Aura - Dashboard</title>
+    <title>Timeless Aura - Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/css/admin/dashboard.css">
     <link rel="stylesheet" href="/css/admin/customers.css">
     <link rel="stylesheet" href="/css/admin/category.css">
 </head>
+
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
@@ -26,7 +28,7 @@
                 <i class="fas fa-box"></i>
                 Add Products
             </a>
-            
+
             <a href="#" class="nav-item" data-page="Orders">
                 <i class="fas fa-shopping-cart"></i>
                 Orders
@@ -51,7 +53,7 @@
                 <i class="fas fa-image"></i>
                 Banner Management
             </a>
-            <a href="#" class="nav-item" data-page="Categories">
+            <a href="/admin/category" class="nav-item" data-page="Categories">
                 <i class="fas fa-list"></i>
                 Categories
             </a>
@@ -60,15 +62,15 @@
 
     <!-- Header -->
     <header class="header">
-        <div class="brand">Timeless Aura</div>
+        <div class="brand">Timeless Aura </div>
         <div class="header-right">
             <div class="notification-icon">
                 <i class="fas fa-bell"></i>
                 <span class="notification-badge">5</span>
             </div>
             <div class="profile-dropdown">
-                <div class="profile-img">
-                    <i class="fas fa-user"></i>
+                <div class="profile-img" id="profile-toggle">
+                    Admin
                 </div>
                 <div class="dropdown-menu">
                     <a href="#" class="dropdown-item">
@@ -81,5 +83,26 @@
                     </a>
                 </div>
             </div>
+
+
+
         </div>
     </header>
+    <script>
+        const profileToggle = document.getElementById('profile-toggle');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+
+        // Toggle dropdown visibility on click
+        profileToggle.addEventListener('click', function (e) {
+            e.stopPropagation(); // Prevent the click from bubbling up
+            dropdownMenu.classList.toggle('show');
+        });
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function () {
+            if (dropdownMenu.classList.contains('show')) {
+                dropdownMenu.classList.remove('show');
+            }
+        });
+
+    </script>

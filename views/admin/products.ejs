@@ -174,8 +174,7 @@
             </thead>
             <tbody>
                 <% data.forEach(function(product) { %>   
-                    <!-- for(let i= 0;i<data.length;i++{ -->
-                <tr>
+                <tr data-product-id="<%= product._id %>">
                     <td><%= product.productName %></td>
                     <td><%= product.category.name %></td>
                     <td>₹<%= product.salePrice %></td>
@@ -227,33 +226,85 @@ document.addEventListener('DOMContentLoaded', function() {
             const statusLabel = this.nextElementSibling;
             const isListed = this.checked;
 
-            fetch(`/admin/toggle-list/${productId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ isListed })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.isListed) {
-                    statusLabel.textContent = 'Listed';
-                    statusLabel.classList.remove('text-danger');
-                    statusLabel.classList.add('text-success');
+            // Show confirmation dialog
+            Swal.fire({
+                title: 'Confirm Status Change',
+                text: `Are you sure you want to ${isListed ? 'list' : 'unlist'} this product?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, change it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Proceed with status change
+                    fetch(`/admin/toggle-list/${productId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ isListed })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update status label and styling
+                            if (data.isListed) {
+                                statusLabel.textContent = 'Listed';
+                                statusLabel.classList.remove('text-danger');
+                                statusLabel.classList.add('text-success');
+                            } else {
+                                statusLabel.textContent = 'Unlisted';
+                                statusLabel.classList.remove('text-success');
+                                statusLabel.classList.add('text-danger');
+                            }
+
+                            // Show success toast
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Product Status Updated',
+                                text: data.message,
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        } else {
+                            // Revert toggle if API call fails
+                            this.checked = !isListed;
+                            
+                            // Show error message
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message || 'Failed to update product status'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        
+                        // Revert toggle
+                        this.checked = !isListed;
+                        
+                        // Show network error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Network Error',
+                            text: 'Unable to update product status'
+                        });
+                    });
                 } else {
-                    statusLabel.textContent = 'Unlisted';
-                    statusLabel.classList.remove('text-success');
-                    statusLabel.classList.add('text-danger');
+                    // Revert toggle if user cancels
+                    this.checked = !isListed;
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Revert the toggle if there's an error
-                this.checked = !this.checked;
             });
         });
     });
 });
 </script>
+
+<!-- Ensure SweetAlert2 is included -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <%- include("../../views/partials/admin/footer") %>

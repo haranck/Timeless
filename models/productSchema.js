@@ -36,7 +36,7 @@ const productSchema = new Schema({
       type: Date,
       default: Date.now,
    },
-   isBlocked: {
+   isListed: {
       type: Boolean,
       default: false,
    },

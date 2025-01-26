@@ -5,7 +5,7 @@ const userAuth = (req,res,next) =>{
    if(req.session.user){
       User.findById(req.session.user)
       .then(data =>{
-         if(data && !isblocked){
+         if(data && !data.isblocked){
             next()
          }else{
             res.redirect('/login')
@@ -18,6 +18,24 @@ const userAuth = (req,res,next) =>{
       })
    }else{
       res.redirect('/login')
+   }
+}
+
+const isBlocked = async (req,res,next)=>{
+   try {
+      if(!req.session.user)return next()
+      else{
+         const user =await User.findById(req.session.user)
+         if(user.isblocked){
+            console.log("redirecting")
+            req.session.user = null;
+            return res.redirect('/login')
+         }
+         next()
+      }
+   } catch (error) {
+      console.log(error);
+      res.redirect('/pageerror')
    }
 }
 
@@ -38,5 +56,6 @@ const adminAuth = (req, res, next) => {
 
 module.exports ={
    userAuth,
-   adminAuth
+   adminAuth,
+   isBlocked
 }

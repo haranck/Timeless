@@ -1,4 +1,6 @@
 const User = require('../../models/userSchema')
+const Category = require('../../models/categorySchema')
+const Product = require('../../models/productSchema')
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const env = require('dotenv').config()
@@ -6,13 +8,26 @@ const env = require('dotenv').config()
 const loadHompage = async (req, res) => {
    try {
       const user = req.session.user;
-      
-      if(user){
+      const categories = await Category.find({isListed:true})   /////////////////
+      let productData = await Product.find({
+         isListed:true,
+         category:{$in:categories.map(category=>category._id)},quantity:{$gt:0}
+      })
+      .sort({createdOn:-1}).limit(8)
+
+      // productData.sort((a,b) => new Date(b.createdOn)-new Date(a.createdOn))  //new arrivals decendint ayit latest addythe items  
+      // productData = productData.slice(0,4)   // for only displaying 4 products
+
+
+      console.log(productData)
+      if (user) {
          const userData = await User.findById(user);
          console.log(userData);
-         return res.render('home', {user:userData});
+         return res.render('home', { user: userData , products: productData });
+      }else{
+         return res.render('home',{products:productData})
       }
-      return res.render('home', {user:null});
+      return res.render('home', { user: null });
    } catch (error) {
       console.log('error loading home page');
       res.status(500).send('Internal server error');
@@ -108,7 +123,7 @@ const verifyOtp = async (req, res) => {
          });
 
          await saveUserData.save();
-         req.session.user = saveUserData._id;
+         // req.session.user = saveUserData._id;
 
          // Clear OTP session data after successful verification
          delete req.session.userOtp;
@@ -117,7 +132,7 @@ const verifyOtp = async (req, res) => {
          return res.json({
             success: true,
             message: "Email verified successfully!",
-            redirectUrl: "/"
+            redirectUrl: "/login"
          });
       } else {
          return res.status(400).json({
@@ -207,18 +222,65 @@ const login = async (req, res) => {
    }
 }
 
-const logout = async(req,res) =>{
+const logout = async (req, res) => {
    try {
-      req.session.destroy((err)=>{
-         if(err){
-            console.log('session destruction error',err);
+      req.session.destroy((err) => {
+         if (err) {
+            console.log('session destruction error', err);
             return res.redirect('/')
          }
          return res.redirect('/login')
       })
    } catch (error) {
-      console.log("logout error",error);
+      console.log("logout error", error);
       res.redirect('/pageNotFound')
+   }
+}
+const loadShoppingPage = async (req,res) =>{
+   try {
+      
+      const user = req.session.user;
+      const categories = await Category.find({isListed:true})   /////////////////
+      const userData = await User.findOne({ _id: user });
+      const categoryIds = categories.map(category => category._id.toString());
+      const page = parseInt(req.query.page) || 1;
+      const limit = 9
+      const skip = (page-1) * limit;
+      const products = await Product.find({
+         isListed:true,
+         category:{$in:categoryIds},
+         quantity:{$gt:0}
+      }).sort({createdAt:-1}).skip(skip).limit(limit)
+
+      const totalProducts = await Product.countDocuments({
+         isListed:true,
+         category:{$in:categoryIds},
+         quantity:{$gt:0}
+      })
+      const totalPages = Math.ceil(totalProducts / limit);
+       const categoriesWithIds = categories.map(category => ({
+         _id: category._id.toString(),
+         name: category.name,
+         description: category.description,
+       
+       }));
+
+       res.render('shop',{
+         user:userData,
+         products:products,
+         categories:categoriesWithIds,
+         totalProducts:totalProducts,
+         currentPage:page,
+         totalPages:totalPages
+       })
+
+
+
+   } catch (error) {
+      // console.log("loadShoppingPage error", error);
+      res.redirect('/pageNotFound')
+
+      
    }
 }
 
@@ -230,5 +292,6 @@ module.exports = {
    resendOtp,
    loadLogin,
    login,
-   logout
+   logout,
+   loadShoppingPage
 }

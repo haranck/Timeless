@@ -38,7 +38,7 @@ passport.serializeUser((user,done)=>{  // serialize cheyunnath  user details ses
 passport.deserializeUser((id,done)=>{  // deserialize cheyunnath sessionilek assign cheyyan user details allel sessionil ninn edukkan
    User.findById(id)
    .then(user=>{
-      done(null,user)
+      done(null,id)
    })
    .catch(err=>{
       done(err,null)

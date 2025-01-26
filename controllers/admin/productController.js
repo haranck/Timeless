@@ -25,7 +25,7 @@ const addProducts = async(req,res) =>{
       console.log("product adding")
       const products =req.body
       const productExists = await product.findOne({
-         productName:products.produtsName
+         productName:products.productsName
       })
       console.log("body", req.body)
       if(!productExists){
@@ -176,6 +176,7 @@ const getEditProduct = async(req,res)=>{
 const editProduct = async (req, res) => {
    try {
       const id = req.params.id
+      console.log('Product ID:', id);
       const data = req.body
       const files = req.files
 

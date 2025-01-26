@@ -67,7 +67,7 @@ const getEditCategory = async (req,res) =>{
    }
 }
 
-const editCategory= async(req,res) =>{
+const  editCategory= async(req,res) =>{
    try {
       console.log("editcat")
       const id = req.params.id
@@ -91,6 +91,7 @@ const editCategory= async(req,res) =>{
 
    } catch (error) {
       console.log('error editing')
+      throw error
       res.status(500).json({error:"internal server error"})
    }
 }

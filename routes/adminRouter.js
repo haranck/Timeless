@@ -39,7 +39,7 @@ const uploads = multer({
 
 router.get('/login',adminController.loadLogin)
 router.post('/login',adminController.login)
-router.get('/',adminAuth,adminController.loadDashboard)                    /////
+router.get('/',adminAuth,adminController.loadDashboard)            /////
 router.get('/logout',adminController.logout)
 router.get('/customers',adminAuth,customerController.customerInfo)
 
