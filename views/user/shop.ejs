@@ -28,8 +28,12 @@
                                                 <ul class="nice-scroll">
                                                     <% if (category && category.length > 0) { %>
                                                         <% for (let i = 0; i < category.length; i++) { %>
-                                                            <li><a href="/filter?category=<%- category[i]._id %>"><%= category[i].name %></a></li>
-
+                                                            <li><a href="/filter?category=<%= category[i]._id %>"><%= category[i].name %></a></li>
+                                                        <% } %>
+                                                    <% } else { %>
+                                                        <li>No categories available</li>
+                                                    <% } %>
+                                                    
                                                 </ul>
                                             </div>
                                             
@@ -671,12 +675,6 @@
                 window.location.href = `/shop?${queryParams.toString()}`;
             });
 
-            // Initial price range update
-            updatePriceRange();
-        });
-    </script>
-
-    <%- include("../../views/partials/user/footer") %>
             // Initial price range update
             updatePriceRange();
         });
