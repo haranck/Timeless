@@ -300,9 +300,11 @@
                 <% for (let i = 0; i < relatedProducts.length; i++) { %>
                     <div class="col-lg-3 col-md-4 col-sm-6"> <!-- 4 items per row on large screens, 3 items on medium, 2 items on small -->
                         <div class="product__item">
+                            <a href="/productDetails?id=<%= relatedProducts[i]._id %>">
                             <div class="product__item__pic set-bg" data-setbg="uploads/product-images/<%= relatedProducts[i].productImages[0] %>">
                                 <span class="label">New</span>
                             </div>
+                            </a>
                             <div class="product__item__text">
                                 <h6><%= relatedProducts[i].productName %></h6>
                                 <a href="/product-details?id=<%= relatedProducts[i]._id %>" class="add-cart">+ Add To Cart</a>

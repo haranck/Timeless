@@ -6,7 +6,8 @@ const env = require('dotenv').config()
 const db = require('./config/db');
 const nocache = require('nocache')
 db()
-const bodyParser = require('body-parser');
+
+
 // const csrf = require('csurf');
 const userRouter = require('./routes/userRouter');
 const passport = require("./config/passport");
@@ -18,11 +19,11 @@ app.use(session({
       secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: true,
-      cookie: { 
+      cookie: {
             secure: false,
             maxAge: 1000 * 60 * 60 * 24 * 7,
             httpOnly: true
-       }
+      }
 }))
 app.use(nocache())
 app.use(passport.initialize());
@@ -32,15 +33,16 @@ app.set("view engine", "ejs");
 app.set("views", [
       path.join(__dirname, "views/user"),
       path.join(__dirname, "views/admin"),
-  ]);
-app.use(express.static(path.join(__dirname, "public"))); 
+]);
+app.use(express.static(path.join(__dirname, "public")));
 
 
-app.use('/',userRouter) 
-app.use('/admin',adminRouter)
 
-app.use("/error", (req,res, next) => {
-    throw new Error("Intentional error triggered on /error route");
+app.use('/admin', adminRouter)
+app.use('/', userRouter)
+
+app.use("/error", (req, res, next) => {
+      throw new Error("Intentional error triggered on /error route");
 })
 
 
@@ -60,7 +62,7 @@ app.use((err, req, res, next) => {
 });
 app.listen(process.env.PORT, () => {
       console.log('Server is running on port 3000')
+      
 })
 
 
-module.exports = app; 

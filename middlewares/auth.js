@@ -27,7 +27,6 @@ const isBlocked = async (req,res,next)=>{
       else{
          const user =await User.findById(req.session.user)
          if(user.isblocked){
-            console.log("redirecting")
             req.session.user = null;
             return res.redirect('/login')
          }

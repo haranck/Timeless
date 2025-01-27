@@ -3,43 +3,43 @@ const mongoose = require('mongoose')
 const bcrypt = require("bcrypt")
 
 
-const loadLogin = (req,res) =>{
-   if(req.session.admin){
+const loadLogin = (req, res) => {
+   if (req.session.admin) {
       return res.redirect('/admin/')
    }
    res.render('admin-login')
 }
 
-const login = async (req,res) =>{
+const login = async (req, res) => {
    try {
-      const {email,password} = req.body
-      const admin = await User.findOne({email,isAdmin:true})
+      const { email, password } = req.body
+      const admin = await User.findOne({ email, isAdmin: true })
 
-      if(admin){
+      if (admin) {
 
-         const passwordMatch = bcrypt.compare(password,admin.password)
-         if(passwordMatch){
+         const passwordMatch = bcrypt.compare(password, admin.password)
+         if (passwordMatch) {
             req.session.admin = true
             return res.redirect('/admin')
-           
-         }else{
+
+         } else {
             return res.redirect('/admin/login')
          }
-        
 
-      }else{
+
+      } else {
          return res.redirect('/admin/login')
       }
    } catch (error) {
-     
 
-      console.log("login error",error);
+
+      console.log("login error", error);
       return res.redirect('/admin/login')
-    
+
    }
 }
 
-const loadDashboard = async (req,res) =>{
+const loadDashboard = async (req, res) => {
    // if(req.session.admin){
    //    try {
    //       res.render('dashboard')
@@ -47,31 +47,31 @@ const loadDashboard = async (req,res) =>{
    //       res.render('/pageerror')
    //    }
    // }
-   try{
-      if(req.session.admin){
+   try {
+      if (req.session.admin) {
          return res.render('dashboard')
       }
       return res.redirect('/admin/login')
-   }catch(err){
+   } catch (err) {
       console.log(err)
    }
 }
-const logout = async (req,res) =>{
+const logout = async (req, res) => {
    try {
-      req.session.destroy(err =>{
-         if(err){
-            console.log("Error destroying session",err);
+      req.session.destroy(err => {
+         if (err) {
+            console.log("Error destroying session", err);
             return res.redirect("/pageerror")
          }
          res.redirect("/admin/login")
       })
    } catch (error) {
-      console.log("unexpected error during logout ",error)
+      console.log("unexpected error during logout ", error)
       res.redirect('/pageerror')
    }
 }
 
-module.exports ={ 
+module.exports = {
    loadLogin,
    login,
    loadDashboard,

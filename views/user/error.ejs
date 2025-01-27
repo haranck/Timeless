@@ -9,98 +9,84 @@
 
 </head>
 <style>
-    #oopss {
-        background: #ffffff;
-        position: fixed;
-        left: 0px;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        line-height: 1.5em;
-        z-index: 9999;
-    }
-
-    #oopss #error-text {
-        font-size: 40px;
+    .error-container {
         display: flex;
-        flex-direction: column;
+        justify-content: center;
         align-items: center;
-        font-family: 'Shabnam', Tahoma, sans-serif;
-        color: #000;
-        direction: rtl;
+        min-height: 80vh;
+        background-color: #f8f9fa;
+        padding: 2rem;
     }
-
-    #oopss #error-text img {
-        margin: 85px auto 20px;
-        height: 342px;
+    .error-wrapper {
+        text-align: center;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        padding: 3rem;
+        max-width: 600px;
+        width: 100%;
     }
-
-    #oopss #error-text span {
-        position: relative;
-        font-size: 3.3em;
-        font-weight: 900;
-        margin-bottom: 50px;
+    .error-icon {
+        font-size: 6rem;
+        color: #dc3545;
+        margin-bottom: 1.5rem;
     }
-
-    #oopss #error-text p.p-a {
-        font-size: 19px;
-        margin: 30px 0 15px 0;
+    .error-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 1rem;
     }
-
-    #oopss #error-text p.p-b {
-        font-size: 15px;
+    .error-message {
+        font-size: 1.1rem;
+        color: #666;
+        margin-bottom: 2rem;
+        line-height: 1.6;
     }
-
-    #oopss #error-text .back {
-        background: #fff;
-        color: #000;
-        font-size: 30px;
+    .back-to-page-btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #000;
+        color: #fff;
         text-decoration: none;
-        margin: 2em auto 0;
-        padding: .7em 2em;
-        border-radius: 500px;
-        box-shadow: 0 20px 70px 4px rgba(0, 0, 0, 0.1), inset 7px 33px 0 0px #555;
-        font-weight: 900;
-        transition: all 300ms ease;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid #000;
     }
-
-    #oopss #error-text .back:hover {
-        -webkit-transform: translateY(-13px);
-        transform: translateY(-13px);
-        box-shadow: 0 35px 90px 4px rgba(0, 0, 0, 0.3), inset 0px 0 0 3px #000;
+    .back-to-page-btn:hover {
+        background-color: #333;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
-
-    @font-face {
-        font-family: Shabnam;
-        src: url("https://cdn.rawgit.com/ahmedhosna95/upload/ba6564f8/fonts/Shabnam/Shabnam-Bold.eot");
-        src: url("https://cdn.rawgit.com/ahmedhosna95/upload/ba6564f8/fonts/Shabnam/Shabnam-Bold.eot?#iefix") format("embedded-opentype"), url("https://cdn.rawgit.com/ahmedhosna95/upload/ba6564f8/fonts/Shabnam/Shabnam-Bold.woff") format("woff"), url("https://cdn.rawgit.com/ahmedhosna95/upload/ba6564f8/fonts/Shabnam/Shabnam-Bold.woff2") format("woff2"), url("https://cdn.rawgit.com/ahmedhosna95/upload/ba6564f8/fonts/Shabnam/Shabnam-Bold.ttf") format("truetype");
-        font-weight: bold;
-    }
-
-    @font-face {
-        font-family: Shabnam;
-        src: url("https://cdn.rawgit.com/ahmedhosna95/upload/ba6564f8/fonts/Shabnam/Shabnam.eot");
-        src: url("https://cdn.rawgit.com/ahmedhosna95/upload/ba6564f8/fonts/Shabnam/Shabnam.eot?#iefix") format("embedded-opentype"), url("https://cdn.rawgit.com/ahmedhosna95/upload/ba6564f8/fonts/Shabnam/Shabnam.woff") format("woff"), url("https://cdn.rawgit.com/ahmedhosna95/upload/ba6564f8/fonts/Shabnam/Shabnam.woff2") format("woff2"), url("https://cdn.rawgit.com/ahmedhosna95/upload/ba6564f8/fonts/Shabnam/Shabnam.ttf") format("truetype");
-        font-weight: normal;
+    .back-to-page-btn i {
+        margin-right: 8px;
     }
 </style>
 
 <body>
 
-    <div id='oopss'>
-        <div id='error-text'>
-            <img src="https://cdn.rawgit.com/ahmedhosna95/upload/1731955f/sad404.svg" alt="404">
-            <span>404 PAGE</span>
-            <p class="p-a">
-                <%= message %></p>
-            <p class="p-b">
-                ... Back to previous page
+    <%- include("../../views/partials/user/header") %>
+
+    <div class="error-container">
+        <div class="error-wrapper">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h1 class="error-title">
+                <%= message ? 'Error' : 'Oops! Something Went Wrong' %>
+            </h1>
+            <p class="error-message">
+                <%= message || 'We apologize, but an unexpected error occurred. Please try again later or contact support.' %>
             </p>
-            <a href='#' class="back">... Back to previous page</a>
+            <a href="/" class="back-to-page-btn">
+                <i class="fas fa-home"></i>
+                Back to Home
+            </a>
         </div>
     </div>
 
-
+    <%- include("../../views/partials/user/footer") %>
 
 </body>
 

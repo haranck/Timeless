@@ -122,40 +122,52 @@
             <div class="row product__filter">
                 <% for (let i=0; i < products.length; i++) { %>
                     <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                        <div class="product__cart__wrap mb-30">
-                            <div class="product__img__action__wrap">
-                                <div class="product__img product__img--zoom">
-                                    <a href="/productDetails?id=<%=products[i]._id %>">
-                                        <img class="default-img"
-                                            src="/uploads/product-images/<%= products[i].productImages[0] %>"
-                                            alt="<%= products[i].productName %>"
-                                            style="border-radius: 10px">
+                        <div class="product-card">
+                            <div class="product-card__image">
+                                <a href="/productDetails?id=<%= products[i]._id %>">
+                                    <img src="/uploads/product-images/<%= products[i].productImages[0] %>" 
+                                         alt="<%= products[i].productName %>"
+                                         class="img-fluid">
+                                </a>
+                                <div class="product-card__actions">
+                                    <a href="/addToWishlist?id=<%= products[i]._id %>" 
+                                       class="product-card__wishlist-btn"
+                                       title="Add to Wishlist">
+                                        <i class="fa-regular fa-heart"></i>
                                     </a>
                                 </div>
-                                <div class="product-action-1">
-                                    <a aria-label="Add to Wishlist" class="action-btn hover-up"
-                                        href="/addToWishlist?id=<%products[i]._id %>"> Add to Wishlist</a>
-                                </div>
                             </div>
-                            <div class="product-content-wrap">
-                                <h6>
+                            <div class="product-card__details">
+                                <h6 class="product-card__title">
                                     <%= products[i].productName %>
                                 </h6>
-                                <h5>
-                                    <%= products[i].salePrice %>
-                                </h5>
-                                <div class="rating">
-                                    <i class="fa fa-star"></i>
-                                    <i class="fa fa-star"></i>
-                                    <i class="fa fa-star"></i>
-                                    <i class="fa fa-star"></i>
-                                    <i class="fa fa-star"></i>
+                                <div class="product-card__pricing">
+                                    <span class="product-card__sale-price">
+                                        ₹<%= products[i].salePrice.toLocaleString('en-IN') %>
+                                    </span>
+                                    <span class="product-card__regular-price">
+                                        ₹<%= products[i].regularPrice.toLocaleString('en-IN') %>
+                                    </span>
                                 </div>
-                                <a href="/addToCart?id=<%= products[i]._id %>">Add to Cart</a>
+                                <div class="product-card__rating">
+                                    <% for(let j = 0; j < 5; j++) { %>
+                                        <i class="fa-solid fa-star <%= j < Math.round(products[i].rating || 0) ? 'active' : '' %>"></i>
+                                    <% } %>
+                                    <span class="product-card__rating-count">
+                                        (<%= products[i].rating || 0 %>/5)
+                                    </span>
+                                </div>
+                                <div class="product-card__cta">
+                                    <a href="/addToCart?id=<%= products[i]._id %>"
+                                       class="product-card__cart-btn">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                        Add to Cart
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <% } %>
+                <% } %>
             </div>
         </div>
     </section>
@@ -286,5 +298,117 @@
         </div>
     </section> -->
     <!-- Latest Blog Section End -->
+
+    <style>
+        /* Product Card Styles */
+        .product-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .product-card:hover {
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
+        }
+        .product-card__image {
+            position: relative;
+            overflow: hidden;
+        }
+        .product-card__image img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover .product-card__image img {
+            transform: scale(1.05);
+        }
+        .product-card__actions {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10;
+        }
+        .product-card__wishlist-btn {
+            background-color: rgba(255,255,255,0.9);
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .product-card__wishlist-btn:hover {
+            background-color: #000;
+            color: #fff;
+        }
+        .product-card__details {
+            padding: 15px;
+        }
+        .product-card__title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .product-card__pricing {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .product-card__sale-price {
+            font-weight: 700;
+            color: #000;
+            margin-right: 10px;
+        }
+        .product-card__regular-price {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 0.9em;
+        }
+        .product-card__rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .product-card__rating .fa-star {
+            color: #e0e0e0;
+            margin-right: 3px;
+        }
+        .product-card__rating .fa-star.active {
+            color: #FFD700;  /* Vibrant gold color */
+        }
+        .product-card__rating-count {
+            color: #888;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        .product-card__cta {
+            width: 100%;
+        }
+        .product-card__cart-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 10px;
+            background-color: #000;
+            color: #fff;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        .product-card__cart-btn i {
+            margin-right: 8px;
+        }
+        .product-card__cart-btn:hover {
+            background-color: #333;
+            transform: translateY(-2px);
+        }
+    </style>
 
     <%- include("../../views/partials/user/footer") %>

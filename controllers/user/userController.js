@@ -8,24 +8,24 @@ const env = require('dotenv').config()
 const loadHompage = async (req, res) => {
    try {
       const user = req.session.user;
-      const categories = await Category.find({isListed:true})   /////////////////
+      const categories = await Category.find({ isListed: true })   /////////////////
       let productData = await Product.find({
-         isListed:true,
-         category:{$in:categories.map(category=>category._id)},quantity:{$gt:0}
+         isListed: true,
+         category: { $in: categories.map(category => category._id) }, quantity: { $gt: 0 }
       })
-      .sort({createdOn:-1}).limit(8)
+         .sort({ createdOn: -1 }).limit(8)
 
       // productData.sort((a,b) => new Date(b.createdOn)-new Date(a.createdOn))  //new arrivals decendint ayit latest addythe items  
       // productData = productData.slice(0,4)   // for only displaying 4 products
 
 
-     
+
       if (user) {
          const userData = await User.findById(user);
-         
-         return res.render('home', { user: userData , products: productData });
-      }else{
-         return res.render('home',{products:productData})
+
+         return res.render('home', { user: userData, products: productData });
+      } else {
+         return res.render('home', { products: productData })
       }
       return res.render('home', { user: null });
    } catch (error) {
@@ -77,7 +77,7 @@ async function sendVerificationEmail(email, otp) {
 }
 
 const signup = async (req, res) => {
-   const { name, email, phone, password, cPassword } = req.body;
+   const { name, email, phone, password} = req.body;
 
    try {
       const existingUser = await User.findOne({ email: email });
@@ -97,7 +97,8 @@ const signup = async (req, res) => {
 
    } catch (error) {
       console.log("Error saving user:", error);
-      return res.status(404).send("Page not found");
+      throw new Error
+      
    }
 }
 
@@ -124,6 +125,7 @@ const verifyOtp = async (req, res) => {
 
          await saveUserData.save();
          // req.session.user = saveUserData._id;
+
 
          // Clear OTP session data after successful verification
          delete req.session.userOtp;
@@ -208,7 +210,7 @@ const login = async (req, res) => {
       }
 
       const passwordMatch = await bcrypt.compare(password, findUser.password);
-      
+
 
       if (!passwordMatch) {
          return res.render('login', { message: 'Password does not match' });
@@ -236,43 +238,43 @@ const logout = async (req, res) => {
       res.redirect('/pageNotFound')
    }
 }
-const loadShoppingPage = async (req,res) =>{
+const loadShoppingPage = async (req, res) => {
    try {
-      
+
       const user = req.session.user;
-      const categories = await Category.find({isListed:true})   /////////////////
+      const categories = await Category.find({ isListed: true })   /////////////////
       const userData = await User.findOne({ _id: user });
       const categoryIds = categories.map(category => category._id.toString());
       const page = parseInt(req.query.page) || 1;
       const limit = 9
-      const skip = (page-1) * limit;
+      const skip = (page - 1) * limit;
       const products = await Product.find({
-         isListed:true,
-         category:{$in:categoryIds},
-         quantity:{$gt:0}
-      }).sort({createdAt:-1}).skip(skip).limit(limit)
+         isListed: true,
+         category: { $in: categoryIds },
+         quantity: { $gt: 0 }
+      }).sort({ createdAt: 1 }).skip(skip).limit(limit)
 
       const totalProducts = await Product.countDocuments({
-         isListed:true,
-         category:{$in:categoryIds},
-         quantity:{$gt:0}
+         isListed: true,
+         category: { $in: categoryIds },
+         quantity: { $gt: 0 }
       })
       const totalPages = Math.ceil(totalProducts / limit);
-       const categoriesWithIds = categories.map(category => ({
+      const categoriesWithIds = categories.map(category => ({
          _id: category._id.toString(),
          name: category.name,
          description: category.description,
-       
-       }));
 
-       res.render('shop',{
-         user:userData,
-         products:products,
-         categories:categoriesWithIds,
-         totalProducts:totalProducts,
-         currentPage:page,
-         totalPages:totalPages
-       })
+      }));
+
+      res.render('shop', {
+         user: userData,
+         products: products,
+         categories: categoriesWithIds,
+         totalProducts: totalProducts,
+         currentPage: page,
+         totalPages: totalPages
+      })
 
 
 
@@ -281,7 +283,7 @@ const loadShoppingPage = async (req,res) =>{
       throw error
       res.redirect('/pageNotFound')
 
-      
+
    }
 }
 
