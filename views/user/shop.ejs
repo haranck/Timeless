@@ -9,100 +9,147 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-3">
-                    <div class="shop-filter-sidebar">
-                        <div class="shop-filter-sidebar__section">
-                            <h5 class="shop-filter-sidebar__title">
-                                <i class="fa-solid fa-filter"></i> Filters
-                            </h5>
+                    <div class="shop__sidebar">
+                        <div class="shop__sidebar__search">
+                            <form action="#">
+                                <input type="text" placeholder="Search...">
+                                <button type="submit"><span class="icon_search"></span></button>
+                            </form>
                         </div>
+                        <div class="shop__sidebar__accordion">
+                            <div class="accordion" id="accordionExample">
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
+                                    </div>
+                                    <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__categories">
+                                                <ul class="nice-scroll">
+                                                    <% if (category && category.length > 0) { %>
+                                                        <% for (let i = 0; i < category.length; i++) { %>
+                                                            <li><a href="/filter?category=<%- category[i]._id %>"><%= category[i].name %></a></li>
 
-                        
-                        <div class="shop-filter-sidebar__section">
-                            <div class="shop-filter-sidebar__search">
-                                <form action="/shop" method="GET">
-                                    <div class="input-group">
-                                        <input type="text" name="search" class="form-control"
-                                            placeholder="Search products..." value="<%= locals.searchQuery || '' %>">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-dark" type="submit">
-                                                <i class="fa-solid fa-magnifying-glass"></i>
-                                            </button>
+                                                </ul>
+                                            </div>
+                                            
                                         </div>
                                     </div>
-                                </form>
-                            </div>
-                        </div>
+                                </div>
+                                
 
-                        <!-- Categories Filter -->
-                        <div class="shop-filter-sidebar__section">
-                            <div class="shop-filter-sidebar__categories">
-                                <h6 class="filter-section-heading">Categories</h6>
-                                <div class="category-list">
-                                    <% 
-                                    // Debug logging for categories 
-                                    console.log('Categories:', categories);
-                                    
-                                    // Ensure categories is defined and is an array
-                                    const safeCategories = Array.isArray(categories) ? categories : []; 
-                                    %>
-                                    <% if (safeCategories.length > 0) { %>
-                                        <% safeCategories.forEach(function(category) { %>
-                                            <% 
-                                            // Ensure category has a name and ID
-                                            const categoryName = category.categoryName && category.categoryName.trim() 
-                                                ? category.categoryName 
-                                                : (category.name || 'Uncategorized');
-                                            const categoryId = category._id || category.id || 'unknown';
-                                            %>
-                                            <div class="category-item">
-                                                <input type="checkbox" 
-                                                       id="category-<%= categoryId %>" 
-                                                       name="categories" 
-                                                       value="<%= categoryId %>"
-                                                       class="category-checkbox">
-                                                <label for="category-<%= categoryId %>">
-                                                    <%= categoryName %>
+
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseThree">Filter Price</a>
+                                    </div>
+                                    <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__price">
+                                                <ul>
+                                                    <li><a href="#">$0.00 - $50.00</a></li>
+                                                    <li><a href="#">$50.00 - $100.00</a></li>
+                                                    <li><a href="#">$100.00 - $150.00</a></li>
+                                                    <li><a href="#">$150.00 - $200.00</a></li>
+                                                    <li><a href="#">$200.00 - $250.00</a></li>
+                                                    <li><a href="#">250.00+</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseFour">Size</a>
+                                    </div>
+                                    <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__size">
+                                                <label for="xs">xs
+                                                    <input type="radio" id="xs">
+                                                </label>
+                                                <label for="sm">s
+                                                    <input type="radio" id="sm">
+                                                </label>
+                                                <label for="md">m
+                                                    <input type="radio" id="md">
+                                                </label>
+                                                <label for="xl">xl
+                                                    <input type="radio" id="xl">
+                                                </label>
+                                                <label for="2xl">2xl
+                                                    <input type="radio" id="2xl">
+                                                </label>
+                                                <label for="xxl">xxl
+                                                    <input type="radio" id="xxl">
+                                                </label>
+                                                <label for="3xl">3xl
+                                                    <input type="radio" id="3xl">
+                                                </label>
+                                                <label for="4xl">4xl
+                                                    <input type="radio" id="4xl">
                                                 </label>
                                             </div>
-                                        <% }); %>
-                                    <% } else { %>
-                                        <p class="text-muted">No categories found</p>
-                                    <% } %>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Price Range Filter -->
-                        <div class="shop-filter-sidebar__section">
-                            <div class="shop-filter-sidebar__price-range">
-                                <h6 class="filter-section-heading">Price Range</h6>
-                                <div class="price-range-container">
-                                    <div class="price-range-labels">
-                                        <span>₹0</span>
-                                        <span>₹10,000</span>
-                                    </div>
-                                    <div class="price-range-wrapper">
-                                        <div class="price-range-track">
-                                            <div class="price-range-fill"></div>
-                                            <input type="range" id="min-price" name="minPrice" min="0" max="10000"
-                                                step="100" value="<%= locals.minPrice || 0 %>">
-                                            <input type="range" id="max-price" name="maxPrice" min="0" max="10000"
-                                                step="100" value="<%= locals.maxPrice || 10000 %>">
                                         </div>
                                     </div>
-                                    <div class="price-range-values">
-                                        <span id="min-price-display">₹0</span>
-                                        <span id="max-price-display">₹10,000</span>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseFive">Colors</a>
+                                    </div>
+                                    <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__color">
+                                                <label class="c-1" for="sp-1">
+                                                    <input type="radio" id="sp-1">
+                                                </label>
+                                                <label class="c-2" for="sp-2">
+                                                    <input type="radio" id="sp-2">
+                                                </label>
+                                                <label class="c-3" for="sp-3">
+                                                    <input type="radio" id="sp-3">
+                                                </label>
+                                                <label class="c-4" for="sp-4">
+                                                    <input type="radio" id="sp-4">
+                                                </label>
+                                                <label class="c-5" for="sp-5">
+                                                    <input type="radio" id="sp-5">
+                                                </label>
+                                                <label class="c-6" for="sp-6">
+                                                    <input type="radio" id="sp-6">
+                                                </label>
+                                                <label class="c-7" for="sp-7">
+                                                    <input type="radio" id="sp-7">
+                                                </label>
+                                                <label class="c-8" for="sp-8">
+                                                    <input type="radio" id="sp-8">
+                                                </label>
+                                                <label class="c-9" for="sp-9">
+                                                    <input type="radio" id="sp-9">
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
+                                    </div>
+                                    <div id="collapseSix" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__tags">
+                                                <a href="#">Product</a>
+                                                <a href="#">Bags</a>
+                                                <a href="#">Shoes</a>
+                                                <a href="#">Fashio</a>
+                                                <a href="#">Clothing</a>
+                                                <a href="#">Hats</a>
+                                                <a href="#">Accessories</a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Apply Filters Button -->
-                        <div class="shop-filter-sidebar__section">
-                            <button id="apply-filters" class="btn btn-dark btn-block">
-                                Apply Filters
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -110,6 +157,25 @@
 
 
                 <div class="col-lg-9">
+                    <div class="shop__product__option">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="shop__product__option__left">
+                                    <p>Showing 1–12 of 126 results</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="shop__product__option__right">
+                                    <p>Sort by Price:</p>
+                                    <select>
+                                        <option value="">Low To High</option>
+                                        <option value="">$0 - $55</option>
+                                        <option value="">$55 - $100</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row product__filter">
                         <% for (let i=0; i < products.length; i++) { %>
                             <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
@@ -605,6 +671,12 @@
                 window.location.href = `/shop?${queryParams.toString()}`;
             });
 
+            // Initial price range update
+            updatePriceRange();
+        });
+    </script>
+
+    <%- include("../../views/partials/user/footer") %>
             // Initial price range update
             updatePriceRange();
         });

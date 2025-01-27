@@ -287,6 +287,67 @@ const loadShoppingPage = async (req, res) => {
    }
 }
 
+const filterProduct = async (req, res) => {
+   try {
+      const user = req.session.user;
+      const categoryId = req.query.category; // Get category ID directly
+      
+      const query = {
+         isblocked: false,
+         quantity: { $gt: 0 }
+      }
+
+      // If a valid category ID is provided, add it to the query
+      if (categoryId) {
+         query.category = categoryId;
+      }
+
+      let findProducts = await Product.find(query)
+         .populate('category') // Populate category details
+         .lean();
+
+      findProducts.sort((a,b) => new Date(b.createdOn) - new Date(a.createdOn));
+
+      const categories = await Category.find({ isListed: true }).lean();
+      console.log('Categories:', categories);
+
+      let itemsPerPage = 9;
+      let currentPage = parseInt(req.query.page) || 1;
+      let startIndex = (currentPage - 1) * itemsPerPage;
+      let endIndex = startIndex + itemsPerPage;
+      let totalPages = Math.ceil(findProducts.length / itemsPerPage);
+      let currentProduct = findProducts.slice(startIndex, endIndex);
+      
+      let userData = null;
+      if (user) {
+         userData = await User.findOne({ _id: user });
+         if (userData && categoryId) {
+            const serchEntry = {
+               category: categoryId,
+               searchedOn: new Date(),
+            }
+            userData.searchHistory.push(serchEntry);
+            await userData.save();
+         }
+      }
+      
+      req.session.filteredProducts = currentProduct;
+
+      res.render('shop', {
+         user: userData,
+         products: currentProduct,
+         category: categories, // List of all categories
+         totalPages: totalPages,
+         currentPage: currentPage,
+         selectedCategory: categoryId || null // Pass the selected category ID
+      });
+
+   } catch (error) {
+      console.log('Error loading filter page', error);
+      res.redirect('/pageNotFound');
+   }
+}
+
 module.exports = {
    loadHompage,
    loadSignup,
@@ -296,5 +357,6 @@ module.exports = {
    loadLogin,
    login,
    logout,
-   loadShoppingPage
+   loadShoppingPage,
+   filterProduct
 }

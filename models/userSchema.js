@@ -36,9 +36,22 @@ const userSchema = new Schema({
   },
     googleId: {
        type: String,
-       sparse: true, // Allows multiple null values  // not in vdo
+       sparse: true, // Allows multiple null values 
        default: null
    },
+   searchHistory: [{
+        category: {
+            type: Schema.Types.ObjectId,
+            required: false
+        },
+        // brand: {
+        //     type: String
+        // },
+        searchOn: {
+            type: Date,
+            default: Date.now
+        }
+    }]
    // cart: [{
    //     type: Schema.Types.ObjectId,
    //     ref: "Cart"
@@ -63,19 +76,7 @@ const userSchema = new Schema({
    //     type: Schema.Types.ObjectId,
    //     ref: "User"
    // }],
-   // searchHistory: [{
-   //     category: {
-   //         type: Schema.Types.ObjectId,
-   //         required: false
-   //     },
-   //     brand: {
-   //         type: String
-   //     },
-   //     searchOn: {
-   //         type: Date,
-   //         default: Date.now
-   //     }
-   // }]
+   // 
 });
 
 const User = mongoose.model('User', userSchema);
