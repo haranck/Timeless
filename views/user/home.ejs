@@ -138,6 +138,7 @@
                                 </div>
                             </div>
                             <div class="product-card__details">
+                                <form action="/">
                                 <h6 class="product-card__title">
                                     <%= products[i].productName %>
                                 </h6>
@@ -157,13 +158,14 @@
                                         (<%= products[i].rating || 0 %>/5)
                                     </span>
                                 </div>
-                                <div class="product-card__cta">
+                                <div class="product-card__cta" type="submit">
                                     <a href="/addToCart?id=<%= products[i]._id %>"
                                        class="product-card__cart-btn">
                                         <i class="fa-solid fa-cart-plus"></i>
                                         Add to Cart
                                     </a>
                                 </div>
+                                </form>
                             </div>
                         </div>
                     </div>

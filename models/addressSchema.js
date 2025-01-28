@@ -1,6 +1,6 @@
 const { name } = require('ejs');
 const mongoose = require('mongoose');
-const {Schema} = mongoose.Schema;
+const {Schema} = mongoose
 
 const addressSchema = new Schema({
 
@@ -38,7 +38,7 @@ const addressSchema = new Schema({
             type: Number,
             required: true
          },
-         altpone:{
+         altphone:{
             type: Number,
             required: true
          }
@@ -46,4 +46,4 @@ const addressSchema = new Schema({
 })
 
 const Address = mongoose.model('Address', addressSchema);
-module.exports = Address;
+module.exports = Address; 

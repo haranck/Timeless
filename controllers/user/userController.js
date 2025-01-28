@@ -78,7 +78,7 @@ async function sendVerificationEmail(email, otp) {
 }
 
 const signup = async (req, res) => {
-   const { name, email, phone, password} = req.body;
+   const { name, email, phone, password } = req.body;
 
    try {
       const existingUser = await User.findOne({ email: email });
@@ -99,7 +99,7 @@ const signup = async (req, res) => {
    } catch (error) {
       console.log("Error saving user:", error);
       throw new Error
-      
+
    }
 }
 
@@ -272,7 +272,7 @@ const loadShoppingPage = async (req, res) => {
          user: userData,
          products: products,
          categories: categoriesWithIds,
-         category:categories,
+         category: categories,
          totalProducts: totalProducts,
          currentPage: page,
          totalPages: totalPages
@@ -288,41 +288,40 @@ const loadShoppingPage = async (req, res) => {
 
    }
 }
-const filterProduct = async (req, res) => {
+const filterProducts = async (req, res) => {
    const { categories, price, sizes } = req.body;
 
    try {
       let query = {};
 
-    if (categories.length > 0) {
-        query.category = { $in: categories };
-    }
+      if (categories.length > 0) {
+         query.category = { $in: categories };
+      }
 
-    if (price) {
-        const [min, max] = price.split("-");
-        if (max) {
+      if (price) {
+         const [min, max] = price.split("-");
+         if (max) {
             query.price = { $gte: parseInt(min), $lte: parseInt(max) };
-        } else {
+         } else {
             query.price = { $gte: parseInt(min) };
-        }
-    }
+         }
+      }
 
-    if (sizes.length > 0) {
-        query.size = { $in: sizes };
-    }
+      if (sizes.length > 0) {
+         query.size = { $in: sizes };
+      }
 
-    // Fetch filtered products
-    const products = await Product.find(query);
+      // Fetch filtered products
+      const products = await Product.find(query);
 
-    // Return filtered products as JSON
-    res.json(products);
+      // Return filtered products as JSON
+      res.json(products);
 
 
    } catch (error) {
       throw error
    }
 }
-
 
 
 module.exports = {
@@ -335,6 +334,6 @@ module.exports = {
    login,
    logout,
    loadShoppingPage,
-   filterProduct
-   
+   filterProducts
+
 }

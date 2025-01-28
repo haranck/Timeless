@@ -4,280 +4,6 @@
     <link rel="stylesheet" href="path/to/css/fontawesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-
-    <section class="shop spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3">
-                    <div class="shop__sidebar">
-                        <div class="shop__sidebar__search">
-                            <form action="#">
-                                <input type="text" placeholder="Search...">
-                                <button type="submit"><span class="icon_search"></span></button>
-                            </form>
-                        </div>
-                        <div class="shop__sidebar__accordion">
-                            <div class="accordion" id="accordionExample">
-
-
-                                <!-- category -->
-                                <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
-                                    </div>
-                                    <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__categories">
-                                                <ul class="nice-scroll">
-                                                    <% if (category && category.length> 0) { %>
-                                                        <% for (let i=0; i < category.length; i++) { %>
-                                                            <li>
-                                                                <label>
-                                                                    <input type="checkbox" class="filter-category"
-                                                                        value="<%= category[i]._id %>" />
-                                                                    <%= category[i].name %>
-                                                                </label>
-                                                            </li>
-                                                            <% } %>
-                                                                <% } else { %>
-                                                                    <li>No categories available</li>
-                                                                    <% } %>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-
-
-                                <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseThree">Filter Price</a>
-                                    </div>
-                                    <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__price">
-                                                <ul>
-                                                    <li>
-                                                        <label>
-                                                            <input type="radio" name="filter-price" class="filter-price"
-                                                                value="0-50" />
-                                                                ₹1000 - ₹5000
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label>
-                                                            <input type="radio" name="filter-price" class="filter-price"
-                                                                value="50-100" />
-                                                                ₹5000 - ₹10000
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label>
-                                                            <input type="radio" name="filter-price" class="filter-price"
-                                                                value="100-150" />
-                                                            ₹10000 - ₹15000
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label>
-                                                            <input type="radio" name="filter-price" class="filter-price"
-                                                                value="150-200" />
-                                                            ₹15000 - ₹20000
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label>
-                                                            <input type="radio" name="filter-price" class="filter-price"
-                                                                value="200-250" />
-                                                            ₹20000 - ₹40000
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label>
-                                                            <input type="radio" name="filter-price" class="filter-price"
-                                                                value="250+" />
-                                                                ₹50000+
-                                                        </label>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- end category -->
-                                <!-- start size -->
-                                <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseFour">Size</a>
-                                    </div>
-                                    <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__size">
-                                                <label for="xs">35mm
-                                                    <input type="checkbox" class="filter-size" value="xs" />
-                                                </label>
-                                                <label for="sm">37mm
-                                                    <input type="checkbox" class="filter-size" value="sm" />
-                                                </label>
-                                                <label for="md">40mm
-                                                    <input type="checkbox" class="filter-size" value="md" />
-                                                </label>
-                                                <label for="xl">42mm
-                                                    <input type="checkbox" class="filter-size" value="xl" />
-                                                </label>
-                                                <label for="2xl">45mm
-                                                    <input type="checkbox" class="filter-size" value="2xl" />
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- end size -->
-
-
-                                <!-- <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
-                                    </div>
-                                    <div id="collapseSix" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__tags">
-                                                <a href="#">Product</a>
-                                                <a href="#">Bags</a>
-                                                <a href="#">Shoes</a>
-                                                <a href="#">Fashio</a>
-                                                <a href="#">Clothing</a>
-                                                <a href="#">Hats</a>
-                                                <a href="#">Accessories</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> -->
-
-                                <div class="apply-filter">
-                                    <button id="applyFilter" class="btn "
-                                        style="background-color: #333333; color: white;">Apply Filter</button>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-
-                <div class="col-lg-9">
-                    <div class="shop__product__option">
-                        <div class="row">
-                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                <div class="shop__product__option__left">
-                                    <p>Showing 1–12 of 126 results</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                <div class="shop__product__option__right">
-                                    <p>Sort by Price:</p>
-                                    <select>
-                                        <option value="">Low To High</option>
-                                        <option value="">$0 - $55</option>
-                                        <option value="">$55 - $100</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row product__filter">
-                        <% for (let i=0; i < products.length; i++) { %>
-                            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                                <div class="product-card">
-                                    <div class="product-card__image">
-                                        <a href="/productDetails?id=<%= products[i]._id %>">
-                                            <img src="/uploads/product-images/<%= products[i].productImages[0] %>"
-                                                alt="<%= products[i].productName %>" class="img-fluid">
-                                        </a>
-                                        <div class="product-card__actions">
-                                            <a href="/addToWishlist?id=<%= products[i]._id %>"
-                                                class="product-card__wishlist-btn" title="Add to Wishlist">
-                                                <i class="fa-regular fa-heart"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="product-card__details">
-                                        <h6 class="product-card__title">
-                                            <%= products[i].productName %>
-                                        </h6>
-                                        <div class="product-card__pricing">
-                                            <span class="product-card__sale-price">
-                                                ₹<%= products[i].salePrice.toLocaleString('en-IN') %>
-                                            </span>
-                                            <span class="product-card__regular-price">
-                                                ₹<%= products[i].regularPrice.toLocaleString('en-IN') %>
-                                            </span>
-                                        </div>
-                                        <div class="product-card__rating">
-                                            <% for(let j=0; j < 5; j++) { %>
-                                                <i
-                                                    class="fa-solid fa-star <%= j < Math.round(products[i].rating || 0) ? 'active' : '' %>"></i>
-                                                <% } %>
-                                                    <span class="product-card__rating-count">
-                                                        (<%= products[i].rating || 0 %>/5)
-                                                    </span>
-                                        </div>
-                                        <div class="product-card__cta">
-                                            <a href="/addToCart?id=<%= products[i]._id %>"
-                                                class="product-card__cart-btn">
-                                                <i class="fa-solid fa-cart-plus"></i>
-                                                Add to Cart
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <% } %>
-                    </div>
-
-                    <!-- Pagination -->
-                    <div class="row">
-                        <div class="col-12">
-                            <nav aria-label="Product pagination" class="shop-pagination">
-                                <ul class="pagination justify-content-center">
-                                    <% if (currentPage> 1) { %>
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page=<%= currentPage - 1 %>"
-                                                aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        <% } %>
-
-                                            <% for (let p=1; p <=totalPages; p++) { %>
-                                                <li class="page-item <%= p === currentPage ? 'active' : '' %>">
-                                                    <a class="page-link" href="?page=<%= p %>">
-                                                        <%= p %>
-                                                    </a>
-                                                </li>
-                                                <% } %>
-
-                                                    <% if (currentPage < totalPages) { %>
-                                                        <li class="page-item">
-                                                            <a class="page-link" href="?page=<%= currentPage + 1 %>"
-                                                                aria-label="Next">
-                                                                <span aria-hidden="true">&raquo;</span>
-                                                            </a>
-                                                        </li>
-                                                        <% } %>
-                                </ul>
-                            </nav>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <style>
         /* Product Card Styles (same as home.ejs) */
         .product-card {
@@ -626,6 +352,280 @@
             }
         }
     </style>
+    <section class="shop spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="shop__sidebar">
+                        <div class="shop__sidebar__search">
+                            <form action="#">
+                                <input type="text" placeholder="Search...">
+                                <button type="submit"><span class="icon_search"></span></button>
+                            </form>
+                        </div>
+                        <div class="shop__sidebar__accordion">
+                            <div class="accordion" id="accordionExample">
+
+
+                                <!-- category -->
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
+                                    </div>
+                                    <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__categories">
+                                                <ul class="nice-scroll">
+                                                    <% if (category && category.length> 0) { %>
+                                                        <% for (let i=0; i < category.length; i++) { %>
+                                                            <li>
+                                                                <label>
+                                                                    <input type="checkbox" class="filter-category"
+                                                                        value="<%= category[i]._id %>" />
+                                                                    <%= category[i].name %>
+                                                                </label>
+                                                            </li>
+                                                            <% } %>
+                                                                <% } else { %>
+                                                                    <li>No categories available</li>
+                                                                    <% } %>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseThree">Filter Price</a>
+                                    </div>
+                                    <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__price">
+                                                <ul>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="0-50" />
+                                                                ₹1000 - ₹5000
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="50-100" />
+                                                                ₹5000 - ₹10000
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="100-150" />
+                                                            ₹10000 - ₹15000
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="150-200" />
+                                                            ₹15000 - ₹20000
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="200-250" />
+                                                            ₹20000 - ₹40000
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="250+" />
+                                                                ₹50000+
+                                                        </label>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end category -->
+                                <!-- start size -->
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseFour">Size</a>
+                                    </div>
+                                    <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__size">
+                                                <label for="xs">35mm
+                                                    <input type="checkbox" class="filter-size" value="xs" />
+                                                </label>
+                                                <label for="sm">37mm
+                                                    <input type="checkbox" class="filter-size" value="sm" />
+                                                </label>
+                                                <label for="md">40mm
+                                                    <input type="checkbox" class="filter-size" value="md" />
+                                                </label>
+                                                <label for="xl">42mm
+                                                    <input type="checkbox" class="filter-size" value="xl" />
+                                                </label>
+                                                <label for="2xl">45mm
+                                                    <input type="checkbox" class="filter-size" value="2xl" />
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end size -->
+
+
+                                <!-- <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
+                                    </div>
+                                    <div id="collapseSix" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__tags">
+                                                <a href="#">Product</a>
+                                                <a href="#">Bags</a>
+                                                <a href="#">Shoes</a>
+                                                <a href="#">Fashio</a>
+                                                <a href="#">Clothing</a>
+                                                <a href="#">Hats</a>
+                                                <a href="#">Accessories</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> -->
+
+                                <div class="apply-filter">
+                                    <button id="applyFilter" class="btn "
+                                        style="background-color: #333333; color: white;">Apply Filter</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-lg-9">
+                    <div class="shop__product__option">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="shop__product__option__left">
+                                    <p>Showing 1–12 of 126 results</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="shop__product__option__right">
+                                    <p>Sort by Price:</p>
+                                    <select>
+                                        <option value="">Low To High</option>
+                                        <option value="">$0 - $55</option>
+                                        <option value="">$55 - $100</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row product__filter">
+                        <% for (let i=0; i < products.length; i++) { %>
+                            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                                <div class="product-card">
+                                    <div class="product-card__image">
+                                        <a href="/productDetails?id=<%= products[i]._id %>">
+                                            <img src="/uploads/product-images/<%= products[i].productImages[0] %>"
+                                                alt="<%= products[i].productName %>" class="img-fluid">
+                                        </a>
+                                        <div class="product-card__actions">
+                                            <a href="/addToWishlist?id=<%= products[i]._id %>"
+                                                class="product-card__wishlist-btn" title="Add to Wishlist">
+                                                <i class="fa-regular fa-heart"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="product-card__details">
+                                        <h6 class="product-card__title">
+                                            <%= products[i].productName %>
+                                        </h6>
+                                        <div class="product-card__pricing">
+                                            <span class="product-card__sale-price">
+                                                ₹<%= products[i].salePrice.toLocaleString('en-IN') %>
+                                            </span>
+                                            <span class="product-card__regular-price">
+                                                ₹<%= products[i].regularPrice.toLocaleString('en-IN') %>
+                                            </span>
+                                        </div>
+                                        <div class="product-card__rating">
+                                            <% for(let j=0; j < 5; j++) { %>
+                                                <i
+                                                    class="fa-solid fa-star <%= j < Math.round(products[i].rating || 0) ? 'active' : '' %>"></i>
+                                                <% } %>
+                                                    <span class="product-card__rating-count">
+                                                        (<%= products[i].rating || 0 %>/5)
+                                                    </span>
+                                        </div>
+                                        <div class="product-card__cta">
+                                            <a href="/addToCart?id=<%= products[i]._id %>"
+                                                class="product-card__cart-btn">
+                                                <i class="fa-solid fa-cart-plus"></i>
+                                                Add to Cart
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <% } %>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="row">
+                        <div class="col-12">
+                            <nav aria-label="Product pagination" class="shop-pagination">
+                                <ul class="pagination justify-content-center">
+                                    <% if (currentPage> 1) { %>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=<%= currentPage - 1 %>"
+                                                aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                        <% } %>
+
+                                            <% for (let p=1; p <=totalPages; p++) { %>
+                                                <li class="page-item <%= p === currentPage ? 'active' : '' %>">
+                                                    <a class="page-link" href="?page=<%= p %>">
+                                                        <%= p %>
+                                                    </a>
+                                                </li>
+                                                <% } %>
+
+                                                    <% if (currentPage < totalPages) { %>
+                                                        <li class="page-item">
+                                                            <a class="page-link" href="?page=<%= currentPage + 1 %>"
+                                                                aria-label="Next">
+                                                                <span aria-hidden="true">&raquo;</span>
+                                                            </a>
+                                                        </li>
+                                                        <% } %>
+                                </ul>
+                            </nav>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+ 
 
     <script>
 
