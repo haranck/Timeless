@@ -4,7 +4,7 @@ const userController = require('../controllers/user/userController');
 const passport = require('passport');
 const { userAuth, adminAuth, isBlocked } = require("../middlewares/auth")
 const productController = require('../controllers/user/productController')
-
+const profileController = require('../controllers/user/profileController')
 
 
 router.get('/', isBlocked, userController.loadHompage);
@@ -34,6 +34,16 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
 router.get("/login", userController.loadLogin);
 router.post("/login", userController.login);
 router.get('/logout', userController.logout)
+
+//profile mgt
+
+router.get("/forgot-password", profileController.getForgotPassPage) /// ? ? ? ? ? ? 
+router.post("/forgot-email-valid", profileController.forgotEmailValid)
+router.post("/verify-passForgot-otp", profileController.verifyForgotPassOtp)
+router.get("/reset-password", profileController.getResetPassPage)
+router.post("/resend-forgot-otp", profileController.resendtOTP)
+router.post("/reset-password", profileController.postNewPassword)
+
 
 
 module.exports = router;

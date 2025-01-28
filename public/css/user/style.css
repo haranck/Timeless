@@ -200,8 +200,8 @@ ol {
 	margin-top: -13px;
 	margin-left: -13px;
 	border-radius: 60px;
-	animation: loader 0.8s linear infinite;
-	-webkit-animation: loader 0.8s linear infinite;
+	
+	
 }
 
 @keyframes loader {
@@ -600,7 +600,7 @@ ol {
 }
 
 .hero__text h6 {
-	color: #ff0000;
+	color: #bc8585;
 	font-size: 14px;
 	font-weight: 700;
 	text-transform: uppercase;
@@ -3863,6 +3863,4 @@ ol {
 	}
 }
 
-#myElement{
-	
-}
+

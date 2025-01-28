@@ -1,3 +1,4 @@
+
 const User = require('../../models/userSchema')
 const Category = require('../../models/categorySchema')
 const Product = require('../../models/productSchema')
@@ -287,74 +288,40 @@ const loadShoppingPage = async (req, res) => {
 
    }
 }
-
 const filterProduct = async (req, res) => {
+   const { categories, price, sizes } = req.body;
+
    try {
-      const user = req.session.user;
-      const  category = req.query.category
-      // const brand = req.query.brand
-      const findCategory = category ? await Category.findOne({ name: category }) : null
-      // const findBrand = brand ? await Brand.findOne({ name: brand }) : null
-      // const brands= await Brand.find({}).lean()
-      const query= {
-         isblocked: false,
-         quantity: { $gt: 0 }
-      }
+      let query = {};
 
-      if (findCategory) {
-         query.category = findCategory._id
-      }
-      // if (findBrand) {
-      //    query.brand = findBrand._id
-      // }
+    if (categories.length > 0) {
+        query.category = { $in: categories };
+    }
 
-      let findProducts = await Product.find(query).lean()
+    if (price) {
+        const [min, max] = price.split("-");
+        if (max) {
+            query.price = { $gte: parseInt(min), $lte: parseInt(max) };
+        } else {
+            query.price = { $gte: parseInt(min) };
+        }
+    }
 
-      findProducts.sort((a,b)=>new Date (b.createdOn)-new Date(a.createdOn))  //new arrivals decending ayit latest addythe items
+    if (sizes.length > 0) {
+        query.size = { $in: sizes };
+    }
 
-      const categories = await Category.find({ isListed: true }).lean()
-      // console.log('Categories:', categories);
+    // Fetch filtered products
+    const products = await Product.find(query);
 
-      let itemsPerPage = 9;
-
-      let currentPage = parseInt(req.query.page) || 1;
-      let startIndex = (currentPage - 1) * itemsPerPage;
-      let endIndex = startIndex + itemsPerPage;
-      let totalPages = Math.ceil(findProducts.length / itemsPerPage);
-      let currentProduct = findProducts.slice(startIndex, endIndex);
-      let userData = null
-      if (user) {
-         userData = await User.findOne({ _id: user })
-         if(userData){
-            const serchEntry ={
-               category:findCategory ?  findCategory._id : null,
-               // brand:findBrand ?  findBrand._id : null
-               searchedOn:new Date(),
-            }
-            userData.searchHistory.push(serchEntry)
-            await userData.save()
-         }
-      }
-      req.session.filteredProducts = currentProduct
-      console.log()
-      res.render('shop', {
-         user: userData,
-         products: currentProduct,
-         category: categories,
-         totalPages: totalPages,
-         currentPage: currentPage,
-         selectedCategory:category || null
-         // selectedBrand:brand || null
-         // brands: brands
-      })
+    // Return filtered products as JSON
+    res.json(products);
 
 
    } catch (error) {
-      console.log('error loading filter page', error);
-      res.redirect('/pageNotFound')
+      throw error
    }
 }
-
 
 
 
@@ -369,4 +336,5 @@ module.exports = {
    logout,
    loadShoppingPage,
    filterProduct
+   
 }

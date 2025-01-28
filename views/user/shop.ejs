@@ -18,6 +18,9 @@
                         </div>
                         <div class="shop__sidebar__accordion">
                             <div class="accordion" id="accordionExample">
+
+
+                                <!-- category -->
                                 <div class="card">
                                     <div class="card-heading">
                                         <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
@@ -26,21 +29,26 @@
                                         <div class="card-body">
                                             <div class="shop__sidebar__categories">
                                                 <ul class="nice-scroll">
-                                                    <% if (category && category.length > 0) { %>
-                                                        <% for (let i = 0; i < category.length; i++) { %>
-                                                            <li><a href="/filter?category=<%= category[i]._id %>"><%= category[i].name %></a></li>
-                                                        <% } %>
-                                                    <% } else { %>
-                                                        <li>No categories available</li>
-                                                    <% } %>
-                                                    
+                                                    <% if (category && category.length> 0) { %>
+                                                        <% for (let i=0; i < category.length; i++) { %>
+                                                            <li>
+                                                                <label>
+                                                                    <input type="checkbox" class="filter-category"
+                                                                        value="<%= category[i]._id %>" />
+                                                                    <%= category[i].name %>
+                                                                </label>
+                                                            </li>
+                                                            <% } %>
+                                                                <% } else { %>
+                                                                    <li>No categories available</li>
+                                                                    <% } %>
                                                 </ul>
                                             </div>
-                                            
                                         </div>
                                     </div>
                                 </div>
-                                
+
+
 
 
                                 <div class="card">
@@ -51,17 +59,55 @@
                                         <div class="card-body">
                                             <div class="shop__sidebar__price">
                                                 <ul>
-                                                    <li><a href="#">$0.00 - $50.00</a></li>
-                                                    <li><a href="#">$50.00 - $100.00</a></li>
-                                                    <li><a href="#">$100.00 - $150.00</a></li>
-                                                    <li><a href="#">$150.00 - $200.00</a></li>
-                                                    <li><a href="#">$200.00 - $250.00</a></li>
-                                                    <li><a href="#">250.00+</a></li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="0-50" />
+                                                                ₹1000 - ₹5000
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="50-100" />
+                                                                ₹5000 - ₹10000
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="100-150" />
+                                                            ₹10000 - ₹15000
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="150-200" />
+                                                            ₹15000 - ₹20000
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="200-250" />
+                                                            ₹20000 - ₹40000
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="250+" />
+                                                                ₹50000+
+                                                        </label>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                                <!-- end category -->
+                                <!-- start size -->
                                 <div class="card">
                                     <div class="card-heading">
                                         <a data-toggle="collapse" data-target="#collapseFour">Size</a>
@@ -69,73 +115,29 @@
                                     <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
                                         <div class="card-body">
                                             <div class="shop__sidebar__size">
-                                                <label for="xs">xs
-                                                    <input type="radio" id="xs">
+                                                <label for="xs">35mm
+                                                    <input type="checkbox" class="filter-size" value="xs" />
                                                 </label>
-                                                <label for="sm">s
-                                                    <input type="radio" id="sm">
+                                                <label for="sm">37mm
+                                                    <input type="checkbox" class="filter-size" value="sm" />
                                                 </label>
-                                                <label for="md">m
-                                                    <input type="radio" id="md">
+                                                <label for="md">40mm
+                                                    <input type="checkbox" class="filter-size" value="md" />
                                                 </label>
-                                                <label for="xl">xl
-                                                    <input type="radio" id="xl">
+                                                <label for="xl">42mm
+                                                    <input type="checkbox" class="filter-size" value="xl" />
                                                 </label>
-                                                <label for="2xl">2xl
-                                                    <input type="radio" id="2xl">
-                                                </label>
-                                                <label for="xxl">xxl
-                                                    <input type="radio" id="xxl">
-                                                </label>
-                                                <label for="3xl">3xl
-                                                    <input type="radio" id="3xl">
-                                                </label>
-                                                <label for="4xl">4xl
-                                                    <input type="radio" id="4xl">
+                                                <label for="2xl">45mm
+                                                    <input type="checkbox" class="filter-size" value="2xl" />
                                                 </label>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseFive">Colors</a>
-                                    </div>
-                                    <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__color">
-                                                <label class="c-1" for="sp-1">
-                                                    <input type="radio" id="sp-1">
-                                                </label>
-                                                <label class="c-2" for="sp-2">
-                                                    <input type="radio" id="sp-2">
-                                                </label>
-                                                <label class="c-3" for="sp-3">
-                                                    <input type="radio" id="sp-3">
-                                                </label>
-                                                <label class="c-4" for="sp-4">
-                                                    <input type="radio" id="sp-4">
-                                                </label>
-                                                <label class="c-5" for="sp-5">
-                                                    <input type="radio" id="sp-5">
-                                                </label>
-                                                <label class="c-6" for="sp-6">
-                                                    <input type="radio" id="sp-6">
-                                                </label>
-                                                <label class="c-7" for="sp-7">
-                                                    <input type="radio" id="sp-7">
-                                                </label>
-                                                <label class="c-8" for="sp-8">
-                                                    <input type="radio" id="sp-8">
-                                                </label>
-                                                <label class="c-9" for="sp-9">
-                                                    <input type="radio" id="sp-9">
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card">
+                                <!-- end size -->
+
+
+                                <!-- <div class="card">
                                     <div class="card-heading">
                                         <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
                                     </div>
@@ -152,7 +154,13 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div> -->
+
+                                <div class="apply-filter">
+                                    <button id="applyFilter" class="btn "
+                                        style="background-color: #333333; color: white;">Apply Filter</button>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -244,7 +252,7 @@
                                         </li>
                                         <% } %>
 
-                                            <% for(let p=1; p <=totalPages; p++) { %>
+                                            <% for (let p=1; p <=totalPages; p++) { %>
                                                 <li class="page-item <%= p === currentPage ? 'active' : '' %>">
                                                     <a class="page-link" href="?page=<%= p %>">
                                                         <%= p %>
@@ -262,6 +270,7 @@
                                                         <% } %>
                                 </ul>
                             </nav>
+
                         </div>
                     </div>
                 </div>
@@ -559,7 +568,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            -webkit-appearance: none;
+
             background: transparent;
             pointer-events: none;
         }
@@ -619,65 +628,132 @@
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const minPriceSlider = document.getElementById('min-price');
-            const maxPriceSlider = document.getElementById('max-price');
-            const minPriceDisplay = document.getElementById('min-price-display');
-            const maxPriceDisplay = document.getElementById('max-price-display');
-            const priceFill = document.querySelector('.price-range-fill');
-            const applyFiltersBtn = document.getElementById('apply-filters');
 
-            // Update price values and fill when sliders change
-            function updatePriceRange() {
-                const minPrice = parseInt(minPriceSlider.value);
-                const maxPrice = parseInt(maxPriceSlider.value);
+        // myscript
 
-                // Ensure min price doesn't exceed max price
-                if (minPrice > maxPrice) {
-                    minPriceSlider.value = maxPrice;
-                }
+        document.getElementById("applyFilter").addEventListener("click", async () => {
+            // Get selected categories
+            const selectedCategories = Array.from(
+                document.querySelectorAll(".filter-category:checked")
+            ).map((checkbox) => checkbox.value);
 
-                // Calculate percentage for fill
-                const minPercentage = (minPrice / 10000) * 100;
-                const maxPercentage = (maxPrice / 10000) * 100;
+            // Get selected price range
+            const selectedPrice = document.querySelector(".filter-price:checked")
+                ? document.querySelector(".filter-price:checked").value
+                : null;
 
-                // Update displayed values
-                minPriceDisplay.textContent = `₹${minPrice.toLocaleString('en-IN')}`;
-                maxPriceDisplay.textContent = `₹${maxPrice.toLocaleString('en-IN')}`;
+            // Get selected sizes
+            const selectedSizes = Array.from(
+                document.querySelectorAll(".filter-size:checked")
+            ).map((checkbox) => checkbox.value);
 
-                // Update price range fill
-                priceFill.style.left = `${minPercentage}%`;
-                priceFill.style.width = `${maxPercentage - minPercentage}%`;
-            }
+            // Prepare filter data
+            const filterData = {
+                categories: selectedCategories,
+                price: selectedPrice,
+                sizes: selectedSizes,
+            };
 
-            // Add event listeners to sliders
-            minPriceSlider.addEventListener('input', updatePriceRange);
-            maxPriceSlider.addEventListener('input', updatePriceRange);
-
-            // Apply filters button click handler
-            applyFiltersBtn.addEventListener('click', function () {
-                const minPrice = minPriceSlider.value;
-                const maxPrice = maxPriceSlider.value;
-                const selectedCategories = Array.from(
-                    document.querySelectorAll('.category-checkbox:checked')
-                ).map(cb => cb.value);
-                const searchQuery = document.querySelector('input[name="search"]').value;
-
-                // Construct query string
-                const queryParams = new URLSearchParams({
-                    minPrice: minPrice,
-                    maxPrice: maxPrice,
-                    search: searchQuery,
-                    categories: selectedCategories.join(',')
+            // Send the filter data to the backend via AJAX
+            try {
+                const response = await fetch("/filter", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(filterData),
                 });
 
-                // Redirect to shop page with filters
-                window.location.href = `/shop?${queryParams.toString()}`;
-            });
+                // Get the filtered results
+                const filteredProducts = await response.json();
 
-            // Initial price range update
-            updatePriceRange();
+                // Dynamically update the product list
+                const productList = document.getElementById("product-list");
+                productList.innerHTML = filteredProducts
+                    .map(
+                        (product) => `
+                    <div class="product">
+                        <h4>${product.name}</h4>
+                        <p>${product.category}</p>
+                        <p>${product.price}</p>
+                    </div>
+        `
+                    )
+                    .join("");
+            } catch (error) {
+                console.error("Error applying filters:", error);
+            }
         });
+
+
+        //end myscript
+
+
+
+
+
+        // document.addEventListener('DOMContentLoaded', function () {
+        //     const minPriceSlider = document.getElementById('min-price');
+        //     const maxPriceSlider = document.getElementById('max-price');
+        //     const minPriceDisplay = document.getElementById('min-price-display');
+        //     const maxPriceDisplay = document.getElementById('max-price-display');
+        //     const priceFill = document.querySelector('.price-range-fill');
+        //     const applyFiltersBtn = document.getElementById('apply-filters');
+
+        //     // Update price values and fill when sliders change
+        //     function updatePriceRange() {
+        //         const minPrice = parseInt(minPriceSlider.value);
+        //         const maxPrice = parseInt(maxPriceSlider.value);
+
+        //         // Ensure min price doesn't exceed max price
+        //         if (minPrice > maxPrice) {
+        //             minPriceSlider.value = maxPrice;
+        //         }
+
+        //         // Calculate percentage for fill
+        //         const minPercentage = (minPrice / 10000) * 100;
+        //         const maxPercentage = (maxPrice / 10000) * 100;
+
+        //         // Update displayed values
+        //         minPriceDisplay.textContent = `₹${minPrice.toLocaleString('en-IN')}`;
+        //         maxPriceDisplay.textContent = `₹${maxPrice.toLocaleString('en-IN')}`;
+
+        //         // Update price range fill
+        //         priceFill.style.left = `${minPercentage}%`;
+        //         priceFill.style.width = `${maxPercentage - minPercentage}%`;
+        //     }
+
+        //     // Add event listeners to sliders
+        //     minPriceSlider.addEventListener('input', updatePriceRange);
+        //     maxPriceSlider.addEventListener('input', updatePriceRange);
+
+        //     // Apply filters button click handler
+        //     applyFiltersBtn.addEventListener('click', function () {
+        //         const minPrice = minPriceSlider.value;
+        //         const maxPrice = maxPriceSlider.value;
+        //         const selectedCategories = Array.from(
+        //             document.querySelectorAll('.category-checkbox:checked')
+        //         ).map(cb => cb.value);
+        //         const searchQuery = document.querySelector('input[name="search"]').value;
+
+        //         // Construct query string
+        //         const queryParams = new URLSearchParams({
+        //             minPrice: minPrice,
+        //             maxPrice: maxPrice,
+        //             search: searchQuery,
+        //             categories: selectedCategories.join(',')
+        //         });
+
+        //         // Redirect to shop page with filters
+        //         window.location.href = `/shop?${queryParams.toString()}`;
+        //     });
+
+        //     // Initial price range update
+        //     updatePriceRange();
+        // });
+
+
+
     </script>
 
     <%- include("../../views/partials/user/footer") %>
