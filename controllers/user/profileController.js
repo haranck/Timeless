@@ -295,61 +295,115 @@ const verifyChangePassOtp = async (req, res) => {
     }
 }
 
-const addAddress =async (req, res) => {
+// const addAddress =async (req, res) => {
+//     try {
+//         const user = req.session.user
+//         res.render("add-address",{user:user})
+//     } catch (error) {
+//         res.redirect('/pageNotFound')
+//     }
+// }
+
+const addAddress = async (req, res) => {
     try {
-        const user = req.session.user
-        res.render("add-address",{user:user})
+      const userId = req.session.user
+      const userData = await User.findById(userId)
+      res.render("add-address", { user: userData })
     } catch (error) {
-        res.redirect('/pageNotFound')
+      console.error("Error in addAddress:", error)
+      res.redirect("/pageNotFound")
     }
-}
+  }
+
+// const postAddAddress = async (req, res) => {
+//     // console.log(req.body)
+//     try {
+        
+//         const userId = req.session.user
+//         const userData = await User.findOne({ _id: userId })
+//         const {addressType,name,city,landMark,state,pincode,phone,altPhone} = req.body
+//         const userAddress =await Address.findOne({ userId: userData._id })
+
+//         if(!userAddress){
+//            const newAddress = new Address({  
+//               userId: userData._id,
+//               address:[{
+//                 addressType,
+//                 name,
+//                 city,
+//                 landMark,
+//                 state,
+//                 pincode,
+//                 phone,
+//                 altPhone :altPhone || "N/A"
+//               }]
+//            })
+//            await newAddress.save()
+//         }else{
+//             userAddress.address.push({
+//                 addressType,
+//                 name,
+//                 city,
+//                 landMark,
+//                 state,
+//                 pincode,
+//                 phone,
+//                 altPhone:altPhone || "N/A"
+//               })
+//               await userAddress.save()
+//         }
+//         res.redirect("/userProfile")
+
+        
+//     } catch (error) {
+//         console.log("Error adding address", error)
+//         res.redirect('/pageNotFound')
+//     }
+// }
+
 
 const postAddAddress = async (req, res) => {
-    console.log(req.body)
     try {
-        
-        const userId = req.session.user
-        const userData = await User.findOne({ _id: userId })
-        const {addressType,name,city,landMark,state,pincode,phone,altPhone} = req.body
-        const userAddress =await Address.findOne({ userId: userData._id })
-
-        if(!userAddress){
-           const newAddress = new Address({  
-              userId: userData._id,
-              address:[{
-                addressType,
-                name,
-                city,
-                landMark,
-                state,
-                pincode,
-                phone,
-                altPhone :altPhone || "N/A"
-              }]
-           })
-           await newAddress.save()
-        }else{
-            userAddress.address.push({
-                addressType,
-                name,
-                city,
-                landMark,
-                state,
-                pincode,
-                phone,
-                altPhone:altPhone || "N/A"
-              })
-              await userAddress.save()
-        }
-        res.redirect("/userProfile")
-
-        
+      const userId = req.session.user
+      const { addressType, name, city, landMark, state, pincode, phone, altPhone } = req.body
+      const userAddress = await Address.findOne({ userId: userId })
+  
+      if (!userAddress) {
+        const newAddress = new Address({
+          userId: userId,
+          address: [
+            {
+              addressType,
+              name,
+              city,
+              landMark,
+              state,
+              pincode,
+              phone,
+              altPhone: altPhone || "N/A",
+            },
+          ],
+        })
+        await newAddress.save()
+      } else {
+        userAddress.address.push({
+          addressType,
+          name,
+          city,
+          landMark,
+          state,
+          pincode,
+          phone,
+          altPhone: altPhone || "N/A",
+        })
+        await userAddress.save()
+      }
+      res.redirect("/userProfile")
     } catch (error) {
-        console.log("Error adding address", error)
-        res.redirect('/pageNotFound')
+      console.error("Error in postAddAddress:", error)
+      res.redirect("/pageNotFound")
     }
-}
-
+  }
 
 
 module.exports = {
@@ -368,5 +422,6 @@ module.exports = {
     changePasswordValid,
     verifyChangePassOtp,
     addAddress,
-    postAddAddress
+    postAddAddress,
+    
 }
