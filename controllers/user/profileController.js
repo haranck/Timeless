@@ -257,12 +257,12 @@ const changePasswordValid = async (req, res) => {
                 req.session.userData = req.body
                 req.session.email = email
                 res.render("change-password-otp")
-                
+
                 console.log("otp sent", otp);
             } else {
                 res.json({ success: false, message: "Failed to send OTP. Please try again." })
             }
-        
+
         } else {
             res.render("change-password", { message: "User with this email not found" })
         }
@@ -288,10 +288,27 @@ const verifyChangePassOtp = async (req, res) => {
                 success: false,
                 message: "Invalid OTP"
             })
-        } 
+        }
     } catch (error) {
         console.log("Error verifying OTP", error)
         res.redirect('/pageNotFound')
+    }
+}
+
+const getAllAddresses = async (req, res) => {
+    try {
+        const userId = req.session.user
+        const addressData = await Address.findOne({ userId: userId })
+
+        let userAddress = null
+        if (addressData && addressData.address) {
+            userAddress = addressData.address
+        }
+
+        res.render("address", { userAddress: userAddress })
+    } catch (error) {
+        console.error("Error in getAllAddresses:", error)
+        res.redirect("/pageNotFound")
     }
 }
 
@@ -306,105 +323,173 @@ const verifyChangePassOtp = async (req, res) => {
 
 const addAddress = async (req, res) => {
     try {
-      const userId = req.session.user
-      const userData = await User.findById(userId)
-      res.render("address", { user: userData })
+        const userId = req.session.user
+        const addressData = await Address.findOne({ userId: userId })
+
+        let userAddress = null
+        if (addressData && addressData.address) {
+            userAddress = addressData.address
+        }
+
+        res.render("add-address", { userAddress: userAddress })
     } catch (error) {
-      console.error("Error in addAddress:", error)
-      res.redirect("/pageNotFound")
+        console.error("Error in addAddress:", error)
+        res.redirect("/pageNotFound")
     }
-  }
+}
 
-// const postAddAddress = async (req, res) => {
-//     // console.log(req.body)
-//     try {
-        
-//         const userId = req.session.user
-//         const userData = await User.findOne({ _id: userId })
-//         const {addressType,name,city,landMark,state,pincode,phone,altPhone} = req.body
-//         const userAddress =await Address.findOne({ userId: userData._id })
 
-//         if(!userAddress){
-//            const newAddress = new Address({  
-//               userId: userData._id,
-//               address:[{
-//                 addressType,
-//                 name,
-//                 city,
-//                 landMark,
-//                 state,
-//                 pincode,
-//                 phone,
-//                 altPhone :altPhone || "N/A"
-//               }]
-//            })
-//            await newAddress.save()
-//         }else{
-//             userAddress.address.push({
-//                 addressType,
-//                 name,
-//                 city,
-//                 landMark,
-//                 state,
-//                 pincode,
-//                 phone,
-//                 altPhone:altPhone || "N/A"
-//               })
-//               await userAddress.save()
-//         }
-//         res.redirect("/userProfile")
-
-        
-//     } catch (error) {
-//         console.log("Error adding address", error)
-//         res.redirect('/pageNotFound')
-//     }
-// }
 
 
 const postAddAddress = async (req, res) => {
     try {
-      const userId = req.session.user
-      const { addressType, name, city, landMark, state, pincode, phone, altPhone } = req.body
-      const userAddress = await Address.findOne({ userId: userId })
-  
-      if (!userAddress) {
-        const newAddress = new Address({
-          userId: userId,
-          address: [
-            {
-              addressType,
-              name,
-              city,
-              landMark,
-              state,
-              pincode,
-              phone,
-              altPhone: altPhone || "N/A",
-            },
-          ],
-        })
-        await newAddress.save()
-      } else {
-        userAddress.address.push({
-          addressType,
-          name,
-          city,
-          landMark,
-          state,
-          pincode,
-          phone,
-          altPhone: altPhone || "N/A",
-        })
-        await userAddress.save()
-      }
-      res.redirect("/userProfile")
-    } catch (error) {
-      console.error("Error in postAddAddress:", error)
-      res.redirect("/pageNotFound")
-    }
-  }
+        const userId = req.session.user
+        const { addressType, name, city, landMark, state, pincode, phone, altPhone } = req.body
+        const userAddress = await Address.findOne({ userId: userId })
 
+        if (!userAddress) {
+            const newAddress = new Address({
+                userId: userId,
+                address: [
+                    {
+                        addressType,
+                        name,
+                        city,
+                        landMark,
+                        state,
+                        pincode,
+                        phone,
+                        altPhone: altPhone || "N/A",
+                    },
+                ],
+            })
+            await newAddress.save()
+        } else {
+            userAddress.address.push({
+                addressType,
+                name,
+                city,
+                landMark,
+                state,
+                pincode,
+                phone,
+                altPhone: altPhone || "N/A",
+            })
+            await userAddress.save()
+        }
+        res.redirect("/address")
+    } catch (error) {
+        console.error("Error in postAddAddress:", error)
+        res.redirect("/pageNotFound")
+    }
+}
+
+
+
+const editAddress = async (req, res) => {
+
+    try {
+
+        const addressId = req.query.id
+        const user = req.session.user
+        const currAddress = await Address.findOne({
+            "address._id": addressId,
+        })
+
+        if (!currAddress) {
+            return res.redirect("/pageNotFound")
+        }
+        const addressData = currAddress.address.find(item => {
+            return item._id.toString() === addressId.toString()
+        })
+
+
+        if (!addressData) {
+            return res.redirect("/pageNotFound")
+        }
+
+        res.render("editAddress", {
+            user: user,
+            address: addressData
+        })
+
+    } catch (error) {
+        console.log("Error editing address", error)
+        res.redirect('/pageNotFound')
+    }
+}
+
+const postEditAddress = async (req, res) => {
+    try {
+
+        const data = req.body
+        const addressId = req.query.id
+        const user = req.session.user
+        const findAddress = await Address.findOne({
+            "address._id": addressId,
+        })
+
+        if (!findAddress) {
+            return res.redirect("/pageNotFound")
+        }
+        await Address.updateOne(
+            { "address._id": addressId },
+            {
+                $set: {
+                    "address.$": {
+                        _id: addressId,
+                        addressType: data.addressType,
+                        name: data.name,
+                        city: data.city,
+                        landMark: data.landMark,
+                        state: data.state,
+                        pincode: data.pincode,
+                        phone: data.phone,
+                        altPhone: data.altPhone
+                    }
+                }
+            }
+
+        )
+
+        res.redirect("/address")
+
+
+    } catch (error) {
+        console.log("Error editing address", error)
+        res.redirect('/pageNotFound')
+    }
+}
+
+const deleteAddress = async (req, res) => {
+
+    try {
+
+        const addressId = req.query.id
+        const findAddress = await Address.findOne({
+            "address._id": addressId,
+        })
+
+        if (!findAddress) {
+            return res.redirect("/pageNotFound")
+        }
+        await Address.updateOne(
+            { "address._id": addressId },
+            {
+                $pull: {
+                    address: {
+                        _id: addressId
+                    }
+                }
+            }
+        )
+        res.redirect("/address")
+
+    } catch (error) {
+        console.log("Error deleting address", error)
+        res.redirect('/pageNotFound')
+    }
+}
 
 module.exports = {
     getForgotPassPage,
@@ -423,5 +508,8 @@ module.exports = {
     verifyChangePassOtp,
     addAddress,
     postAddAddress,
-    
+    getAllAddresses,
+    editAddress,
+    postEditAddress,
+    deleteAddress
 }
