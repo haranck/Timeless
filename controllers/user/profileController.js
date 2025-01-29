@@ -308,7 +308,7 @@ const addAddress = async (req, res) => {
     try {
       const userId = req.session.user
       const userData = await User.findById(userId)
-      res.render("add-address", { user: userData })
+      res.render("address", { user: userData })
     } catch (error) {
       console.error("Error in addAddress:", error)
       res.redirect("/pageNotFound")
