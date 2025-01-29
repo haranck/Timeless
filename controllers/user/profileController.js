@@ -305,6 +305,7 @@ const addAddress =async (req, res) => {
 }
 
 const postAddAddress = async (req, res) => {
+    console.log(req.body)
     try {
         
         const userId = req.session.user
@@ -323,7 +324,7 @@ const postAddAddress = async (req, res) => {
                 state,
                 pincode,
                 phone,
-                altPhone
+                altPhone :altPhone || "N/A"
               }]
            })
            await newAddress.save()
@@ -336,7 +337,7 @@ const postAddAddress = async (req, res) => {
                 state,
                 pincode,
                 phone,
-                altPhone
+                altPhone:altPhone || "N/A"
               })
               await userAddress.save()
         }

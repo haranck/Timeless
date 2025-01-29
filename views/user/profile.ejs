@@ -151,7 +151,7 @@
                    </a>
                  </li>
                  <li class="nav-item">
-                   <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="/address" role="tab" aria-controls="address" aria-selected="true">
+                   <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="/addAddress" role="tab" aria-controls="address" aria-selected="true">
                      <i class="fi-rs-marker mr-10"></i>My Address
                    </a>
                  </li>
@@ -214,7 +214,7 @@
                  aria-labelledby="address-tab"
                >
                  <div class="row">
-                    <%if(user.address){%>
+                    <%if(userAddress){%>
                         <%userAddress.address.forEach((address) => {%>
                         
                 

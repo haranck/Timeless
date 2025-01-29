@@ -17,8 +17,9 @@
                                 <h2>Fall - Winter Collections 2035</h2>
                                 <p>A specialist label creating luxury essentials. Ethically crafted with an unwavering
                                     commitment to exceptional quality.</p>
-                                <a href="/shop" class="primary-btn" style="background-color: white;color: black;">Shop now
-                                   </a>
+                                <a href="/shop" class="primary-btn" style="background-color: white;color: black;">Shop
+                                    now
+                                </a>
                                 <div class="hero__social">
                                     <a href="#"><i class="fa-brands fa-facebook" style="color: #ffffff;"></i></a>
                                     <a href="#"><i class="fa-brands fa-twitter" style="color: #ffffff;"></i></a>
@@ -85,7 +86,7 @@
                         <div class="banner__item__text">
                             <h2>Accessories</h2>
                             <a href="/shop">Shop now</a>
-                        </div>  
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-7">
@@ -96,7 +97,7 @@
                             width: 464px;
                             margin-top: 304px;
                             margin-right: 96px;
-                            border-radius: 25px;" >
+                            border-radius: 25px;">
                         </div>
                         <div class="banner__item__text">
                             <h2 style="margin-left: 93px;">Legend Watches </h2>
@@ -125,51 +126,47 @@
                         <div class="product-card">
                             <div class="product-card__image">
                                 <a href="/productDetails?id=<%= products[i]._id %>">
-                                    <img src="/uploads/product-images/<%= products[i].productImages[0] %>" 
-                                         alt="<%= products[i].productName %>"
-                                         class="img-fluid">
+                                    <img src="/uploads/product-images/<%= products[i].productImages[0] %>"
+                                        alt="<%= products[i].productName %>" class="img-fluid">
                                 </a>
                                 <div class="product-card__actions">
-                                    <a href="/addToWishlist?id=<%= products[i]._id %>" 
-                                       class="product-card__wishlist-btn"
-                                       title="Add to Wishlist">
+                                    <a href="/addToWishlist?id=<%= products[i]._id %>"
+                                        class="product-card__wishlist-btn" title="Add to Wishlist">
                                         <i class="fa-regular fa-heart"></i>
                                     </a>
                                 </div>
                             </div>
                             <div class="product-card__details">
-                                <form action="/">
-                                <h6 class="product-card__title">
-                                    <%= products[i].productName %>
-                                </h6>
-                                <div class="product-card__pricing">
-                                    <span class="product-card__sale-price">
-                                        ₹<%= products[i].salePrice.toLocaleString('en-IN') %>
-                                    </span>
-                                    <span class="product-card__regular-price">
-                                        ₹<%= products[i].regularPrice.toLocaleString('en-IN') %>
-                                    </span>
-                                </div>
-                                <div class="product-card__rating">
-                                    <% for(let j = 0; j < 5; j++) { %>
-                                        <i class="fa-solid fa-star <%= j < Math.round(products[i].rating || 0) ? 'active' : '' %>"></i>
-                                    <% } %>
-                                    <span class="product-card__rating-count">
-                                        (<%= products[i].rating || 0 %>/5)
-                                    </span>
-                                </div>
-                                <div class="product-card__cta" type="submit">
-                                    <a href="/addToCart?id=<%= products[i]._id %>"
-                                       class="product-card__cart-btn">
-                                        <i class="fa-solid fa-cart-plus"></i>
-                                        Add to Cart
-                                    </a>
-                                </div>
-                                </form>
+                                
+                                    <h6 class="product-card__title">
+                                        <%= products[i].productName %>
+                                    </h6>
+                                    <div class="product-card__pricing">
+                                        <span class="product-card__sale-price">
+                                            ₹<%= products[i].salePrice.toLocaleString('en-IN') %>
+                                        </span>
+                                        <span class="product-card__regular-price">
+                                            ₹<%= products[i].regularPrice.toLocaleString('en-IN') %>
+                                        </span>
+                                    </div>
+                                    <div class="product-card__rating">
+                                        <% for(let j=0; j < 5; j++) { %>
+                                            <i
+                                                class="fa-solid fa-star <%= j < Math.round(products[i].rating || 0) ? 'active' : '' %>"></i>
+                                            <% } %>
+                                                <span class="product-card__rating-count">
+                                                    (<%= products[i].rating || 0 %>/5)
+                                                </span>
+                                    </div>
+                                    
+                                        <button onclick="addToCart('<%= products[i]._id %>')" class="btn">Add to
+                                            Cart</button>
+                                    
+                                
                             </div>
                         </div>
                     </div>
-                <% } %>
+                    <% } %>
             </div>
         </div>
     </section>
@@ -308,33 +305,39 @@
             border-radius: 12px;
             overflow: hidden;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
+
         .product-card:hover {
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
             transform: translateY(-5px);
         }
+
         .product-card__image {
             position: relative;
             overflow: hidden;
         }
+
         .product-card__image img {
             width: 100%;
             height: 250px;
             object-fit: cover;
             transition: transform 0.3s ease;
         }
+
         .product-card:hover .product-card__image img {
             transform: scale(1.05);
         }
+
         .product-card__actions {
             position: absolute;
             top: 15px;
             right: 15px;
             z-index: 10;
         }
+
         .product-card__wishlist-btn {
-            background-color: rgba(255,255,255,0.9);
+            background-color: rgba(255, 255, 255, 0.9);
             color: #000;
             width: 40px;
             height: 40px;
@@ -344,13 +347,16 @@
             justify-content: center;
             transition: all 0.3s ease;
         }
+
         .product-card__wishlist-btn:hover {
             background-color: #000;
             color: #fff;
         }
+
         .product-card__details {
             padding: 15px;
         }
+
         .product-card__title {
             font-weight: 600;
             margin-bottom: 10px;
@@ -358,41 +364,51 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
         .product-card__pricing {
             display: flex;
             align-items: center;
             margin-bottom: 10px;
         }
+
         .product-card__sale-price {
             font-weight: 700;
             color: #000;
             margin-right: 10px;
         }
+
         .product-card__regular-price {
             text-decoration: line-through;
             color: #888;
             font-size: 0.9em;
         }
+
         .product-card__rating {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
         }
+
         .product-card__rating .fa-star {
             color: #e0e0e0;
             margin-right: 3px;
         }
+
         .product-card__rating .fa-star.active {
-            color: #FFD700;  /* Vibrant gold color */
+            color: #FFD700;
+            /* Vibrant gold color */
         }
+
         .product-card__rating-count {
             color: #888;
             font-size: 0.8em;
             margin-left: 5px;
         }
+
         .product-card__cta {
             width: 100%;
         }
+
         .product-card__cart-btn {
             display: flex;
             align-items: center;
@@ -404,13 +420,61 @@
             border-radius: 6px;
             transition: all 0.3s ease;
         }
+
         .product-card__cart-btn i {
             margin-right: 8px;
         }
+
         .product-card__cart-btn:hover {
             background-color: #333;
             transform: translateY(-2px);
         }
     </style>
+
+
+<script>
+    async function addToCart(productId) {
+        try {
+            const response = await fetch('/addToCart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // If you're using CSRF protection, add the token here
+                    // 'CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    quantity: 1
+                })
+            });
+    
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Show success message using SweetAlert2
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Product added to cart successfully',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    // Optionally refresh the cart or update cart count
+                    window.location.href = '/cart';
+                });
+            } else {
+                throw new Error(data.message || 'Failed to add product to cart');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: error.message || 'Failed to add product to cart',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+    </script>
 
     <%- include("../../views/partials/user/footer") %>

@@ -61,8 +61,8 @@ router.post("/addAddress", userAuth, profileController.postAddAddress)
 
 
 // Cart Management
-router.get("/cart", userAuth, cartController.getCartPage)
-router.post("/addToCart", userAuth, cartController.addToCart)
+router.get("/cart", userAuth, cartController.getCartPage);
+router.post("/addToCart", userAuth, cartController.addToCart);
 
 
 
