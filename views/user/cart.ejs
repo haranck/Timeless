@@ -1,6 +1,10 @@
 <%- include("../../views/partials/user/header") %>
 
-
+<style>
+    .cart-img{
+        max-width: 39%;    
+    }
+</style>
     <!-- Breadcrumb Section Begin -->
     <section class="breadcrumb-option">
         <div class="container">
@@ -36,54 +40,54 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <%if(cart.items.length>0){%>
-                                        <%cart.items.forEach(item=> { %>
+                                <% if(cart.items.length > 0) { %>
+                                    <% cart.items.forEach(item => { %>
+                                        <tr>
                                             <td class="product__cart__item">
                                                 <div class="product__cart__item__pic">
-                                                    <img src="<%=item.product.image%>" alt="">
+                                                    <img class="cart-img" src="/uploads/product-images/<%= item.productId.productImages[0] %>" alt="">
                                                 </div>
                                                 <div class="product__cart__item__text">
-                                                    <h6>
-                                                        <%=item.product.name%>
-                                                    </h6>
-                                                    <h5>₹<%=item.product.price%>.toLocaleString("en-IN")</h5>
+                                                    <h6><%= item.productId.productName %></h6>
+                                                    <h5>₹<%= item.productId.salePrice %></h5>
                                                 </div>
                                             </td>
                                             <td class="quantity__item">
                                                 <div class="quantity">
                                                     <div class="pro-qty-2">
-                                                        <input type="text" value="1">
+                                                        <input type="text" value="<%= item.quantity %>">
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="cart__price">₹<%=item.product.price%>.toLocaleString("en-IN")
+                                            <td class="cart__price">₹<%= item.totalPrice%></td>
+                                            <td class="cart__close">
+                                                <a href="javascript:void(0);" onclick="confirmRemove('<%= item.productId._id %>')">
+                                                    <i class="fa fa-close"></i>
+                                                </a>
                                             </td>
-                                            <td class="cart__close"><i class="fa fa-close"></i></td>
-                                            <%});%>
-                                                <%}else{%>
-                                                    <td colspan="4" class="text-center">No products in the cart</td>
-                                                    <%}%>
-
-                                </tr>
-
-                                <!-- deleting start -->
-                                <!-- deleting end -->
-
+                                            
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>      
+                                    <tr>
+                                        <td colspan="4" class="text-center">No products in the cart</td>
+                                    </tr>
+                                <% } %>
                             </tbody>
+                            
                         </table>
                     </div>
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-6">
                             <div class="continue__btn">
-                                <a href="#">Continue Shopping</a>
+                                <a href="/shop">Continue Shopping</a>
                             </div>
                         </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6">
+                        <!-- <div class="col-lg-6 col-md-6 col-sm-6">
                             <div class="continue__btn update__btn">
                                 <a href="#"><i class="fa fa-spinner"></i> Update cart</a>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -109,7 +113,74 @@
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
     <script>
+
+function confirmRemove(productId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, remove it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/cart/remove/${productId}`, { method: "DELETE" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Removed!', 'Your item has been removed.', 'success')
+                        .then(() => location.reload()); // Reload page to reflect changes
+                    } else {
+                        Swal.fire('Error!', data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    Swal.fire('Error!', 'Something went wrong.', 'error');
+                });
+            }
+        });
+    }
+        // function removeFromCart(productId) {
+        //     Swal.fire({
+        //         title: "Are you sure?",
+        //         text: "This item will be removed from your cart.",
+        //         icon: "warning",
+        //         showCancelButton: true,
+        //         confirmButtonColor: "#d33",
+        //         cancelButtonColor: "#3085d6",
+        //         confirmButtonText: "Yes, remove it!"
+        //     }).then((result) => {
+        //         if (result.isConfirmed) {
+        //             fetch(`/cart/remove/${productId}`, {
+        //                 method: "DELETE",
+
+        //             })
+        //             .then(response => response.json())
+        //             .then(data => {
+        //                 if (data.success) {
+        //                     Swal.fire("Removed!", "The item has been removed.", "success")
+                            
+        //                     .then(() => location.reload());
+        //                 } else {
+        //                     Swal.fire("Error!", data.message, "error");
+        //                 }
+        //             })
+        //             .catch(error => {
+        //                 console.error("Error:", error);
+        //                 Swal.fire("Error!", "Something went wrong.", "error");
+        //             });
+        //         }
+        //     });
+        // }
+    </script>
+
+
+    <!-- <script>
         function changeQuantity() {
             Swal.fire({
                 title: 'Quantity Changed!',
@@ -117,22 +188,22 @@
                 icon: 'success',
                 timer: 3000
             });
-        }
+        } 
 
-        function confirmRemove() {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, remove it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire('Removed!', 'Your item has been removed.', 'success');
-                }
-            });
-        }
-    </script>
+          function confirmRemove() {
+             Swal.fire({
+                 title: 'Are you sure?',
+                 text: "You won't be able to revert this!",
+                 icon: 'warning',
+                 showCancelButton: true,
+                 confirmButtonColor: '#3085d6',
+                 cancelButtonColor: '#d33',
+                 confirmButtonText: 'Yes, remove it!'
+             }).then((result) => {
+                 if (result.isConfirmed) {
+                     Swal.fire('Removed!', 'Your item has been removed.', 'success');
+                 }
+             });
+         }
+     </script> -->
     <%- include("../../views/partials/user/footer") %>

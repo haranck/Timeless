@@ -3,45 +3,37 @@ const Product = require("../../models/productSchema");
 const Cart = require('../../models/cartSchema')
 const mongodb = require("mongodb");
 
-const getCartPage = async (req, res) => {
+const loadCart = async (req, res) => {
     try {
-        console.log("Cart page loaded");
-        const userId = req.session.user; 
-        // Modify the populate to match how you're accessing it in the template
-        const cart = await Cart.findOne({ userId })
-            .populate({
-                path: 'items.productId',
-                model: 'Product',
-                select: 'name price' // Select the fields you need
-            });
+        const userId = req.session.user;
+        
+        const cart = await Cart.findOne({ userId }).populate("items.productId");// product details populate cheythedukkunnu
 
-        if (!cart || cart.items.length === 0) {
-            return res.render("cart", { cart: { items: [] } }); // Pass empty cart instead of null
+        // If cart is empty, return a default structure
+        if (!cart) {
+            return res.render("cart", {
+                cart: {
+                    items: [],
+                    totalPrice: 0
+                }
+            });
         }
 
-        // Transform the data to match your template
-        const transformedCart = {
-            items: cart.items.map(item => ({
-                product: {
-                    name: item.productId.name,
-                    price: item.productId.price
-                },
-                quantity: item.quantity,
-                totalPrice: item.totalPrice
-            })),
-            totalPrice: cart.cartTotal
-        };
+        // Calculate total price
+        cart.totalPrice = cart.items.reduce((total, item) => total + item.totalPrice, 0);
 
-        res.render("cart", { cart: transformedCart });
+        res.render("cart", { cart });
+
     } catch (error) {
-        console.error("Error in cart page:", error);
-        res.status(500).redirect("/pageNotFound");
+        console.error("Error loading cart:", error);
+        res.status(500).send("Failed to load cart");
     }
 };
+
 const addToCart = async (req, res) => {
     try {
         console.log('Request body:', req.body);
-        const { productId, quantity,price,totalPrice } = req.body;
+        const { productId, quantity } = req.body;
         const userId = req.session.user;
 
         // Input validation
@@ -54,15 +46,16 @@ const addToCart = async (req, res) => {
 
         // Find product and get its price
         const product = await Product.findById(productId);
+        console.log("product",product);
         if (!product) {
             return res.status(404).json({ 
                 success: false,
                 message: "Product not found" 
             });
         }
-
+        console.log("salePrice",product.salePrice)
         // Ensure product price exists
-        if (!product.price || isNaN(product.price)) {
+        if (!product.salePrice) {
             return res.status(400).json({ 
                 success: false,
                 message: "Invalid product price" 
@@ -83,7 +76,7 @@ const addToCart = async (req, res) => {
         }
 
         // Calculate item price and total
-        const itemPrice = Number(product.price);
+        const itemPrice = Number(product.salePrice);
         const itemTotalPrice = itemPrice * itemQuantity;
 
         const existingItemIndex = cart.items.findIndex(item => 
@@ -94,11 +87,13 @@ const addToCart = async (req, res) => {
             // Update existing item
             cart.items[existingItemIndex].quantity += itemQuantity;
             cart.items[existingItemIndex].price = itemPrice;
-            cart.items[existingItemIndex].totalPrice = 
-                cart.items[existingItemIndex].quantity * itemPrice;
+            cart.items[existingItemIndex].totalPrice =  cart.items[existingItemIndex].quantity * itemPrice;
+               
         } else {
+
             // Add new item
             cart.items.push({
+                
                 productId,
                 quantity: itemQuantity,
                 price: itemPrice,
@@ -115,10 +110,12 @@ const addToCart = async (req, res) => {
 
         // Send success response
         res.status(200).json({
+            
             success: true,
             message: "Product added to cart successfully",
             cartTotal: cart.cartTotal,
-            itemsCount: cart.items.length
+            itemsCount: cart.items.length,
+            redirectUrl: "/cart"
         });
 
     } catch (error) {
@@ -132,6 +129,6 @@ const addToCart = async (req, res) => {
 };
 
 module.exports = {
-    getCartPage,
-    addToCart
+    loadCart,
+    addToCart,
 }

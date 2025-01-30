@@ -573,11 +573,11 @@
                                                     </span>
                                         </div>
                                         <div class="product-card__cta">
-                                            <a href="/addToCart?id=<%= products[i]._id %>"
+                                            <button onclick="addToCart('<%= products[i]._id %>')"
                                                 class="product-card__cart-btn">
                                                 <i class="fa-solid fa-cart-plus"></i>
                                                 Add to Cart
-                                            </a>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -629,7 +629,50 @@
 
     <script>
 
-        // myscript
+
+        async function addToCart(productId) {
+        try {
+            const response = await fetch('/addToCart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // If you're using CSRF protection, add the token here
+                    // 'CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    quantity: 1
+                })
+            });
+    
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Show success message using SweetAlert2
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Product added to cart successfully',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    // Optionally refresh the cart or update cart count
+                    window.location.href = '/cart';
+                });
+            } else {
+                throw new Error(data.message || 'Failed to add product to cart');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: error.message || 'Failed to add product to cart',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+    
 
         document.getElementById("applyFilter").addEventListener("click", async () => {
             // Get selected categories
@@ -684,73 +727,6 @@
                 console.error("Error applying filters:", error);
             }
         });
-
-
-        //end myscript
-
-
-
-
-
-        // document.addEventListener('DOMContentLoaded', function () {
-        //     const minPriceSlider = document.getElementById('min-price');
-        //     const maxPriceSlider = document.getElementById('max-price');
-        //     const minPriceDisplay = document.getElementById('min-price-display');
-        //     const maxPriceDisplay = document.getElementById('max-price-display');
-        //     const priceFill = document.querySelector('.price-range-fill');
-        //     const applyFiltersBtn = document.getElementById('apply-filters');
-
-        //     // Update price values and fill when sliders change
-        //     function updatePriceRange() {
-        //         const minPrice = parseInt(minPriceSlider.value);
-        //         const maxPrice = parseInt(maxPriceSlider.value);
-
-        //         // Ensure min price doesn't exceed max price
-        //         if (minPrice > maxPrice) {
-        //             minPriceSlider.value = maxPrice;
-        //         }
-
-        //         // Calculate percentage for fill
-        //         const minPercentage = (minPrice / 10000) * 100;
-        //         const maxPercentage = (maxPrice / 10000) * 100;
-
-        //         // Update displayed values
-        //         minPriceDisplay.textContent = `₹${minPrice.toLocaleString('en-IN')}`;
-        //         maxPriceDisplay.textContent = `₹${maxPrice.toLocaleString('en-IN')}`;
-
-        //         // Update price range fill
-        //         priceFill.style.left = `${minPercentage}%`;
-        //         priceFill.style.width = `${maxPercentage - minPercentage}%`;
-        //     }
-
-        //     // Add event listeners to sliders
-        //     minPriceSlider.addEventListener('input', updatePriceRange);
-        //     maxPriceSlider.addEventListener('input', updatePriceRange);
-
-        //     // Apply filters button click handler
-        //     applyFiltersBtn.addEventListener('click', function () {
-        //         const minPrice = minPriceSlider.value;
-        //         const maxPrice = maxPriceSlider.value;
-        //         const selectedCategories = Array.from(
-        //             document.querySelectorAll('.category-checkbox:checked')
-        //         ).map(cb => cb.value);
-        //         const searchQuery = document.querySelector('input[name="search"]').value;
-
-        //         // Construct query string
-        //         const queryParams = new URLSearchParams({
-        //             minPrice: minPrice,
-        //             maxPrice: maxPrice,
-        //             search: searchQuery,
-        //             categories: selectedCategories.join(',')
-        //         });
-
-        //         // Redirect to shop page with filters
-        //         window.location.href = `/shop?${queryParams.toString()}`;
-        //     });
-
-        //     // Initial price range update
-        //     updatePriceRange();
-        // });
 
 
 
