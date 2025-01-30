@@ -4,6 +4,44 @@
     .cart-img{
         max-width: 39%;    
     }
+
+    .custom-quantity-input {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        overflow: hidden;
+        width: fit-content;
+    }
+
+    .quantity-btn {
+        background: #f8f9fa;
+        border: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.2s;
+    }
+
+    .quantity-btn:hover {
+        background: #e9ecef;
+    }
+
+    .quantity-value {
+        width: 40px;
+        text-align: center;
+        border: none;
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        padding: 8px 0;
+        font-size: 14px;
+    }
+
+    .quantity-value::-webkit-inner-spin-button,
+    .quantity-value::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
 </style>
     <!-- Breadcrumb Section Begin -->
     <section class="breadcrumb-option">
@@ -53,10 +91,12 @@
                                                 </div>
                                             </td>
                                             <td class="quantity__item">
-                                                <div class="quantity">
-                                                    <div class="pro-qty-2">
-                                                        <input type="text" value="<%= item.quantity %>">
-                                                    </div>
+                                                <div class="custom-quantity-input">
+                                                    <button class="quantity-btn" onclick="updateItemQuantity('<%= item.productId._id %>', 'decrease')">-</button>
+                                                    <input type="number" class="quantity-value" value="<%= item.quantity %>" min="1" 
+                                                        onchange="updateItemQuantity('<%= item.productId._id %>', 'set', this.value)"
+                                                        readonly>
+                                                    <button class="quantity-btn" onclick="updateItemQuantity('<%= item.productId._id %>', 'increase')">+</button>
                                                 </div>
                                             </td>
                                             <td class="cart__price">₹<%= item.totalPrice%></td>
@@ -114,96 +154,145 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
     <script>
-
-function confirmRemove(productId) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, remove it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`/cart/remove/${productId}`, { method: "DELETE" })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire('Removed!', 'Your item has been removed.', 'success')
-                        .then(() => location.reload()); // Reload page to reflect changes
-                    } else {
-                        Swal.fire('Error!', data.message, 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    Swal.fire('Error!', 'Something went wrong.', 'error');
-                });
-            }
-        });
-    }
-        // function removeFromCart(productId) {
-        //     Swal.fire({
-        //         title: "Are you sure?",
-        //         text: "This item will be removed from your cart.",
-        //         icon: "warning",
-        //         showCancelButton: true,
-        //         confirmButtonColor: "#d33",
-        //         cancelButtonColor: "#3085d6",
-        //         confirmButtonText: "Yes, remove it!"
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             fetch(`/cart/remove/${productId}`, {
-        //                 method: "DELETE",
-
-        //             })
-        //             .then(response => response.json())
-        //             .then(data => {
-        //                 if (data.success) {
-        //                     Swal.fire("Removed!", "The item has been removed.", "success")
+        function confirmRemove(productId) {
+            // Find the cart row before removal
+            const cartRow = document.querySelector(`a[onclick="confirmRemove('${productId}')"]`).closest('tr');
+            
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This item will be removed from your cart.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, remove it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/cart/remove/${productId}`, { 
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the item from DOM
+                            cartRow.remove();
                             
-        //                     .then(() => location.reload());
-        //                 } else {
-        //                     Swal.fire("Error!", data.message, "error");
-        //                 }
-        //             })
-        //             .catch(error => {
-        //                 console.error("Error:", error);
-        //                 Swal.fire("Error!", "Something went wrong.", "error");
-        //             });
-        //         }
-        //     });
-        // }
+                            // Recalculate total price
+                            calculateTotalPrice();
+                            
+                            // Check if cart is empty
+                            const remainingItems = document.querySelectorAll('tr').length;
+                            if (remainingItems <= 1) { // Only header row remains
+                                location.reload(); // Reload to show empty cart message
+                            }
+
+                            Swal.fire('Removed!', 'Your item has been removed.', 'success');
+                        } else {
+                            Swal.fire('Error!', data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        Swal.fire('Error!', 'Something went wrong.', 'error');
+                    });
+                }
+            });
+        }
+
+        function calculateTotalPrice() {
+            const cartRows = document.querySelectorAll('tr');
+            let subtotal = 0;
+
+            cartRows.forEach(row => {
+                const priceElement = row.querySelector('.cart__price');
+                if (priceElement) {
+                    const price = parseFloat(priceElement.textContent.replace('₹', ''));
+                    if (!isNaN(price)) {
+                        subtotal += price;
+                    }
+                }
+            });
+
+            // Add IDs to the price elements in the HTML for easier selection
+            document.querySelectorAll('ul li').forEach(li => {
+                const text = li.childNodes[0].textContent.trim();
+                if (text === 'Subtotal') {
+                    li.querySelector('span').textContent = `₹${subtotal.toFixed(2)}`;
+                }
+                if (text === 'Total') {
+                    li.querySelector('span').textContent = `₹${subtotal.toFixed(2)}`;
+                }
+            });
+
+            return subtotal;
+        }
+
+        // Call the function when page loads
+        document.addEventListener('DOMContentLoaded', calculateTotalPrice);
+
+        async function updateItemQuantity(productId, action, value = null) {
+            let quantityInput = event.target.parentElement.querySelector('.quantity-value');
+            let currentQuantity = parseInt(quantityInput.value);
+            let newQuantity = currentQuantity;
+            newQuantity = action === 'increase' ? currentQuantity + 1 : currentQuantity - 1 ;
+            if(newQuantity > 5){
+                Swal.fire('Error!', 'You can only order up to 5 items.', 'error');
+                return;
+            }
+            if(newQuantity < 1){
+                Swal.fire('Error!', 'You can not order less than 1 item.', 'error');
+                return;
+            }
+            const response = await fetch('/addToCart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    quantity: action === 'increase' ? 1 : -1
+                })
+            } )
+            const data = await response.json();
+            if(!response.ok){
+                Swal.fire('Error!', data.message, 'error');
+                return;
+            }
+            // switch(action) {
+            //     case 'increase':
+            //         newQuantity = currentQuantity + 1;
+            //         break;
+            //     case 'decrease':
+            //         newQuantity = currentQuantity > 1 ? currentQuantity - 1 : 1;
+            //         break;
+            //     case 'set':
+            //         newQuantity = parseInt(value) || 1;
+            //         break;
+            // }
+            await Swal.fire('Success!', '', 'success');
+            if (newQuantity !== currentQuantity) {
+                quantityInput.value = newQuantity;
+                
+                // Update the price for this item
+                const pricePerUnit = parseFloat(quantityInput.closest('tr').querySelector('.product__cart__item__text h5').textContent.replace('₹', ''));
+                const totalPriceElement = quantityInput.closest('tr').querySelector('.cart__price');
+                totalPriceElement.textContent = `₹${(pricePerUnit * newQuantity).toFixed(2)}`;
+
+                // Recalculate total cart price
+                calculateTotalPrice();
+
+                // You can add AJAX call here to update the backend
+                // fetch('/cart/update', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({ productId, quantity: newQuantity })
+                // });
+            }
+        }
     </script>
 
-
-    <!-- <script>
-        function changeQuantity() {
-            Swal.fire({
-                title: 'Quantity Changed!',
-                text: 'Your cart quantity has been updated.',
-                icon: 'success',
-                timer: 3000
-            });
-        } 
-
-          function confirmRemove() {
-             Swal.fire({
-                 title: 'Are you sure?',
-                 text: "You won't be able to revert this!",
-                 icon: 'warning',
-                 showCancelButton: true,
-                 confirmButtonColor: '#3085d6',
-                 cancelButtonColor: '#d33',
-                 confirmButtonText: 'Yes, remove it!'
-             }).then((result) => {
-                 if (result.isConfirmed) {
-                     Swal.fire('Removed!', 'Your item has been removed.', 'success');
-                 }
-             });
-         }
-     </script> -->
     <%- include("../../views/partials/user/footer") %>
