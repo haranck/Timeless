@@ -4,7 +4,6 @@
         /* Modal Background */
         .modal {
             display: none;
-            /* Hidden by default */
             position: fixed;
             z-index: 1000;
             left: 0;
@@ -12,52 +11,95 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            /* Semi-transparent background */
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
+            padding: 20px;
+            overflow-y: auto;
         }
 
         /* Modal Content */
         .modal-content {
             background: #fff;
-            width: 400px;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
         }
 
         /* Close Button */
         .close-btn {
-            float: right;
+            position: absolute;
+            right: 20px;
+            top: 15px;
             font-size: 24px;
             font-weight: bold;
             cursor: pointer;
+            color: #666;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: #000;
+        }
+
+        /* Form Title */
+        .modal-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Form Group */
+        .form-group {
+            margin-bottom: 20px;
         }
 
         /* Input Fields */
         .modal-content input {
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .modal-content input:focus {
+            outline: none;
+            border-color: #4A90E2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+        }
+
+        .modal-content input::placeholder {
+            color: #999;
         }
 
         /* Save Button */
         .save-btn {
             width: 100%;
-            padding: 10px;
-            background: #28a745;
+            padding: 12px;
+            background: #4A90E2;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
         }
 
         .save-btn:hover {
-            background: #218838;
+            background: #357ABD;
+        }
+
+        .save-btn:active {
+            transform: translateY(1px);
         }
     </style>
 
@@ -92,113 +134,76 @@
                                     <i class="fas fa-shipping-fast me-2"></i>Shipping Address
                                 </h6>
                                 <div class="saved-addresses mb-4">
-                                    <!-- Saved Address 1 -->
-                                    <div class="saved-address-item mb-4 p-4 border rounded bg-white">
-                                        <% if (userAddress && userAddress.length> 0) { %>
-                                            <% userAddress.forEach((address, index)=> { %>
+                                    <% if (userAddress && userAddress.length > 0) { %>
+                                        <% userAddress.forEach((address, index) => { %>
+                                            <div class="saved-address-item mb-4 p-4 border rounded bg-white">
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="shipping_address"
-                                                        id="address1" checked>
-                                                    <label class="form-check-label w-100" for="address1">
+                                                        id="address_<%= address._id %>" value="<%= address._id %>" <%= index === 0 ? 'checked' : '' %>>
+                                                    <label class="form-check-label w-100" for="address_<%= address._id %>">
                                                         <div class="d-flex justify-content-between align-items-start">
                                                             <div>
                                                                 <strong class="d-block mb-2">
-                                                                    <i class="fas fa-map-marker-alt"></i>
-                                                                    <%= address.addressType %> : Address
+                                                                    <i class="fas fa-map-marker-alt me-2"></i>
+                                                                    <%= address.addressType %> Address
                                                                 </strong>
                                                                 <div class="address-details ms-4">
-                                                                    <p class="mb-2 text-dark">
-                                                                        <%= address.name %>
-                                                                    </p>
+                                                                    <p class="mb-2 text-dark"><%= address.name %></p>
                                                                     <p class="mb-2 text-muted">
-                                                                        Pincode: <%= address.pincode %>, <br>
-                                                                            Landmark: <%= address.landMark %>
+                                                                        Landmark: <%= address.landMark %><br>
+                                                                        Pincode: <%= address.pincode %>
                                                                     </p>
                                                                     <p class="mb-2 text-dark">
                                                                         <%= address.city %>, <%= address.state %>
                                                                     </p>
                                                                     <p class="mb-1">
                                                                         <i class="fas fa-phone-alt me-2"></i>
-                                                                        <span class="text-dark">
-                                                                            <%= address.phone %>
-                                                                        </span>
+                                                                        <span class="text-dark"><%= address.phone %></span>
                                                                     </p>
-                                                                    <p class="mb-0">
-                                                                        <i class="fas fa-phone me-2"></i>
-                                                                        <span class="text-muted">
-                                                                            <%= address.altPhone %>
-                                                                        </span>
-                                                                    </p>
+                                                                    <% if (address.altPhone) { %>
+                                                                        <p class="mb-0">
+                                                                            <i class="fas fa-phone me-2"></i>
+                                                                            <span class="text-muted"><%= address.altPhone %></span>
+                                                                        </p>
+                                                                    <% } %>
                                                                 </div>
                                                             </div>
-
-                                                            <button class="btn btn-outline-dark"
-                                                                onclick="openEditAddressModal('<%= address._id %>')">
+                                                            <button type="button" class="btn btn-outline-dark" onclick="openEditAddressModal('<%= address._id %>')">
                                                                 <i class="fas fa-edit me-2"></i>Edit
                                                             </button>
-
-
                                                         </div>
                                                     </label>
                                                 </div>
-                                                <% }) %>
-                                                    <% } else { %>
-                                                        <p>You haven't added any addresses yet.</p>
-                                                        <% } %>
-                                    </div>
-                                    <!-- Saved Address 2 -->
-                                    <!-- <div class="saved-address-item mb-4 p-4 border rounded bg-white">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="shipping_address"
-                                                id="address2">
-                                            <label class="form-check-label w-100" for="address2">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <div>
-                                                        <strong class="d-block mb-2">
-                                                            <i class="fas fa-building me-2"></i>Office
-                                                        </strong>
-                                                        <div class="address-details ms-4">
-                                                            <p class="mb-2 text-dark">John Doe</p>
-                                                            <p class="mb-2 text-muted">
-                                                                456 Business Ave, <br>
-                                                                Floor 5, Suite 502, <br>
-                                                                Landmark: Business District
-                                                            </p>
-                                                            <p class="mb-2 text-dark">New York, NY 10002</p>
-                                                            <p class="mb-1">
-                                                                <i class="fas fa-phone-alt me-2"></i>
-                                                                <span class="text-dark">(555) 234-5678</span>
-                                                            </p>
-                                                            <p class="mb-0">
-                                                                <i class="fas fa-phone me-2"></i>
-                                                                <span class="text-muted">(555) 876-5432</span>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <button class="btn btn-outline-dark">
-                                                        <i class="fas fa-edit me-2"></i>Edit
-                                                    </button>
-                                                </div>
-                                            </label>
+                                            </div>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <div class="text-center py-4">
+                                            <p class="mb-3">You haven't added any addresses yet.</p>
+                                            <a href="" class=" btn-dark ">
+                                                <button onclick="openAddAddressModal()">
+                                                    <i class="fas fa-plus-circle me-2"></i>Add New Address
+                                                </button>
+                                            </a>
                                         </div>
-                                    </div> -->
+                                    <% } %>
                                 </div>
-                                <a href="/addAddress">
-                                    <button
-                                        class="site-btn mb-4 d-flex align-items-center justify-content-center w-100">
-                                        <i class="fas fa-plus-circle me-2"></i>Add New Address
-                                    </button>
-                                </a>
-                                <div class="additional-info p-4 border rounded bg-white">
-                                    <h6 class="checkout__title mb-4">
-                                        <i class="fas fa-info-circle me-2"></i>Additional Information
-                                    </h6>
-                                    <div class="checkout__input">
-                                        <p>Order Notes (Optional)</p>
-                                        <textarea class="w-100 p-3" rows="4"
-                                            placeholder="Special notes for delivery (e.g., delivery timing, specific instructions for delivery person, preferred contact method)"
-                                            style="resize: none; border: 1px solid #e1e1e1; border-radius: 4px;"></textarea>
-                                    </div>
+                                <% if (userAddress && userAddress.length > 0) { %>
+                                    <a href="" class="btn btn-dark d-block">
+                                        <button onclick="openAddAddressModal()">
+                                            <i class="fas fa-plus-circle me-2"></i>Add Another Address
+                                        </button>
+                                    </a>
+                                <% } %>
+                            </div>
+                            <div class="additional-info p-4 border rounded bg-white">
+                                <h6 class="checkout__title mb-4">
+                                    <i class="fas fa-info-circle me-2"></i>Additional Information
+                                </h6>
+                                <div class="checkout__input">
+                                    <p>Order Notes (Optional)</p>
+                                    <input type="text" class="w-100 p-3" rows="4"style="resize: none; border: 1px solid #e1e1e1; border-radius: 4px;"
+                                    placeholder="Special notes for delivery (e.g., delivery timing, specific instructions for delivery)">
+                                    </input>
                                 </div>
                             </div>
                         </div>
@@ -225,8 +230,8 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <% if(cart.items.length> 0) { %>
-                                                    <% cart.items.forEach(item=> { %>
+                                                <% if(cart.items.length > 0) { %>
+                                                    <% cart.items.forEach(item => { %>
                                                         <tr>
                                                             <td>
                                                                 <%= item.productId.productName %>
@@ -238,13 +243,13 @@
                                                             <td class="text-end">₹<%= item.totalPrice %>
                                                             </td>
                                                         </tr>
-                                                        <% }) %>
-                                                            <% } else { %>
-                                                                <tr>
-                                                                    <td colspan="4" class="text-center">No products in
-                                                                        the cart</td>
-                                                                </tr>
-                                                                <% } %>
+                                                        <% }); %>
+                                                    <% } else { %>
+                                                        <tr>
+                                                            <td colspan="4" class="text-center">No products in
+                                                                the cart</td>
+                                                        </tr>
+                                                    <% } %>
                                             </tbody>
                                         </table>
                                     </div>
@@ -314,8 +319,7 @@
                                             </label>
                                         </div>
                                         <div class="form-check mb-3">
-                                            <input class="form-check-input" type="radio" name="payment_method"
-                                                id="card">
+                                            <input class="form-check-input" type="radio" name="payment_method" id="card">
                                             <label class="form-check-label" for="card">
                                                 <i class="fas fa-credit-card me-2"></i>Credit/Debit Card
                                             </label>
@@ -338,37 +342,114 @@
     <div id="editAddressModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h2>Edit Address</h2>
-            <form action="/update-address" method="POST">
-                <label for="name">Full Name</label>
-                <input type="text" id="name" name="name" value="<%= userAddress ? userAddress.name : '' %>" required>
+            <h2 class="modal-title">Edit Address</h2>
+            <form action="/editCheckoutAddress" method="POST">
+                <div class="form-group">
+                    <label for="addressType">Address Type</label>
+                    <input type="text" id="edit_addressType" name="addressType" placeholder="Address Type (e.g., Home, Office)" required>
+                    
 
-                <label for="city">City</label>
-                <input type="text" id="city" name="city" value="<%= userAddress ? userAddress.city : '' %>" required>
+                    <label for="name">Place Name</label>
+                    <input type="text" id="edit_name" name="name" placeholder="Full Name" required>
+                
+                    <label for="city">City</label>
+                    <input type="text" id="edit_city" name="city" placeholder="City" required>
+                 
+                    <label for="state">State</label>
+                    <input type="text" id="edit_state" name="state" placeholder="State" required>
+                            
+                    <label for="landMark">Landmark</label>
+                    <input type="text" id="edit_landMark" name="landMark" placeholder="Landmark" required>
+                    
+                    <label for="pincode">Pincode</label>
+                    <input type="text" id="edit_pincode" name="pincode" placeholder="Pincode" required>
+                
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="edit_phone" name="phone" placeholder="Phone Number" required>
+                
+                    <label for="altPhone">Alternative Phone Number (Optional)</label>
+                    <input type="tel" id="edit_altPhone" name="altPhone" placeholder="Alternative Phone Number (Optional)">
+                </div>
 
-                <label for="pincode">Pincode</label>
-                <input type="text" id="pincode" name="pincode" value="<%= userAddress ? userAddress.pincode : '' %>"
-                    required>
+                <input type="hidden" id="edit_address_id" name="address_id">
 
-                <label for="phone">Phone</label>
-                <input type="text" id="phone" name="phone" value="<%= userAddress ? userAddress.phone : '' %>" required>
+                <button type="submit" class="save-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
 
-                <input type="hidden" name="address_id" value="<%= userAddress ? userAddress._id : '' %>">
+    <!-- //////////////// -->
 
-                <button type="submit" class="save-btn">Save</button>
+    <div id="addAddressModal" class="addModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeAddressModal()">&times;</span>
+            <h2 class="modal-title">Add Address</h2>
+            <form action="/addCheckoutAddress" method="POST">
+                <div class="form-group">
+                    <label for="addressType">Address Type</label>
+                    <input type="text" name="addressType" placeholder="Address Type (e.g., Home, Office)" required>
+                    
+                    <label for="name">Place Name</label>
+                    <input type="text" name="name" placeholder="Full Name" required>
+                
+                    <label for="city">City</label>
+                    <input type="text" name="city" placeholder="City" required>
+                 
+                    <label for="state">State</label>
+                    <input type="text" name="state" placeholder="State" required>
+                            
+                    <label for="landMark">Landmark</label>
+                    <input type="text" name="landMark" placeholder="Landmark" required>
+                    
+                    <label for="pincode">Pincode</label>
+                    <input type="text" name="pincode" placeholder="Pincode" required>
+                
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" name="phone" placeholder="Phone Number" required>
+                
+                    <label for="altPhone">Alternative Phone Number (Optional)</label>
+                    <input type="tel" name="altPhone" placeholder="Alternative Phone Number (Optional)">
+                </div>
+
+                <button type="submit" class="save-btn">Save Changes</button>
             </form>
         </div>
     </div>
 
     <script>
-        // Function to Open Modal
-        function openModal() {
-            document.getElementById("editAddressModal").style.display = "flex";
+        // Function to Open Modal with address data
+        function openEditAddressModal(addressId) {
+        const addresses = <%- JSON.stringify(userAddress) %>;
+        const address = addresses.find(addr => addr._id === addressId);//Finds the matching address using .find().
+            
+            if (address) {
+                document.getElementById("edit_addressType").value = address.addressType || '';
+                document.getElementById("edit_name").value = address.name || '';
+                document.getElementById("edit_city").value = address.city || '';
+                document.getElementById("edit_state").value = address.state || '';
+                document.getElementById("edit_landMark").value = address.landMark || '';
+                document.getElementById("edit_pincode").value = address.pincode || '';
+                document.getElementById("edit_phone").value = address.phone || '';
+                document.getElementById("edit_altPhone").value = address.altPhone || '';
+                document.getElementById("edit_address_id").value = address._id;
+                
+                document.getElementById("editAddressModal").style.display = "flex";
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            }
         }
-
+        function openAddAddressModal() {
+            document.getElementById("addAddressModal").style.display = "flex";
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+        //function to close add modal 
+        function closeAddressModal() {
+            document.getElementById("addAddressModal").style.display = "none";
+            document.body.style.overflow = ''; // Restore background scrolling
+        }
         // Function to Close Modal
         function closeModal() {
             document.getElementById("editAddressModal").style.display = "none";
+            document.body.style.overflow = ''; // Restore background scrolling
         }
 
         // Close modal when clicking outside of it
@@ -378,7 +459,12 @@
                 closeModal();
             }
         };
-
+        window.onclick = function (event) {
+            const modal = document.getElementById("addAddressModal");
+            if (event.target === addModal) {
+                closeAddressModal();
+            }
+        };
     </script>
 
     <%- include("../../views/partials/user/footer") %>

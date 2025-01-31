@@ -6,85 +6,129 @@ const Address = require('../../models/addressSchema')
 
 const loadCheckout = async (req, res) => {
     try {
-
         const userId = req.session.user;
         const cart = await Cart.findOne({ userId }).populate("items.productId");
         const user = await User.findById(userId);
-        const address = await Address.findOne({ userId: userId });
+        const addressDoc = await Address.findOne({ userId: userId });
 
-        let userAddress = null
-        if (address && address.address) {
-            userAddress = address.address
+        let userAddress = [];
+        if (addressDoc && addressDoc.address) {
+            userAddress = addressDoc.address;
         }
 
         res.render("checkout", {
             cart,
             user,
-            userAddress: userAddress
+            userAddress
         });
 
     } catch (error) {
-        console.log("error in checkout", error)
-        res.redirect("/pageNotFound")
+        console.log("error in checkout", error);
+        res.redirect("/pageNotFound");
     }
 }
 
-const postCheckout = async (req, res) => {
-    try {
-
-    } catch (error) {
-
-    }
-}
-
-// const editCheckoutAddress = async (req, res) => {
+// const postCheckout = async (req, res) => {
 //     try {
-//         const userId = req.session.user
-//         const { addressType, name, city, landMark, state, pincode, phone, altPhone } = req.body
-//         const userAddress = await Address.findOne({ userId: userId })
-//         if (!userAddress) {
-//             return res.redirect("/pageNotFound")
-//         }
-//         userAddress.address.push({
-//             addressType,
-//             name,
-//             city,
-//             landMark,
-//             state,
-//             pincode,
-//             phone,
-//             altPhone
-//         })
-//         await userAddress.save()
-//         res.render("checkout",{
-//             userAddress:userAddress
-//         })
+
 //     } catch (error) {
-//         console.log("error in editCheckoutAddress", error)
-//         res.redirect("/pageNotFound")
+
 //     }
 // }
 
 const editCheckoutAddress = async (req, res) => {
     try {
-        const { address_id, name, city, pincode, phone } = req.body;
+        const userId = req.session.user;
+        const { 
+            address_id, 
+            name, 
+            addressType,
+            city, 
+            state,
+            landMark,
+            pincode, 
+            phone,
+            altPhone 
+        } = req.body;
 
-        if (!address_id || address_id.length !== 24) {
+        if (!address_id) {
             console.log("Invalid Address ID:", address_id);
             return res.status(400).json({ error: "Invalid address ID" });
         }
 
-        await Address.findByIdAndUpdate(address_id, { name, city, pincode, phone });
+        const address = await Address.findOne({ userId: userId, "address._id": address_id });// If the user has multiple saved addresses, this ensures we fetch the correct document.
+        if (!address) {
+            return res.status(404).json({ error: "Address not found" });
+        }
 
-        res.redirect('/checkout'); // Reload the checkout page with updated address
+        // Find and update the specific address in the array
+        const addressIndex = address.address.findIndex(addr => addr._id.toString() === address_id);
+        if (addressIndex === -1) {
+            return res.status(404).json({ error: "Address not found in array" });
+        }
+
+        address.address[addressIndex] = {
+            ...address.address[addressIndex],
+            name,
+            addressType,
+            city,
+            state,
+            landMark,
+            pincode,
+            phone,
+            altPhone
+        };
+
+        await address.save();
+        res.redirect('/checkout');
     } catch (error) {
-        console.log("error in editCheckoutAddress", error)
-        res.redirect("/pageNotFound")
+        console.log("error in editCheckoutAddress", error);
+        res.status(500).json({ error: "Internal server error" });
     }
 }
 
+const addCheckoutAddress = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const { 
+            name,
+            addressType,
+            city, 
+            state,
+            landMark,
+            pincode, 
+            phone,
+            altPhone 
+        } = req.body;
+
+        const address = new Address({
+            userId,
+            address: [
+                {
+                    name,
+                    addressType,
+                    city,
+                    state,
+                    landMark,
+                    pincode,
+                    phone,
+                    altPhone
+                }
+            ]
+        });
+        await address.save();
+        res.redirect('/checkout');
+
+
+    } catch (error) {
+        console.log("error in addCheckoutAddress", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
+
+
 module.exports = {
     loadCheckout,
-    postCheckout,
-    editCheckoutAddress
+    editCheckoutAddress,
+    addCheckoutAddress
 }
