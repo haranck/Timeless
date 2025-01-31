@@ -76,28 +76,53 @@ const addToCart = async (req, res) => {
         }
 
         // Calculate item price and total
-        const itemPrice = Number(product.salePrice);
-        const itemTotalPrice = itemPrice * itemQuantity;
+        // const itemPrice = Number(product.salePrice);
+        // const itemTotalPrice = itemPrice * itemQuantity;
 
+        // find the item in the cart
         const existingItemIndex = cart.items.findIndex(item => 
             item.productId.toString() === productId.toString()
         );
 
         if (existingItemIndex > -1) {
+
+            //get current quantity
+            let newQuantity = cart.items[existingItemIndex].quantity + itemQuantity;
+
+            if(newQuantity >5){
+                return res.status(400).json({ 
+                    success: false,
+                    // message: "You can only order up to 5 items" 
+                });
+            }
+            if(newQuantity > product.quantity){
+                return res.status(400).json({ 
+                    success: false,
+                    message: "You can not order more than available stock" 
+                });
+            }
+            if(newQuantity <1){
+                return res.status(400).json({ 
+                    success: false,
+                    // message: "You can not order less than 1 item" 
+                });
+            }
+
+
+
             // Update existing item
-            cart.items[existingItemIndex].quantity += itemQuantity;
-            cart.items[existingItemIndex].price = itemPrice;
-            cart.items[existingItemIndex].totalPrice =  cart.items[existingItemIndex].quantity * itemPrice;
+            cart.items[existingItemIndex].quantity = newQuantity;
+            // cart.items[existingItemIndex].price = itemPrice;
+            cart.items[existingItemIndex].totalPrice =  newQuantity * product.salePrice;
                
         } else {
 
             // Add new item
             cart.items.push({
-                
                 productId,
                 quantity: itemQuantity,
-                price: itemPrice,
-                totalPrice: itemTotalPrice
+                price: product.salePrice,
+                totalPrice: product.salePrice * itemQuantity
             });
         }
 
@@ -114,8 +139,7 @@ const addToCart = async (req, res) => {
             success: true,
             message: "Product added to cart successfully",
             cartTotal: cart.cartTotal,
-            itemsCount: cart.items.length,
-            redirectUrl: "/cart"
+            itemsCount: cart.items.length
         });
 
     } catch (error) {

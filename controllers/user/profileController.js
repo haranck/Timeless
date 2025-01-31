@@ -321,6 +321,7 @@ const getAllAddresses = async (req, res) => {
 //     }
 // }
 
+
 const addAddress = async (req, res) => {
     try {
         const userId = req.session.user
@@ -402,7 +403,6 @@ const editAddress = async (req, res) => {
         const addressData = currAddress.address.find(item => {
             return item._id.toString() === addressId.toString()
         })
-
 
         if (!addressData) {
             return res.redirect("/pageNotFound")

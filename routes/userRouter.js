@@ -6,6 +6,7 @@ const { userAuth, adminAuth, isBlocked } = require("../middlewares/auth")
 const productController = require('../controllers/user/productController')
 const profileController = require('../controllers/user/profileController')
 const cartController = require("../controllers/user/cartController");
+const checkoutController = require("../controllers/user/checkoutController");
 
 
 router.get('/', isBlocked, userController.loadHompage);
@@ -68,6 +69,11 @@ router.get("/deleteAddress", userAuth, profileController.deleteAddress)
 router.get("/cart", userAuth, cartController.loadCart);
 router.post("/addToCart", userAuth, cartController.addToCart);
 router.delete("/cart/remove/:productId", cartController.removeCartItem);
+
+//checkout management
+router.get("/checkout", userAuth, checkoutController.loadCheckout);
+router.post("/checkout", userAuth, checkoutController.postCheckout);
+router.get("/editCheckoutAddress", userAuth, checkoutController.editCheckoutAddress)
 
 
 

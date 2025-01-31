@@ -1,0 +1,266 @@
+<%- include("../../views/partials/user/header") %>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Check Out</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <a href="/shop">Shop</a>
+                            <span>Check Out</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Checkout Section Begin -->
+    <section class="checkout spad">
+        <div class="container">
+            <div class="checkout__form">
+                <form action="/checkout" method="POST">
+                    <div class="row">
+                        <div class="col-lg-7 col-md-6">
+                            <div class="shipping-address-section p-4 bg-light rounded mb-4" style="min-height: 800px;">
+                                <h6 class="checkout__title mb-4">
+                                    <i class="fas fa-shipping-fast me-2"></i>Shipping Address
+                                </h6>
+                                <div class="saved-addresses mb-4">
+                                    <!-- Saved Address 1 -->
+                                    <div class="saved-address-item mb-4 p-4 border rounded bg-white">
+                                        <% if (userAddress && userAddress.length> 0) { %>
+                                            <% userAddress.forEach((address, index)=> { %>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="shipping_address"
+                                                        id="address1" checked>
+                                                    <label class="form-check-label w-100" for="address1">
+                                                        <div class="d-flex justify-content-between align-items-start">
+                                                            <div>
+                                                                <strong class="d-block mb-2">
+                                                                    <i class="fas fa-map-marker-alt"></i><%= address.addressType %> : Address
+                                                                </strong>
+                                                                <div class="address-details ms-4">
+                                                                    <p class="mb-2 text-dark"><%= address.name %></p>
+                                                                    <p class="mb-2 text-muted">
+                                                                        Pincode: <%= address.pincode %>, <br>
+                                                                        Landmark: <%= address.landMark %>
+                                                                    </p>
+                                                                    <p class="mb-2 text-dark"><%= address.city %>, <%= address.state %></p>
+                                                                    <p class="mb-1">
+                                                                        <i class="fas fa-phone-alt me-2"></i>
+                                                                        <span class="text-dark"><%= address.phone %></span>
+                                                                    </p>
+                                                                    <p class="mb-0">
+                                                                        <i class="fas fa-phone me-2"></i>
+                                                                        <span class="text-muted"><%= address.altPhone %></span>
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <a href="/editCheckoutAddress?id=<%= address._id %>">
+                                                                <button class="btn btn-outline-dark">
+                                                                    <i class="fas fa-edit me-2"></i>Edit
+                                                                </button>
+                                                            </a>
+                                                            
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                                <% }) %>
+                                                    <% } else { %>
+                                                        <p>You haven't added any addresses yet.</p>
+                                                    <% } %>
+                                    </div>
+                                    <!-- Saved Address 2 -->
+                                    <!-- <div class="saved-address-item mb-4 p-4 border rounded bg-white">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="shipping_address"
+                                                id="address2">
+                                            <label class="form-check-label w-100" for="address2">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <strong class="d-block mb-2">
+                                                            <i class="fas fa-building me-2"></i>Office
+                                                        </strong>
+                                                        <div class="address-details ms-4">
+                                                            <p class="mb-2 text-dark">John Doe</p>
+                                                            <p class="mb-2 text-muted">
+                                                                456 Business Ave, <br>
+                                                                Floor 5, Suite 502, <br>
+                                                                Landmark: Business District
+                                                            </p>
+                                                            <p class="mb-2 text-dark">New York, NY 10002</p>
+                                                            <p class="mb-1">
+                                                                <i class="fas fa-phone-alt me-2"></i>
+                                                                <span class="text-dark">(555) 234-5678</span>
+                                                            </p>
+                                                            <p class="mb-0">
+                                                                <i class="fas fa-phone me-2"></i>
+                                                                <span class="text-muted">(555) 876-5432</span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-outline-dark">
+                                                        <i class="fas fa-edit me-2"></i>Edit
+                                                    </button>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div> -->
+                                </div>
+                                <a href="/addAddress">
+                                    <button class="site-btn mb-4 d-flex align-items-center justify-content-center w-100">
+                                        <i class="fas fa-plus-circle me-2"></i>Add New Address
+                                    </button>
+                                </a>
+                                <div class="additional-info p-4 border rounded bg-white">
+                                    <h6 class="checkout__title mb-4">
+                                        <i class="fas fa-info-circle me-2"></i>Additional Information
+                                    </h6>
+                                    <div class="checkout__input">
+                                        <p>Order Notes (Optional)</p>
+                                        <textarea class="w-100 p-3" rows="4"
+                                            placeholder="Special notes for delivery (e.g., delivery timing, specific instructions for delivery person, preferred contact method)"
+                                            style="resize: none; border: 1px solid #e1e1e1; border-radius: 4px;"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 col-md-6">
+                            <div class="checkout__order p-4" style="min-height: 800px;">
+                                <h4 class="order__title mb-4">
+                                    <i class="fas fa-shopping-cart me-2"></i>Your Order
+                                </h4>
+
+
+                                <!-- ////////////////////////////////////////////////////////////////////////////////////////       -->
+
+
+                                <!-- Product List -->
+                                <div class="checkout__order__products mb-4">
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Product</th>
+                                                    <th class="text-end">Price</th>
+                                                    <th class="text-center">Qty</th>
+                                                    <th class="text-end">Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if(cart.items.length> 0) { %>
+                                                    <% cart.items.forEach(item=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= item.productId.productName %>
+                                                            </td>
+                                                            <td class="text-end">₹<%= item.productId.salePrice %>
+                                                            </td>
+                                                            <td class="text-center">X<%= item.quantity %>
+                                                            </td>
+                                                            <td class="text-end">₹<%= item.totalPrice %>
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+                                                            <% } else { %>
+                                                                <tr>
+                                                                    <td colspan="4" class="text-center">No products in
+                                                                        the cart</td>
+                                                                </tr>
+                                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Coupon Code Section -->
+                                <div class="checkout__coupon mb-4 p-3 border rounded bg-white">
+                                    <h6 class="mb-3">
+                                        <i class="fas fa-tag me-2"></i>Have a Coupon?
+                                    </h6>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Enter Coupon Code">
+                                        <button class="site-btn">Apply</button>
+                                    </div>
+                                </div>
+
+                                <!-- Order Summary -->
+                                <div class="order-summary p-3 bg-white rounded border mb-4">
+                                    <h6 class="mb-3">
+                                        <i class="fas fa-calculator me-2"></i>Order Summary
+                                    </h6>
+                                    <ul class="checkout__total__all">
+                                        <li class="d-flex justify-content-between mb-2">
+                                            Subtotal <span>₹9,500</span>
+                                        </li>
+                                        <li class="d-flex justify-content-between mb-2">
+                                            Shipping Charge <span>₹100</span>
+                                        </li>
+                                        <li class="d-flex justify-content-between mb-2">
+                                            Tax (18%) <span>₹1,710</span>
+                                        </li>
+                                        <li class="d-flex justify-content-between mb-2 text-success">
+                                            Discount <span>-₹500</span>
+                                        </li>
+                                        <li class="d-flex justify-content-between total-amount">
+                                            <strong>Total</strong> <strong>₹10,810</strong>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- Payment Methods -->
+                                <div class="checkout__payment__methods p-4 border rounded bg-white">
+                                    <h6 class="mb-4">
+                                        <i class="fas fa-credit-card me-2"></i>Select Payment Method
+                                    </h6>
+                                    <div class="payment-method">
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="radio" name="payment_method" id="cod"
+                                                checked>
+                                            <label class="form-check-label d-flex align-items-center" for="cod">
+                                                <i class="fas fa-money-bill-wave me-2"></i>
+                                                <span>Cash on Delivery</span>
+                                                <span class="badge bg-success ms-2">No additional charges</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="radio" name="payment_method"
+                                                id="wallet">
+                                            <label class="form-check-label" for="wallet">
+                                                <i class="fas fa-wallet me-2"></i>Wallet
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="radio" name="payment_method" id="upi">
+                                            <label class="form-check-label" for="upi">
+                                                <i class="fas fa-mobile-alt me-2"></i>UPI
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="radio" name="payment_method"
+                                                id="card">
+                                            <label class="form-check-label" for="card">
+                                                <i class="fas fa-credit-card me-2"></i>Credit/Debit Card
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="site-btn w-100 mt-4">
+                                    <i class="fas fa-check-circle me-2"></i>PLACE ORDER
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+
+    <%- include("../../views/partials/user/footer") %>

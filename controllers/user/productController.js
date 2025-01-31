@@ -16,7 +16,7 @@ const productDetails = async (req, res) => {
 
         const relatedProducts = await Product.find({
             category: findCategory,
-            _id: { $ne: productId } //exclude the current product
+            _id: { $ne: productId } 
         }).limit(4)
 
 
