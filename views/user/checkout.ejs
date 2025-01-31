@@ -1,5 +1,66 @@
 <%- include("../../views/partials/user/header") %>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Modal Background */
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Semi-transparent background */
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background: #fff;
+            width: 400px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        /* Close Button */
+        .close-btn {
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Input Fields */
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Save Button */
+        .save-btn {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .save-btn:hover {
+            background: #218838;
+        }
+    </style>
+
 
     <section class="breadcrumb-option">
         <div class="container">
@@ -42,38 +103,48 @@
                                                         <div class="d-flex justify-content-between align-items-start">
                                                             <div>
                                                                 <strong class="d-block mb-2">
-                                                                    <i class="fas fa-map-marker-alt"></i><%= address.addressType %> : Address
+                                                                    <i class="fas fa-map-marker-alt"></i>
+                                                                    <%= address.addressType %> : Address
                                                                 </strong>
                                                                 <div class="address-details ms-4">
-                                                                    <p class="mb-2 text-dark"><%= address.name %></p>
+                                                                    <p class="mb-2 text-dark">
+                                                                        <%= address.name %>
+                                                                    </p>
                                                                     <p class="mb-2 text-muted">
                                                                         Pincode: <%= address.pincode %>, <br>
-                                                                        Landmark: <%= address.landMark %>
+                                                                            Landmark: <%= address.landMark %>
                                                                     </p>
-                                                                    <p class="mb-2 text-dark"><%= address.city %>, <%= address.state %></p>
+                                                                    <p class="mb-2 text-dark">
+                                                                        <%= address.city %>, <%= address.state %>
+                                                                    </p>
                                                                     <p class="mb-1">
                                                                         <i class="fas fa-phone-alt me-2"></i>
-                                                                        <span class="text-dark"><%= address.phone %></span>
+                                                                        <span class="text-dark">
+                                                                            <%= address.phone %>
+                                                                        </span>
                                                                     </p>
                                                                     <p class="mb-0">
                                                                         <i class="fas fa-phone me-2"></i>
-                                                                        <span class="text-muted"><%= address.altPhone %></span>
+                                                                        <span class="text-muted">
+                                                                            <%= address.altPhone %>
+                                                                        </span>
                                                                     </p>
                                                                 </div>
                                                             </div>
-                                                            <a href="/editCheckoutAddress?id=<%= address._id %>">
-                                                                <button class="btn btn-outline-dark">
-                                                                    <i class="fas fa-edit me-2"></i>Edit
-                                                                </button>
-                                                            </a>
-                                                            
+
+                                                            <button class="btn btn-outline-dark"
+                                                                onclick="openEditAddressModal('<%= address._id %>')">
+                                                                <i class="fas fa-edit me-2"></i>Edit
+                                                            </button>
+
+
                                                         </div>
                                                     </label>
                                                 </div>
                                                 <% }) %>
                                                     <% } else { %>
                                                         <p>You haven't added any addresses yet.</p>
-                                                    <% } %>
+                                                        <% } %>
                                     </div>
                                     <!-- Saved Address 2 -->
                                     <!-- <div class="saved-address-item mb-4 p-4 border rounded bg-white">
@@ -113,7 +184,8 @@
                                     </div> -->
                                 </div>
                                 <a href="/addAddress">
-                                    <button class="site-btn mb-4 d-flex align-items-center justify-content-center w-100">
+                                    <button
+                                        class="site-btn mb-4 d-flex align-items-center justify-content-center w-100">
                                         <i class="fas fa-plus-circle me-2"></i>Add New Address
                                     </button>
                                 </a>
@@ -258,9 +330,55 @@
                         </div>
                     </div>
                 </form>
+
             </div>
         </div>
     </section>
+    <!-- Edit Address Modal -->
+    <div id="editAddressModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2>Edit Address</h2>
+            <form action="/update-address" method="POST">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" value="<%= userAddress ? userAddress.name : '' %>" required>
 
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" value="<%= userAddress ? userAddress.city : '' %>" required>
+
+                <label for="pincode">Pincode</label>
+                <input type="text" id="pincode" name="pincode" value="<%= userAddress ? userAddress.pincode : '' %>"
+                    required>
+
+                <label for="phone">Phone</label>
+                <input type="text" id="phone" name="phone" value="<%= userAddress ? userAddress.phone : '' %>" required>
+
+                <input type="hidden" name="address_id" value="<%= userAddress ? userAddress._id : '' %>">
+
+                <button type="submit" class="save-btn">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Function to Open Modal
+        function openModal() {
+            document.getElementById("editAddressModal").style.display = "flex";
+        }
+
+        // Function to Close Modal
+        function closeModal() {
+            document.getElementById("editAddressModal").style.display = "none";
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function (event) {
+            const modal = document.getElementById("editAddressModal");
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+
+    </script>
 
     <%- include("../../views/partials/user/footer") %>

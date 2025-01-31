@@ -37,28 +37,46 @@ const postCheckout = async (req, res) => {
     }
 }
 
+// const editCheckoutAddress = async (req, res) => {
+//     try {
+//         const userId = req.session.user
+//         const { addressType, name, city, landMark, state, pincode, phone, altPhone } = req.body
+//         const userAddress = await Address.findOne({ userId: userId })
+//         if (!userAddress) {
+//             return res.redirect("/pageNotFound")
+//         }
+//         userAddress.address.push({
+//             addressType,
+//             name,
+//             city,
+//             landMark,
+//             state,
+//             pincode,
+//             phone,
+//             altPhone
+//         })
+//         await userAddress.save()
+//         res.render("checkout",{
+//             userAddress:userAddress
+//         })
+//     } catch (error) {
+//         console.log("error in editCheckoutAddress", error)
+//         res.redirect("/pageNotFound")
+//     }
+// }
+
 const editCheckoutAddress = async (req, res) => {
     try {
-        const userId = req.session.user
-        const { addressType, name, city, landMark, state, pincode, phone, altPhone } = req.body
-        const userAddress = await Address.findOne({ userId: userId })
-        if (!userAddress) {
-            return res.redirect("/pageNotFound")
+        const { address_id, name, city, pincode, phone } = req.body;
+
+        if (!address_id || address_id.length !== 24) {
+            console.log("Invalid Address ID:", address_id);
+            return res.status(400).json({ error: "Invalid address ID" });
         }
-        userAddress.address.push({
-            addressType,
-            name,
-            city,
-            landMark,
-            state,
-            pincode,
-            phone,
-            altPhone
-        })
-        await userAddress.save()
-        res.render("checkout",{
-            userAddress:userAddress
-        })
+
+        await Address.findByIdAndUpdate(address_id, { name, city, pincode, phone });
+
+        res.redirect('/checkout'); // Reload the checkout page with updated address
     } catch (error) {
         console.log("error in editCheckoutAddress", error)
         res.redirect("/pageNotFound")

@@ -73,7 +73,8 @@ router.delete("/cart/remove/:productId", cartController.removeCartItem);
 //checkout management
 router.get("/checkout", userAuth, checkoutController.loadCheckout);
 router.post("/checkout", userAuth, checkoutController.postCheckout);
-router.get("/editCheckoutAddress", userAuth, checkoutController.editCheckoutAddress)
+// router.get("/editCheckoutAddress", userAuth, checkoutController.editCheckoutAddress)
+router.post("/update-address", userAuth, checkoutController.editCheckoutAddress)
 
 
 
