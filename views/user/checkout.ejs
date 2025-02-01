@@ -322,8 +322,8 @@
                                                 <% } else { %>
                                                     <div class="text-center py-4">
                                                         <p class="mb-3">You haven't added any addresses yet.</p>
-                                                        <button onclick="openAddAddressModal()" class="btn btn-dark">
-                                                            <i class="fas fa-plus-circle me-2"></i>Add New Address
+                                                        <button type="button" onclick="openAddAddressModal()" class="btn btn-dark d-block w-100">
+                                                            <i class="fas fa-plus-circle me-2"></i>Add Another Address
                                                         </button>
                                                     </div>
                                                     <% } %>
@@ -413,19 +413,19 @@
                                     </h6>
                                     <ul class="checkout__total__all">
                                         <li class="d-flex justify-content-between mb-2">
-                                            Subtotal <span>₹9,500</span>
+                                            Subtotal <span>₹<%=cart.totalPrice%></span>
                                         </li>
                                         <li class="d-flex justify-content-between mb-2">
-                                            Shipping Charge <span>₹100</span>
+                                            Shipping Charge <span>₹0</span>
                                         </li>
                                         <li class="d-flex justify-content-between mb-2">
-                                            Tax (18%) <span>₹1,710</span>
+                                            Tax (0%) <span>₹0</span>
                                         </li>
                                         <li class="d-flex justify-content-between mb-2 text-success">
-                                            Discount <span>-₹500</span>
+                                            Discount <span>-₹0</span>
                                         </li>
                                         <li class="d-flex justify-content-between total-amount">
-                                            <strong>Total</strong> <strong>₹10,810</strong>
+                                            <strong>Total</strong> <strong>₹<%=cart.totalPrice%></strong>
                                         </li>
                                     </ul>
                                 </div>
@@ -467,13 +467,17 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                
                                 <button type="submit" class="site-btn w-100 mt-4">
                                     <i class="fas fa-check-circle me-2"></i>PLACE ORDER
                                 </button>
+                               
                             </div>
+                            
                         </div>
+                        
                     </div>
+                   
                 </form>
 
             </div>
@@ -558,6 +562,8 @@
             </form>
         </div>
     </div>
+
+    
 
     <script>
         // Function to Open Modal with address data

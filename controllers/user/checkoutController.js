@@ -15,7 +15,7 @@ const loadCheckout = async (req, res) => {
         if (addressDoc && addressDoc.address) {
             userAddress = addressDoc.address;
         }
-
+        cart.totalPrice = cart.items.reduce((total, item) => total + item.totalPrice, 0);
         res.render("checkout", {
             cart,
             user,
@@ -143,9 +143,28 @@ const addCheckoutAddress = async (req, res) => {
     }
 }
 
+const postCheckout = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const { 
+            address_id, 
+            name, 
+            addressType,
+            city, 
+            state,
+            landMark,
+            pincode, 
+            phone,
+            altPhone ,
+        } = req.body;
+    } catch (error) {
+        
+    }
+}
 
 module.exports = {
     loadCheckout,
     editCheckoutAddress,
-    addCheckoutAddress
+    addCheckoutAddress,
+    postCheckout
 }
