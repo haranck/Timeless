@@ -101,6 +101,140 @@
         .save-btn:active {
             transform: translateY(1px);
         }
+
+        /* Modal Background */
+        .addModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            /* Ensures the modal is above other content */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Semi-transparent black background */
+            justify-content: center;
+            align-items: center;
+            /* Centers the modal vertically and horizontally */
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* Modal Content */
+        .addModal .modal-content {
+            background: #fff;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* Close Button */
+        .addModal .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .addModal .close-btn:hover {
+            color: #000;
+        }
+
+        /* Modal Title */
+        .addModal .modal-title {
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Form Group */
+        .addModal .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Input Fields */
+        .addModal .form-group input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s ease-in-out;
+        }
+
+        .addModal .form-group input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* Save Button */
+        .addModal .save-btn {
+            width: 100%;
+            background: #007bff;
+            color: #fff;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out;
+        }
+
+        .addModal .save-btn:hover {
+            background: #0056b3;
+        }
+
+        .addModal .save-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Fade-in Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .addModal .modal-content {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .addModal .modal-title {
+                font-size: 18px;
+            }
+
+            .addModal .form-group input {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            .addModal .save-btn {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
     </style>
 
 
@@ -134,13 +268,15 @@
                                     <i class="fas fa-shipping-fast me-2"></i>Shipping Address
                                 </h6>
                                 <div class="saved-addresses mb-4">
-                                    <% if (userAddress && userAddress.length > 0) { %>
-                                        <% userAddress.forEach((address, index) => { %>
+                                    <% if (userAddress && userAddress.length> 0) { %>
+                                        <% userAddress.forEach((address, index)=> { %>
                                             <div class="saved-address-item mb-4 p-4 border rounded bg-white">
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="shipping_address"
-                                                        id="address_<%= address._id %>" value="<%= address._id %>" <%= index === 0 ? 'checked' : '' %>>
-                                                    <label class="form-check-label w-100" for="address_<%= address._id %>">
+                                                        id="address_<%= address._id %>" value="<%= address._id %>"
+                                                        <%=index===0 ? 'checked' : '' %>>
+                                                    <label class="form-check-label w-100"
+                                                        for="address_<%= address._id %>">
                                                         <div class="d-flex justify-content-between align-items-start">
                                                             <div>
                                                                 <strong class="d-block mb-2">
@@ -148,52 +284,59 @@
                                                                     <%= address.addressType %> Address
                                                                 </strong>
                                                                 <div class="address-details ms-4">
-                                                                    <p class="mb-2 text-dark"><%= address.name %></p>
+                                                                    <p class="mb-2 text-dark">
+                                                                        <%= address.name %>
+                                                                    </p>
                                                                     <p class="mb-2 text-muted">
                                                                         Landmark: <%= address.landMark %><br>
-                                                                        Pincode: <%= address.pincode %>
+                                                                            Pincode: <%= address.pincode %>
                                                                     </p>
                                                                     <p class="mb-2 text-dark">
                                                                         <%= address.city %>, <%= address.state %>
                                                                     </p>
                                                                     <p class="mb-1">
                                                                         <i class="fas fa-phone-alt me-2"></i>
-                                                                        <span class="text-dark"><%= address.phone %></span>
+                                                                        <span class="text-dark">
+                                                                            <%= address.phone %>
+                                                                        </span>
                                                                     </p>
                                                                     <% if (address.altPhone) { %>
                                                                         <p class="mb-0">
                                                                             <i class="fas fa-phone me-2"></i>
-                                                                            <span class="text-muted"><%= address.altPhone %></span>
+                                                                            <span class="text-muted">
+                                                                                <%= address.altPhone %>
+                                                                            </span>
                                                                         </p>
-                                                                    <% } %>
+                                                                        <% } %>
                                                                 </div>
                                                             </div>
-                                                            <button type="button" class="btn btn-outline-dark" onclick="openEditAddressModal('<%= address._id %>')">
+                                                            <button type="button" class="btn btn-outline-dark"
+                                                                onclick="openEditAddressModal('<%= address._id %>')">
                                                                 <i class="fas fa-edit me-2"></i>Edit
                                                             </button>
                                                         </div>
                                                     </label>
                                                 </div>
                                             </div>
-                                        <% }); %>
-                                    <% } else { %>
-                                        <div class="text-center py-4">
-                                            <p class="mb-3">You haven't added any addresses yet.</p>
-                                            <a href="" class=" btn-dark ">
-                                                <button onclick="openAddAddressModal()">
-                                                    <i class="fas fa-plus-circle me-2"></i>Add New Address
-                                                </button>
-                                            </a>
-                                        </div>
-                                    <% } %>
+                                            <% }); %>
+                                                <% } else { %>
+                                                    <div class="text-center py-4">
+                                                        <p class="mb-3">You haven't added any addresses yet.</p>
+                                                        <a href="" class=" btn-dark ">
+                                                            <button onclick="openAddAddressModal()">
+                                                                <i class="fas fa-plus-circle me-2"></i>Add New Address
+                                                            </button>
+                                                        </a>
+                                                    </div>
+                                                    <% } %>
                                 </div>
-                                <% if (userAddress && userAddress.length > 0) { %>
+                                <% if (userAddress && userAddress.length> 0) { %>
                                     <a href="" class="btn btn-dark d-block">
                                         <button onclick="openAddAddressModal()">
                                             <i class="fas fa-plus-circle me-2"></i>Add Another Address
                                         </button>
                                     </a>
-                                <% } %>
+                                    <% } %>
                             </div>
                             <div class="additional-info p-4 border rounded bg-white">
                                 <h6 class="checkout__title mb-4">
@@ -201,8 +344,9 @@
                                 </h6>
                                 <div class="checkout__input">
                                     <p>Order Notes (Optional)</p>
-                                    <input type="text" class="w-100 p-3" rows="4"style="resize: none; border: 1px solid #e1e1e1; border-radius: 4px;"
-                                    placeholder="Special notes for delivery (e.g., delivery timing, specific instructions for delivery)">
+                                    <input type="text" class="w-100 p-3" rows="4"
+                                        style="resize: none; border: 1px solid #e1e1e1; border-radius: 4px;"
+                                        placeholder="Special notes for delivery (e.g., delivery timing, specific instructions for delivery)">
                                     </input>
                                 </div>
                             </div>
@@ -230,8 +374,8 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <% if(cart.items.length > 0) { %>
-                                                    <% cart.items.forEach(item => { %>
+                                                <% if(cart.items.length> 0) { %>
+                                                    <% cart.items.forEach(item=> { %>
                                                         <tr>
                                                             <td>
                                                                 <%= item.productId.productName %>
@@ -244,12 +388,12 @@
                                                             </td>
                                                         </tr>
                                                         <% }); %>
-                                                    <% } else { %>
-                                                        <tr>
-                                                            <td colspan="4" class="text-center">No products in
-                                                                the cart</td>
-                                                        </tr>
-                                                    <% } %>
+                                                            <% } else { %>
+                                                                <tr>
+                                                                    <td colspan="4" class="text-center">No products in
+                                                                        the cart</td>
+                                                                </tr>
+                                                                <% } %>
                                             </tbody>
                                         </table>
                                     </div>
@@ -319,7 +463,8 @@
                                             </label>
                                         </div>
                                         <div class="form-check mb-3">
-                                            <input class="form-check-input" type="radio" name="payment_method" id="card">
+                                            <input class="form-check-input" type="radio" name="payment_method"
+                                                id="card">
                                             <label class="form-check-label" for="card">
                                                 <i class="fas fa-credit-card me-2"></i>Credit/Debit Card
                                             </label>
@@ -346,29 +491,31 @@
             <form action="/editCheckoutAddress" method="POST">
                 <div class="form-group">
                     <label for="addressType">Address Type</label>
-                    <input type="text" id="edit_addressType" name="addressType" placeholder="Address Type (e.g., Home, Office)" required>
-                    
+                    <input type="text" id="edit_addressType" name="addressType"
+                        placeholder="Address Type (e.g., Home, Office)" required>
+
 
                     <label for="name">Place Name</label>
                     <input type="text" id="edit_name" name="name" placeholder="Full Name" required>
-                
+
                     <label for="city">City</label>
                     <input type="text" id="edit_city" name="city" placeholder="City" required>
-                 
+
                     <label for="state">State</label>
                     <input type="text" id="edit_state" name="state" placeholder="State" required>
-                            
+
                     <label for="landMark">Landmark</label>
                     <input type="text" id="edit_landMark" name="landMark" placeholder="Landmark" required>
-                    
+
                     <label for="pincode">Pincode</label>
                     <input type="text" id="edit_pincode" name="pincode" placeholder="Pincode" required>
-                
+
                     <label for="phone">Phone Number</label>
                     <input type="tel" id="edit_phone" name="phone" placeholder="Phone Number" required>
-                
+
                     <label for="altPhone">Alternative Phone Number (Optional)</label>
-                    <input type="tel" id="edit_altPhone" name="altPhone" placeholder="Alternative Phone Number (Optional)">
+                    <input type="tel" id="edit_altPhone" name="altPhone"
+                        placeholder="Alternative Phone Number (Optional)">
                 </div>
 
                 <input type="hidden" id="edit_address_id" name="address_id">
@@ -388,25 +535,25 @@
                 <div class="form-group">
                     <label for="addressType">Address Type</label>
                     <input type="text" name="addressType" placeholder="Address Type (e.g., Home, Office)" required>
-                    
+
                     <label for="name">Place Name</label>
                     <input type="text" name="name" placeholder="Full Name" required>
-                
+
                     <label for="city">City</label>
                     <input type="text" name="city" placeholder="City" required>
-                 
+
                     <label for="state">State</label>
                     <input type="text" name="state" placeholder="State" required>
-                            
+
                     <label for="landMark">Landmark</label>
                     <input type="text" name="landMark" placeholder="Landmark" required>
-                    
+
                     <label for="pincode">Pincode</label>
                     <input type="text" name="pincode" placeholder="Pincode" required>
-                
+
                     <label for="phone">Phone Number</label>
                     <input type="tel" name="phone" placeholder="Phone Number" required>
-                
+
                     <label for="altPhone">Alternative Phone Number (Optional)</label>
                     <input type="tel" name="altPhone" placeholder="Alternative Phone Number (Optional)">
                 </div>
@@ -419,9 +566,9 @@
     <script>
         // Function to Open Modal with address data
         function openEditAddressModal(addressId) {
-        const addresses = <%- JSON.stringify(userAddress) %>;
-        const address = addresses.find(addr => addr._id === addressId);//Finds the matching address using .find().
-            
+            const addresses = <% - JSON.stringify(userAddress) %>;
+            const address = addresses.find(addr => addr._id === addressId);//Finds the matching address using .find().
+
             if (address) {
                 document.getElementById("edit_addressType").value = address.addressType || '';
                 document.getElementById("edit_name").value = address.name || '';
@@ -432,7 +579,7 @@
                 document.getElementById("edit_phone").value = address.phone || '';
                 document.getElementById("edit_altPhone").value = address.altPhone || '';
                 document.getElementById("edit_address_id").value = address._id;
-                
+
                 document.getElementById("editAddressModal").style.display = "flex";
                 document.body.style.overflow = 'hidden'; // Prevent background scrolling
             }
