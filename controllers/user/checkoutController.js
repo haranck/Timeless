@@ -101,10 +101,27 @@ const addCheckoutAddress = async (req, res) => {
             altPhone 
         } = req.body;
 
-        const address = new Address({
-            userId,
-            address: [
-                {
+        // Check if user already has an address document
+        let addressDoc = await Address.findOne({ userId });
+
+        if (addressDoc) {
+            // If exists, add new address to array
+            addressDoc.address.push({
+                name,
+                addressType,
+                city,
+                state,
+                landMark,
+                pincode,
+                phone,
+                altPhone
+            });
+            await addressDoc.save();
+        } else {
+            // If no address document exists, create new one
+            addressDoc = new Address({
+                userId,
+                address: [{
                     name,
                     addressType,
                     city,
@@ -113,13 +130,13 @@ const addCheckoutAddress = async (req, res) => {
                     pincode,
                     phone,
                     altPhone
-                }
-            ]
-        });
-        await address.save();
+                }]
+            });
+            await addressDoc.save();
+        }
+
+        // Redirect back to checkout page
         res.redirect('/checkout');
-
-
     } catch (error) {
         console.log("error in addCheckoutAddress", error);
         res.status(500).json({ error: "Internal server error" });

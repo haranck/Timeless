@@ -322,20 +322,16 @@
                                                 <% } else { %>
                                                     <div class="text-center py-4">
                                                         <p class="mb-3">You haven't added any addresses yet.</p>
-                                                        <a href="" class=" btn-dark ">
-                                                            <button onclick="openAddAddressModal()">
-                                                                <i class="fas fa-plus-circle me-2"></i>Add New Address
-                                                            </button>
-                                                        </a>
+                                                        <button onclick="openAddAddressModal()" class="btn btn-dark">
+                                                            <i class="fas fa-plus-circle me-2"></i>Add New Address
+                                                        </button>
                                                     </div>
                                                     <% } %>
                                 </div>
                                 <% if (userAddress && userAddress.length> 0) { %>
-                                    <a href="" class="btn btn-dark d-block">
-                                        <button onclick="openAddAddressModal()">
-                                            <i class="fas fa-plus-circle me-2"></i>Add Another Address
-                                        </button>
-                                    </a>
+                                    <button type="button" onclick="openAddAddressModal()" class="btn btn-dark d-block w-100">
+                                        <i class="fas fa-plus-circle me-2"></i>Add Another Address
+                                    </button>
                                     <% } %>
                             </div>
                             <div class="additional-info p-4 border rounded bg-white">
@@ -527,9 +523,9 @@
 
     <!-- //////////////// -->
 
-    <div id="addAddressModal" class="addModal">
+    <div id="addAddressModal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeAddressModal()">&times;</span>
+            <span class="close-btn" onclick="closeModal()">&times;</span>
             <h2 class="modal-title">Add Address</h2>
             <form action="/addCheckoutAddress" method="POST">
                 <div class="form-group">
@@ -566,8 +562,8 @@
     <script>
         // Function to Open Modal with address data
         function openEditAddressModal(addressId) {
-            const addresses = <% - JSON.stringify(userAddress) %>;
-            const address = addresses.find(addr => addr._id === addressId);//Finds the matching address using .find().
+            const addresses = <%- JSON.stringify(userAddress) %>;
+            const address = addresses.find(addr => addr._id === addressId);
 
             if (address) {
                 document.getElementById("edit_addressType").value = address.addressType || '';
@@ -581,35 +577,38 @@
                 document.getElementById("edit_address_id").value = address._id;
 
                 document.getElementById("editAddressModal").style.display = "flex";
-                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                document.body.style.overflow = 'hidden';
             }
-        }
-        function openAddAddressModal() {
-            document.getElementById("addAddressModal").style.display = "flex";
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
-        }
-        //function to close add modal 
-        function closeAddressModal() {
-            document.getElementById("addAddressModal").style.display = "none";
-            document.body.style.overflow = ''; // Restore background scrolling
-        }
-        // Function to Close Modal
-        function closeModal() {
-            document.getElementById("editAddressModal").style.display = "none";
-            document.body.style.overflow = ''; // Restore background scrolling
         }
 
-        // Close modal when clicking outside of it
-        window.onclick = function (event) {
-            const modal = document.getElementById("editAddressModal");
-            if (event.target === modal) {
-                closeModal();
+        function openAddAddressModal(event) {
+            if (event) {
+                event.preventDefault();
             }
-        };
-        window.onclick = function (event) {
             const modal = document.getElementById("addAddressModal");
-            if (event.target === addModal) {
-                closeAddressModal();
+            if (modal) {
+                modal.style.display = "flex";
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal() {
+            const editModal = document.getElementById("editAddressModal");
+            const addModal = document.getElementById("addAddressModal");
+            
+            if (editModal) editModal.style.display = "none";
+            if (addModal) addModal.style.display = "none";
+            
+            document.body.style.overflow = '';
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const editModal = document.getElementById("editAddressModal");
+            const addModal = document.getElementById("addAddressModal");
+            
+            if (event.target === editModal || event.target === addModal) {
+                closeModal();
             }
         };
     </script>
