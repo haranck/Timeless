@@ -146,19 +146,9 @@ const addCheckoutAddress = async (req, res) => {
 const postCheckout = async (req, res) => {
     try {
         const userId = req.session.user;
-        const { 
-            address_id, 
-            name, 
-            addressType,
-            city, 
-            state,
-            landMark,
-            pincode, 
-            phone,
-            altPhone ,
-        } = req.body;
+        return res.status(200).json({ success: true });
     } catch (error) {
-        
+        res.status(500).json({ error: "Internal server error" });
     }
 }
 
