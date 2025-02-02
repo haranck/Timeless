@@ -93,7 +93,7 @@ const orderSchema = new Schema({
       },
       productName: {
          type: String,
-         required: true
+         required: true,
       },
       price: {
          type: Number,

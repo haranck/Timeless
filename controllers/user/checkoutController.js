@@ -163,9 +163,23 @@ const placeOrder = async (req, res) => {
 
         console.log(cleanedTotal)
 
+        const orderedItemsWithDetails = await Promise.all(orderedItems.map(async (item) => {
+            const product = await Product.findById(item.productId);
+            
+            if (!product) {
+                throw new Error(`Product not found for ID: ${item.productId}`);
+            }
+            return {
+                productId: product._id,
+                quantity: item.quantity,
+                price: product.salePrice,
+                productName: product.productName,
+            };
+        }));
+
         //format ordered items according to the schema
-        console.log(orderedItems)
-        const formattedItems = orderedItems.map(item => ({
+        
+        const formattedItems = orderedItemsWithDetails.map(item => ({
             productId: item.productId,
             quantity: item.quantity,
             price: item.price,
@@ -187,8 +201,17 @@ const placeOrder = async (req, res) => {
         // Save the order
         await newOrder.save();
 
+        // decreasing quantity
+     
+        orderedItems.forEach(async (item) => {
+            await Product.updateOne(
+                { _id: item.productId._id},
+                { $inc: { quantity: -item.quantity } }
+            );
+        });
+
         // Clear the user's cart after successful order
-        await Cart.findOneAndUpdate(
+        await Cart.findOneAndUpdate(   
             { userId },
             { $set: { items: [] } }
         );
