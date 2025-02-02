@@ -190,33 +190,23 @@
                         <div class="dashboard-menu">
                             <ul class="nav flex-column" role="tablist">
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab">
+                                    <a class="nav-link active" id="dashboard-tab" data-toggle="tab" href="#dashboard" role="tab">
                                         <i class="fas fa-tachometer-alt"></i>Dashboard
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="address-tab" href="/address" role="tab">
+                                    <a class="nav-link" href="/address">
                                         <i class="fas fa-map-marker-alt"></i>My Address
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab">
+                                    <a class="nav-link" id="orders-tab" data-toggle="tab" href="#orders" role="tab">
                                         <i class="fas fa-shopping-bag"></i>Orders
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="wallet-tab" data-bs-toggle="tab" href="#track-orders" role="tab">
+                                    <a class="nav-link" id="wallet-tab" data-toggle="tab" href="#wallet" role="tab">
                                         <i class="fas fa-wallet"></i>Wallet Status
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="wallet-history-tab" data-bs-toggle="tab" href="#wallet-history" role="tab">
-                                        <i class="fas fa-history"></i>Wallet History
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="referral-tab" data-bs-toggle="tab" href="#referal" role="tab">
-                                        <i class="fas fa-user-friends"></i>Referrals
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -254,46 +244,6 @@
                                 </div>
                             </div>
 
-                            <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
-                                <div class="row">
-                                    <% if (userAddress && userAddress.address && userAddress.address.length > 0) { %>
-                                        <% userAddress.address.forEach((address) => { %>
-                                            <div class="col-lg-6">
-                                                <div class="card mb-3 mb-lg-0">
-                                                    <div class="card-header">
-                                                        <h5 class="mb-0">
-                                                            <%= address.addressType %>
-                                                        </h5>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <address>
-                                                            <%= address.name %><br>
-                                                            <%= address.city %><br>
-                                                            <%= address.landMark %><br>
-                                                            <%= address.state %><br>
-                                                            <%= address.pincode %><br>
-                                                            <%= address.phone %><br>
-                                                            <%= address.altPhone %>
-                                                        </address>
-                                                        <div class="d-flex justify-content-between">
-                                                            <a href="#" class="btn-small">Edit</a>
-                                                            <a href="#" class="btn-small">Delete</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <% }); %>
-                                        <% } else { %>
-                                            <div class="col-lg-12">
-                                                <p>No addresses found.</p>
-                                            </div>
-                                            <% } %>
-                                </div>
-                                <div class="mt-4">
-                                    <a href="/addAddress" class="btn btn-primary">Add New Address</a>
-                                </div>
-                            </div>
-
                             <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
                                 <div class="card">
                                     <div class="card-header">
@@ -312,11 +262,11 @@
                                                 </thead>
                                                 <tbody>
                                                     <tr>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
+                                                        <td>laureto</td>
+                                                        <td>pending</td>
+                                                        <td>₹5000</td>
                                                         <td>
-                                                            <a href="" class="btn-small d-block">View</a>
+                                                            <a href="/viewOrder" class="btn-small d-block">View</a>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -326,7 +276,7 @@
                                 </div>
                             </div>
 
-                            <div class="tab-pane fade" id="track-orders" role="tabpanel" aria-labelledby="track-orders-tab">
+                            <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
                                 <div class="card">
                                     <div class="card-header">
                                         <h5 class="mb-0">Wallet</h5>
@@ -338,52 +288,10 @@
                                                     <div class="form-group">
                                                         <label for="walletAmount" class="h4">Amount</label>
                                                         <div class="h3"></div>
-                                                    </div>
-                                                    <button type="button" class="btn btn-success" onclick="">Add Money</button>
-                                                </form>
+                                                </div>
+                                                <!-- Rest of wallet content -->
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="tab-pane fade" id="wallet-history" role="tabpanel" aria-labelledby="orders-tab">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5 class="mb-0">Wallet History</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Date</th>
-                                                        <th>Status</th>
-                                                        <th>Amount</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="tab-pane fade" id="referal" role="tabpanel" aria-labelledby="track-orders-tab">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5 class="mb-0">Referal</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <h6 class="mb-3">Refer your friends and earn money!</h6>
-                                        <p>Share this link: <strong>></strong></p>
-                                        <p>Earned: ₹</p>
                                     </div>
                                 </div>
                             </div>
@@ -398,5 +306,26 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Initialize Bootstrap tabs
+        $('a[data-toggle="tab"]').on('click', function(e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
+
+        // Set initial active tab
+        $('#dashboard-tab').tab('show');
+
+        // Handle tab switching and active states
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+            // Remove active class from all nav links
+            $('.nav-link').removeClass('active');
+            // Add active class to current tab
+            $(this).addClass('active');
+        });
+    });
+</script>
 
 <%- include("../../views/partials/user/footer") %>

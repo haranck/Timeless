@@ -17,8 +17,6 @@ function generateOtp() {
 
 }
 
-
-
 const getForgotPassPage = async (req, res) => {
     try {
         res.render('forgot-password')

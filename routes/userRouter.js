@@ -39,7 +39,7 @@ router.get('/logout', userController.logout)
 
 //profile mgt
 
-router.get("/forgot-password", profileController.getForgotPassPage) /// ? ? ? ? ? ? 
+router.get("/forgot-password", profileController.getForgotPassPage) 
 router.post("/forgot-email-valid", profileController.forgotEmailValid)
 router.post("/verify-passForgot-otp", profileController.verifyForgotPassOtp)
 router.get("/reset-password", profileController.getResetPassPage)
