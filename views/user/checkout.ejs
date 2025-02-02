@@ -539,7 +539,7 @@
                                         <li class="d-flex justify-content-between mb-2 text-success">
                                             Discount <span>-₹0</span>
                                         </li>
-                                        <li class="d-flex justify-content-between total-amount">
+                                        <li class="d-flex justify-content-between total-amount" id="total-amount">
                                             <strong>Total</strong> <strong>₹<%=cart.totalPrice%></strong>
                                         </li>
                                     </ul>
@@ -552,7 +552,7 @@
                                     </h6>
                                     <div class="payment-method">
                                         <div class="form-check mb-3">
-                                            <input class="form-check-input" type="radio" name="payment_method" id="cod"
+                                            <input class="form-check-input" type="radio" name="payment_method" value="cod" id="cod"
                                                 checked>
                                             <label class="form-check-label d-flex align-items-center" for="cod">
                                                 <i class="fas fa-money-bill-wave me-2"></i>
@@ -561,20 +561,20 @@
                                             </label>
                                         </div>
                                         <div class="form-check mb-3">
-                                            <input class="form-check-input" type="radio" name="payment_method"
+                                            <input class="form-check-input" type="radio" value="wallet" name="payment_method"
                                                 id="wallet">
                                             <label class="form-check-label" for="wallet">
                                                 <i class="fas fa-wallet me-2"></i>Wallet
                                             </label>
                                         </div>
                                         <div class="form-check mb-3">
-                                            <input class="form-check-input" type="radio" name="payment_method" id="upi">
+                                            <input class="form-check-input" type="radio" value="upi" name="payment_method" id="upi">
                                             <label class="form-check-label" for="upi">
                                                 <i class="fas fa-mobile-alt me-2"></i>UPI
                                             </label>
                                         </div>
                                         <div class="form-check mb-3">
-                                            <input class="form-check-input" type="radio" name="payment_method"
+                                            <input class="form-check-input" type="radio" value="credit_card" name="payment_method"
                                                 id="card">
                                             <label class="form-check-label" for="card">
                                                 <i class="fas fa-credit-card me-2"></i>Credit/Debit Card
@@ -758,6 +758,18 @@
 
         async function placeOrder() {
             try {
+                // Get all required order details
+                const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
+                const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+                const totalAmount = document.getElementById('total-amount').textContent.replace('₹', '');
+                const orderedItems = <%- JSON.stringify(cart.items) %>;
+
+                console.log('Order Details:', {
+                    shippingAddress,
+                    paymentMethod,
+                    totalAmount,
+                    orderedItems
+                });
                 // First SweetAlert - Confirmation
                 const confirmResult = await Swal.fire({
                     title: 'Confirm Order',
@@ -783,17 +795,22 @@
                         }
                     });
 
-                    // Make the API call
+                    // Make the API call with all order details
                     const response = await fetch("/checkout", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
                         },
-                        body: JSON.stringify({})
+                        body: JSON.stringify({
+                            shippingAddress,
+                            paymentMethod,
+                            totalAmount,
+                            orderedItems
+                        })
                     });
-
+                    console.log(response);
                     const data = await response.json();
-
+                    console.log(data);
                     if (data.success) {
                         // Success message
                         await Swal.fire({
@@ -804,16 +821,14 @@
                             showConfirmButton: false
                         });
 
-                        // Redirect after success
-                        
-                            window.location.replace('/userProfile');
-                        
+                        // Redirect to orders page after success
+                        window.location.replace('/userProfile');
                     } else {
-                        throw new Error('Order failed');
+                        throw new Error(data.message || 'Order failed');
                     }
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error:', error.message);
                 await Swal.fire({
                     title: 'Error!',
                     text: 'Something went wrong while placing your order. Please try again.',

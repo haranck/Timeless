@@ -147,11 +147,63 @@ const addCheckoutAddress = async (req, res) => {
 const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user;
-      
-        return res.status(200).json({ success: true });
+        const { shippingAddress, paymentMethod, totalAmount, orderedItems } = req.body;
+
+        console.log(userId)
+
+        const cleanedTotal = parseFloat(totalAmount.replace(/\D/g, ''));
+
+        if (isNaN(cleanedTotal)) {
+            return res.status(400).json({ success: false, error: "Invalid total amount" });
+        }
+        
+        if(!userId||!shippingAddress||!paymentMethod||!totalAmount||!orderedItems){
+            return res.status(400).json({ success: false, error: "Please fill all the fields" });
+        }
+
+        console.log(cleanedTotal)
+
+        //format ordered items according to the schema
+        console.log(orderedItems)
+        const formattedItems = orderedItems.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price,
+            productName: item.productName,
+
+        }));
+
+        // Create new order
+        const newOrder = new Order({
+            user_id:userId,
+            address_id:shippingAddress,
+            payment_method: paymentMethod,
+            finalAmount:cleanedTotal,
+            order_items:formattedItems,
+            status:"pending",
+            total:cleanedTotal
+        });
+                                                               
+        // Save the order
+        await newOrder.save();
+
+        // Clear the user's cart after successful order
+        await Cart.findOneAndUpdate(
+            { userId },
+            { $set: { items: [] } }
+        );
+
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Order placed successfully' 
+        });
         
     } catch (error) {
-        res.status(500).json({ error: "Internal server error" });
+        console.error('Order placement error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: "Failed to place order. Please try again." 
+        });
     }
 }
 
