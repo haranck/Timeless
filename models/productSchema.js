@@ -26,9 +26,9 @@ const productSchema = new Schema({
    },
    quantity: {
       type: Number,
-      default: 0, // Corrected from `default: true`
+      default: 0,
    },
-   productImages: [{ // Changed `images` to `productImages` for consistency
+   productImages: [{ 
       type: String,
       required: true,
    }],
@@ -39,7 +39,7 @@ const productSchema = new Schema({
    isListed: {
       type: Boolean,
       default: false,
-   },
+   }, 
    status: {
       type: String,
       enum: ["available", "out of stock", "Discontinued"],
@@ -48,56 +48,6 @@ const productSchema = new Schema({
    },
 }, { timestamps: true });
 
-
-// const productSchema = new Schema({
-//    productName:{
-//       type: String,
-//       required: true
-//    },
-//    regularPrice:{
-//       type: Number,
-//       required: true
-//    },
-//    salePrice:{
-//       type: Number,
-//       required: true
-//    },
-//    description:{
-//       type: String,
-//       required: true
-//    },
-//    category:{
-//       type: Schema.Types.ObjectId,
-//       ref: "Category",
-//       required: true
-//    },
-//    // productOffer:{
-//    //    type: Number,
-//    //    default:true
-//    // },
-//    quantity:{
-//       type: Number,
-//       default: true
-//    },
-//    images:[{
-//       type: String,
-//       required: true
-//    }],
-//    createdAt:{
-//       type: Date,
-//       default: Date.now
-//    },
-//    isBlocked:{
-//       type: Boolean,
-//       default: false
-//    },
-//    status:{
-//       type: String,
-//       enum:["availble","out of stock","Discontinued"],
-//       required: true,
-//       default: "availble"
-//    },
-// },{timestamps: true})
 
 const Product = mongoose.model('Product', productSchema);
 module.exports = Product;

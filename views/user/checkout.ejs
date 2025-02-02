@@ -805,9 +805,9 @@
                         });
 
                         // Redirect after success
-                        setTimeout(() => {
-                            window.location.href = '/userProfile';
-                        }, 2000);
+                        
+                            window.location.replace('/userProfile');
+                        
                     } else {
                         throw new Error('Order failed');
                     }

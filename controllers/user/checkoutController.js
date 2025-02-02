@@ -2,6 +2,7 @@ const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Cart = require('../../models/cartSchema')
 const Address = require('../../models/addressSchema')
+const Order = require('../../models/orderSchema')
 
 
 const loadCheckout = async (req, res) => {
@@ -39,16 +40,16 @@ const loadCheckout = async (req, res) => {
 const editCheckoutAddress = async (req, res) => {
     try {
         const userId = req.session.user;
-        const { 
-            address_id, 
-            name, 
+        const {
+            address_id,
+            name,
             addressType,
-            city, 
+            city,
             state,
             landMark,
-            pincode, 
+            pincode,
             phone,
-            altPhone 
+            altPhone
         } = req.body;
 
         if (!address_id) {
@@ -90,15 +91,15 @@ const editCheckoutAddress = async (req, res) => {
 const addCheckoutAddress = async (req, res) => {
     try {
         const userId = req.session.user;
-        const { 
+        const {
             name,
             addressType,
-            city, 
+            city,
             state,
             landMark,
-            pincode, 
+            pincode,
             phone,
-            altPhone 
+            altPhone
         } = req.body;
 
         // Check if user already has an address document
@@ -143,10 +144,12 @@ const addCheckoutAddress = async (req, res) => {
     }
 }
 
-const postCheckout = async (req, res) => {
+const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user;
+      
         return res.status(200).json({ success: true });
+        
     } catch (error) {
         res.status(500).json({ error: "Internal server error" });
     }
@@ -156,5 +159,5 @@ module.exports = {
     loadCheckout,
     editCheckoutAddress,
     addCheckoutAddress,
-    postCheckout
+    placeOrder
 }

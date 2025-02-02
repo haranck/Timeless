@@ -75,9 +75,6 @@ const addToCart = async (req, res) => {
             });
         }
 
-        // Calculate item price and total
-        // const itemPrice = Number(product.salePrice);
-        // const itemTotalPrice = itemPrice * itemQuantity;
 
         // find the item in the cart
         const existingItemIndex = cart.items.findIndex(item => 

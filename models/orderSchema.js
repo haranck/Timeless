@@ -1,64 +1,137 @@
 const mongoose = require('mongoose');
-const {Schema} = mongoose.Schema;
-const {v4: uuidv4} = require('uuid');
+const { Schema } = mongoose
+const { v4: uuidv4 } = require('uuid');
 const Product = require('./productSchema');
 
+// const orderSchema = new Schema({
+//    orderId:{
+//       type: String,
+//       default:()=> uuidv4(),
+//       unique: true
+//    },
+//    orderedItems:[{
+//       Product:{
+//          type: Schema.Types.ObjectId,
+//          ref: "Product",
+//          required: true
+//       },
+//       quantity:{
+//          type: Number,
+//          required: true
+//       },
+//       price:{
+//          type: Number,
+//          required: true
+//       },
+//       productName:{
+//          type: String,
+//          required: true
+//       }
+
+//    }],
+//    totalPrice:{
+//       type: Number,
+//       required: true
+//    },
+//    discount:{
+//       type: Number,
+//       default:0
+//    },
+//    finalAmount:{
+//       type: Number,
+//       required: true
+//    },
+//    address:{
+//       type:Schema.Types.ObjectId,
+//       ref:"User",
+//       required: true
+//    },
+//    invoiceDate:{
+//       type: Date
+//    },
+//    status:{
+//       type: String,
+//       enum:["pending","shipped","delivered","cancelled","returned","refunded","processing"],
+//       default: "pending"
+//    },
+//    createdAt:{
+//       type: Date,
+//       default: Date.now,
+//    },
+//    coupenApplied:{
+//       type: String,
+//       default: false
+//    }
+// })   
+
 const orderSchema = new Schema({
-   orderId:{
+   orderId: {
       type: String,
-      default:()=> uuidv4(),
+      default: () => uuidv4(),
       unique: true
    },
-   orderedItems:[{
-      Product:{
+   user_id: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+   },
+   address_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Address",
+      required: true
+   },
+   payment_method: {
+      type: String,
+      enum: ["credit_card", "paypal", "cod", "upi", "net_banking"],
+      required: true
+   },
+   order_items: [{
+      productId: {
          type: Schema.Types.ObjectId,
          ref: "Product",
          required: true
       },
-      quantity:{
+      productName: {
+         type: String,
+         required: true
+      },
+      price: {
          type: Number,
          required: true
       },
-      price:{
+      quantity: {
          type: Number,
          required: true
       }
-
    }],
-   totalPrice:{
+   total: {
       type: Number,
       required: true
    },
-   discount:{
+   discount: {
       type: Number,
-      default:0
+      default: 0
    },
-   finalAmount:{
+   finalAmount: {
       type: Number,
       required: true
    },
-   address:{
-      type:Schema.Types.ObjectId,
-      ref:"User",
-      required: true
-   },
-   invoiceDate:{
-      type: Date
-   },
-   status:{
+   status: {
       type: String,
-      enum:["pending","shipped","delivered","cancelled","returned","refunded","processing"],
+      enum: ["pending", "processing", "shipped", "delivered", "cancelled", "returned", "refunded"],
+      default: "pending"
    },
-   createdOn:{
+   invoiceDate: {
       type: Date,
-      default: Date.now,
-      required:true
+      default: Date.now
    },
-   coupenApplied:{
+   coupenApplied: {
       type: String,
       default: false
-   }
-})   
+   },
+}, { timestamps: true });
+
+
 
 const Order = mongoose.model('Order', orderSchema);
-module.exports = Order;
+module.exports = Order;  
