@@ -262,19 +262,10 @@
                 Swal.fire('Error!', data.message, 'error');
                 return;
             }
-            // switch(action) {
-            //     case 'increase':
-            //         newQuantity = currentQuantity + 1;
-            //         break;
-            //     case 'decrease':
-            //         newQuantity = currentQuantity > 1 ? currentQuantity - 1 : 1;
-            //         break;
-            //     case 'set':
-            //         newQuantity = parseInt(value) || 1;
-            //         break;
-            // }
+ 
             await Swal.fire('Success!', '', 'success');
-            if (newQuantity !== currentQuantity) {
+
+            if (newQuantity !== currentQuantity) {// If quantity changed
                 quantityInput.value = newQuantity;
                 
                 // Update the price for this item
@@ -283,14 +274,7 @@
                 totalPriceElement.textContent = `₹${(pricePerUnit * newQuantity).toFixed(2)}`;
 
                 // Recalculate total cart price
-                calculateTotalPrice();
-
-                // You can add AJAX call here to update the backend
-                // fetch('/cart/update', {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify({ productId, quantity: newQuantity })
-                // });
+                calculateTotalPrice()            
             }
         }
     </script>

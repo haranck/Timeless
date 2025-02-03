@@ -691,7 +691,7 @@
 
         // Function to Open Modal with address data
         function openEditAddressModal(addressId) {
-            const addresses = <%-JSON.stringify(userAddress)%>;
+            const addresses = "<%-JSON.stringify(userAddress)%>"
             const address = addresses.find(addr => addr._id === addressId);
 
             if (address) {
@@ -762,7 +762,7 @@
                 const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
                 const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
                 const totalAmount = document.getElementById('total-amount').textContent.replace('₹', '');
-                const orderedItems = <%- JSON.stringify(cart.items) %>;
+                const orderedItems = "<%- JSON.stringify(cart.items) %>"
 
                 console.log('Order Details:', {
                     shippingAddress,
@@ -822,7 +822,7 @@
                         });
 
                         // Redirect to orders page after success
-                        window.location.replace('/userProfile');
+                        window.location.replace('/viewOrder/<%- cart._id %>');
                     } else {
                         throw new Error(data.message || 'Order failed');
                     }

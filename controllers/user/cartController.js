@@ -109,7 +109,6 @@ const addToCart = async (req, res) => {
 
             // Update existing item
             cart.items[existingItemIndex].quantity = newQuantity;
-            // cart.items[existingItemIndex].price = itemPrice;
             cart.items[existingItemIndex].totalPrice =  newQuantity * product.salePrice;
                
         } else {

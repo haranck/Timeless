@@ -1,5 +1,8 @@
 <%- include("../../views/partials/user/header") %>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+
 <style>
     * {
         margin: 0;
@@ -120,6 +123,151 @@
         background: #f8f9fa;
     }
 
+    .btn-cancel {
+        background-color: #dc3545;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 20px;
+        transition: background-color 0.3s;
+    }
+
+    .btn-cancel:hover {
+        background-color: #c82333;
+    }
+
+    .action-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding: 15px;
+        border-top: 1px solid #dee2e6;
+    }
+
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        position: relative;
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            transform: translateY(-100px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #333;
+    }
+
+    .modal-body {
+        margin-bottom: 20px;
+    }
+
+    .modal-body p {
+        color: #666;
+        margin-bottom: 20px;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding-top: 15px;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .close-btn {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+        transition: color 0.3s;
+    }
+
+    .close-btn:hover {
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        color: #333;
+        background-color: #fff;
+    }
+
+    .form-group select:focus {
+        outline: none;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+    .btn-confirm {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
+
+    .btn-confirm:hover {
+        background-color: #218838;
+    }
+
     @media (max-width: 768px) {
         body {
             padding: 1rem;
@@ -133,8 +281,6 @@
             display: block;
             overflow-x: auto;
         }
-    }.btn-cancel{
-        
     }
 </style>
 
@@ -255,7 +401,6 @@
                             <% } %>
                         <% }); %>
                         <tr class="total-row">
-                            <!-- <td> <a href="/cancelOrder/<%= order._id %>" ><button class="btn-cancel">Cancel Order</button></a></td> -->
                             <td colspan="4" style="text-align: right;">Total Amount:</td>
                             <td>₹<%= order.totalAmount || order.total || 0 %></td>
                         </tr>
@@ -264,11 +409,19 @@
                             <td colspan="5" class="text-center">No items found in this order.</td>
                         </tr>
                     <% } %>
-                   
                 </tbody>
-                
             </table>
-            
+            <% if (order.order_items && order.order_items.length > 0) { %>
+                <div class="action-row">
+
+                    <% if(order.status !== 'cancelled') { %>
+                    <button class="btn-cancel" onclick="openModal()">
+                        <i class="fas fa-times-circle"></i> Cancel Order
+                    </button>
+                    <% } %>
+
+                </div>
+            <% } %>
         </div>
     <% } else { %>
         <div class="card">
@@ -280,5 +433,115 @@
         </div>
     <% } %>
 </div>
+
+<div id="cancelOrderModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div class="modal-header">
+            <h2>Cancel Order</h2>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to cancel this order? This action cannot be undone.</p>
+            <div class="form-group">
+                <label for="cancelReason">Reason for cancellation:</label>
+                <select id="cancelReason">
+                    <option value="">Select a reason</option>
+                    <option value="changed_mind">Changed my mind</option>
+                    <option value="wrong_item">Ordered wrong item</option>
+                    <option value="shipping_time">Shipping time too long</option>
+                    <option value="price_issue">Found better price elsewhere</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+            <button type="button" class="btn-confirm" onclick="confirmCancel()">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function openModal(event) {
+        if (event) {
+            event.preventDefault();
+        }
+        const modal = document.getElementById("cancelOrderModal");
+        if (modal) {
+            modal.style.display = "flex";
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeModal() {
+        const modal = document.getElementById("cancelOrderModal");
+        if (modal) {
+            modal.style.display = "none";
+            document.body.style.overflow = 'auto';
+        }
+    }
+
+    async function confirmCancel() {
+        const reason = document.getElementById('cancelReason').value;
+        if (!reason) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please select a reason'
+            });
+            return;
+        }
+        try {
+            const orderId = '<%= order._id %>'
+            const response = await fetch (`/cancelOrder/${orderId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({reason})
+            });
+            const data = await response.json();
+
+            if(data.success){
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Order cancelled successfully',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+                window.location.replace('/viewOrder/'+orderId);
+            }else{
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to cancel order',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to cancel order',
+                showConfirmButton: false,
+                timer: 1500
+            })
+        }
+        closeModal();
+        // location.reload();
+        
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById("cancelOrderModal");
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+
+</script>
 
 <%- include("../../views/partials/user/footer") %>

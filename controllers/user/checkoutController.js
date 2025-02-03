@@ -244,7 +244,7 @@ const viewOrder = async (req, res) => {
 
         if (!order) {
             console.log("Order not found in database");
-            return res.redirect('/profile');
+            return res.redirect('/userProfile');
         }
 
         // Ensure the order belongs to the logged-in user
@@ -282,11 +282,33 @@ const viewOrder = async (req, res) => {
     }
 }
 
+const cancelOrder = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const orderReason = req.body.reason;
+        const order = await Order.findById(orderId);
 
+        if(!orderReason){
+            return res.status(400).json({ success: false, message: 'Reason is required' });
+        }
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+        if(order.status === 'pending'){
+            order.status = 'cancelled';
+            await order.save();
+        }
+        return res.status(200).json({ success: true, message: 'Order cancelled successfully' });
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
 module.exports = {
     loadCheckout,
     editCheckoutAddress,
     addCheckoutAddress,
     placeOrder,
-    viewOrder 
+    viewOrder,
+    cancelOrder 
 }

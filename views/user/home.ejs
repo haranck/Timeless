@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="path/to/css/fontawesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
 
     <!-- Hero Section Begin -->
@@ -138,32 +139,37 @@
                                 </div>
                             </div>
                             <div class="product-card__details">
-                                
-                                    <h6 class="product-card__title">
-                                        <%= products[i].productName %>
-                                    </h6>
-                                    <div class="product-card__pricing">
-                                        <span class="product-card__sale-price">
-                                            ₹<%= products[i].salePrice.toLocaleString('en-IN') %>
-                                        </span>
-                                        <span class="product-card__regular-price">
-                                            ₹<%= products[i].regularPrice.toLocaleString('en-IN') %>
-                                        </span>
-                                    </div>
-                                    <div class="product-card__rating">
-                                        <% for(let j=0; j < 5; j++) { %>
-                                            <i
-                                                class="fa-solid fa-star <%= j < Math.round(products[i].rating || 0) ? 'active' : '' %>"></i>
-                                            <% } %>
-                                                <span class="product-card__rating-count">
-                                                    (<%= products[i].rating || 0 %>/5)
-                                                </span>
-                                    </div>
-                                    
-                                        <button onclick="addToCart('<%= products[i]._id %>')" class="btn">Add to
-                                            Cart</button>
-                                    
-                                
+
+                                <h6 class="product-card__title">
+                                    <%= products[i].productName %>
+                                </h6>
+                                <div class="product-card__pricing">
+                                    <span class="product-card__sale-price">
+                                        ₹<%= products[i].salePrice.toLocaleString('en-IN') %>
+                                    </span>
+                                    <span class="product-card__regular-price">
+                                        ₹<%= products[i].regularPrice.toLocaleString('en-IN') %>
+                                    </span>
+                                </div>
+                                <div class="product-card__rating">
+                                    <% for(let j=0; j < 5; j++) { %>
+                                        <i
+                                            class="fa-solid fa-star <%= j < Math.round(products[i].rating || 0) ? 'active' : '' %>"></i>
+                                        <% } %>
+                                            <span class="product-card__rating-count">
+                                                (<%= products[i].rating || 0 %>/5)
+                                            </span>
+                                </div>
+
+                                <!-- <button onclick="addToCart('<%= products[i]._id %>')" class="btn">Add to
+                                            Cart</button> -->
+
+
+                                <button onclick="addToCart('<%= products[i]._id %>')" class="product-card__cart-btn">
+                                    <i class="fa-solid fa-cart-plus"></i>Add to Cart
+                                </button>
+
+
                             </div>
                         </div>
                     </div>
@@ -430,53 +436,120 @@
             background-color: #333;
             transform: translateY(-2px);
         }
-    </style>
-    
-<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-<script>
-    async function addToCart(productId) {
-        try {
-            const response = await fetch('/addToCart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // If you're using CSRF protection, add the token here
-                    // 'CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    productId: productId,
-                    quantity: 1
-                })
-            });
-    
-            const data = await response.json();
-            
-            if (response.ok) {
-                // Show success message using SweetAlert2
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Product added to cart successfully',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                }).then(() => {
-                    // Optionally refresh the cart or update cart count
-                    window.location.href = '/cart';
-                });
-            } else {
-                throw new Error(data.message || 'Failed to add product to cart');
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
-        } catch (error) {
-            console.error('Error:', error);
-            Swal.fire({
-                title: 'Error!',
-                text: error.message || 'Failed to add product to cart',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-    }
+
+        .toastify {
+            animation: fadeInUp 0.5s ease-in-out;
+        }
+
+        /* Green tick animation */
+        @keyframes tickPop {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.3);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .toastify-avatar {
+            width: 24px;
+            /* Adjust icon size */
+            height: 24px;
+            animation: tickPop 0.5s ease-in-out;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        async function addToCart(productId) {
+            try {
+                const response = await fetch('/addToCart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        quantity: 1
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+
+                    Toastify({
+                        text: "Success\nProduct added to cart successfully",
+                        duration: 2000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        stopOnFocus: true,
+                        style: {
+                            background: "#ffffff",
+                            color: "#28a745",
+                            boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)",
+                            padding: "12px 20px",
+                            borderRadius: "10px",
+                            borderLeft: "5px solid #28a745",
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            textAlign: "left",
+                            animation: "fadeInUp 0.5s ease-in-out"
+                        },
+                        avatar: "https://cdn-icons-png.flaticon.com/512/845/845646.png",
+                    }).showToast();
+
+
+                } else {
+                    throw new Error(data.message || 'Failed to add product to cart');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+               
+                Toastify({
+                    text: "Error\n" + error.message || 'Failed to add product to cart',
+                    duration: 2000,
+                    close: true, 
+                    gravity: "top", 
+                    position: "right", 
+                    stopOnFocus: true, 
+                    style: {
+                        background: "#ffffff", // 
+                        color: "#dc3545", 
+                        boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)", 
+                        padding: "12px 20px",
+                        borderRadius: "10px",
+                        borderLeft: "5px solid #dc3545", 
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        textAlign: "left",
+                        animation: "fadeInUp 0.5s ease-in-out" 
+                    },
+                    avatar: "https://cdn-icons-png.flaticon.com/512/190/190406.png", 
+                }).showToast();
+            }
+        }
     </script>
 
     <%- include("../../views/partials/user/footer") %>
