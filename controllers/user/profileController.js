@@ -1,5 +1,6 @@
 const User = require('../../models/userSchema')
 const Address = require('../../models/addressSchema')
+const Order = require('../../models/orderSchema')
 const nodemailer = require('nodemailer')
 const bcrypt = require('bcrypt')
 const env = require('dotenv').config()
@@ -151,7 +152,12 @@ const userProfile = async (req, res) => {
         const userId = req.session.user
         const userData = await User.findById(userId)
         const addressData = await Address.findOne({ userId: userId })
-        res.render("profile", { user: userData, userAddress: addressData })
+        if(!userId){
+            res.redirect("/login")
+        }
+
+        const orders = await Order.find({user_id: userId}).populate("order_items.productId")
+        res.render("profile", { user: userData, userAddress: addressData, orders })
     } catch (error) {
         res.redirect('/pageNotFound')
     }

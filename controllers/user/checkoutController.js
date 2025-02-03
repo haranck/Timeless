@@ -216,7 +216,7 @@ const placeOrder = async (req, res) => {
             { $set: { items: [] } }
         );
 
-        return res.status(200).json({ 
+        return res.status(200).json({         
             success: true, 
             message: 'Order placed successfully' 
         });
@@ -230,9 +230,34 @@ const placeOrder = async (req, res) => {
     }
 }
 
+const viewOrder = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const orderId = req.params.id
+        
+        const order = await Order.findOne({ _id: orderId });
+        const userAddress = await Address.findOne({ userId: userId });
+        if (!order) {
+            console.log("No orders found for user.");
+        }
+
+        if (!userAddress) {
+            console.log("No address found for user.");
+        }
+        return res.render("order", { order, userAddress });
+    } catch (error) {
+        console.error('View order error:', error);
+        res.redirect('/pageNotFound');
+    }
+}
+
+
+
+
 module.exports = {
     loadCheckout,
     editCheckoutAddress,
     addCheckoutAddress,
-    placeOrder
+    placeOrder,
+    viewOrder 
 }

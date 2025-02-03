@@ -1,0 +1,227 @@
+<%- include("../../views/partials/user/header") %>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+        background-color: #f5f5f5;
+        padding: 0rem;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .card {
+        background: white;
+        border-radius: 10px;
+        padding: 2rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        margin-top: 51px;
+    }
+
+    .section-title {
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 0.5rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .info-item {
+        margin-bottom: 1rem;
+    }
+
+    .info-label {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .info-value {
+        color: #333;
+        font-weight: 500;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 0.3rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .status-paid {
+        background: #e3f9e5;
+        color: #1b4332;
+    }
+
+    .status-delivered {
+        background: #e0f2fe;
+        color: #075985;
+    }
+
+    .products-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+    .products-table th {
+        background: #f8f9fa;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #444;
+    }
+
+    .products-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .product-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    .product-name {
+        color: #2563eb;
+        font-weight: 500;
+    }
+
+    .total-row {
+        font-weight: 600;
+        background: #f8f9fa;
+    }
+
+    @media (max-width: 768px) {
+        body {
+            padding: 1rem;
+        }
+        
+        .card {
+            padding: 1rem;
+        }
+
+        .products-table {
+            display: block;
+            overflow-x: auto;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- Order Information Section -->
+    <div class="card">
+        <h2 class="section-title">Order Information</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Order ID</div>
+                <div class="info-value">#<%- order._id %></div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Order Date</div>
+                <div class="info-value"><%- order.createdAt %></div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Order Status</div>
+                <div class="info-value">
+                    <span class="status status-delivered">Delivered</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Payment Method</div>
+                <div class="info-value"><%- order.paymentMethod %></div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Payment Status</div>
+                <div class="info-value">
+                    <span class="status status-paid"><%- order.status %></span>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Total Amount</div>
+                <div class="info-value">₹<%- order.totalAmount %></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delivery Address Section -->
+    <div class="card">
+        <h2 class="section-title">Delivery Address</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Customer Name</div>
+                <div class="info-value"><%- order.name %></div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Phone Number</div>
+                <div class="info-value">+1 (555) 123-4567</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Address</div>
+                <div class="info-value">123 Main Street, Apt 4B<br>New York, NY 10001<br>United States</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ordered Items Section -->
+    <div class="card">
+        <h2 class="section-title">Ordered Items</h2>
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <img src="https://via.placeholder.com/80" alt="Product 1" class="product-image">
+                    </td>
+                    <td class="product-name">Wireless Headphones</td>
+                    <td>$79.99</td>
+                    <td>2</td>
+                    <td>$159.98</td>
+                </tr>
+                <tr>
+                    <td>
+                        <img src="https://via.placeholder.com/80" alt="Product 2" class="product-image">
+                    </td>
+                    <td class="product-name">Smart Watch</td>
+                    <td>$89.99</td>
+                    <td>1</td>
+                    <td>$89.99</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="4" style="text-align: right;">Total Amount:</td>
+                    <td>$249.97</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<%- include("../../views/partials/user/footer") %>

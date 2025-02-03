@@ -75,6 +75,7 @@ router.get("/checkout", userAuth, checkoutController.loadCheckout);
 router.post("/checkout", userAuth, checkoutController.placeOrder);
 router.post("/editCheckoutAddress", userAuth, checkoutController.editCheckoutAddress)
 router.post("/addCheckoutAddress", userAuth, checkoutController.addCheckoutAddress)
+router.get("/viewOrder/:orderId", userAuth, checkoutController.viewOrder)
 
 
 module.exports = router;
