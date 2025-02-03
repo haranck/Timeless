@@ -233,25 +233,54 @@ const placeOrder = async (req, res) => {
 const viewOrder = async (req, res) => {
     try {
         const userId = req.session.user;
-        const orderId = req.params.id
+        const orderId = req.params.orderId;
         
-        const order = await Order.findOne({ _id: orderId });
-        const userAddress = await Address.findOne({ userId: userId });
+        // Find order and populate product details
+        const order = await Order.findById(orderId)
+            .populate({
+                path: 'order_items.productId',
+                select: 'productName productImages price'
+            });
+
         if (!order) {
-            console.log("No orders found for user.");
+            console.log("Order not found in database");
+            return res.redirect('/profile');
         }
 
-        if (!userAddress) {
-            console.log("No address found for user.");
+        // Ensure the order belongs to the logged-in user
+        if (order.user_id && order.user_id.toString() !== userId) {
+            console.log("Order does not belong to current user");
+            return res.redirect('/profile');
         }
-        return res.render("order", { order, userAddress });
+
+        // Get the address from Address collection
+        const addressDoc = await Address.findOne({ userId: userId });
+        console.log('Address Doc:', addressDoc);
+        console.log('Order address_id:', order.address_id);
+
+        let deliveryAddress = null;
+        if (addressDoc && addressDoc.address && addressDoc.address.length > 0) {
+            // Find the specific address used in this order
+            deliveryAddress = addressDoc.address.find(addr => 
+                addr._id && order.address_id && addr._id.toString() === order.address_id.toString()
+            );
+            console.log('Found delivery address:', deliveryAddress);
+        }
+
+        // Pass the order and address to the view
+        const orderData = {
+            ...order.toObject(),
+            address: deliveryAddress,
+            totalAmount: order.totalAmount || order.total || order.finalAmount,
+            orderStatus: order.status 
+        };
+        
+        return res.render("order", { order: orderData });
     } catch (error) {
         console.error('View order error:', error);
-        res.redirect('/pageNotFound');
+        return res.redirect('/profile');
     }
 }
-
-
 
 
 module.exports = {

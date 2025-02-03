@@ -74,6 +74,16 @@
         color: #075985;
     }
 
+    .status-pending {
+        background: #fff3dc;
+        color: #945d0c;
+    }
+
+    .status-cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
     .products-table {
         width: 100%;
         border-collapse: collapse;
@@ -123,105 +133,152 @@
             display: block;
             overflow-x: auto;
         }
+    }.btn-cancel{
+        
     }
 </style>
-</head>
-<body>
+
 <div class="container">
-    <!-- Order Information Section -->
-    <div class="card">
-        <h2 class="section-title">Order Information</h2>
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">Order ID</div>
-                <div class="info-value">#<%- order._id %></div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Order Date</div>
-                <div class="info-value"><%- order.createdAt %></div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Order Status</div>
-                <div class="info-value">
-                    <span class="status status-delivered">Delivered</span>
+    <% if (order) { %>
+        <!-- Order Information Section -->
+        <div class="card">
+            <h2 class="section-title">Order Information</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Order ID</div>
+                    <div class="info-value">#<%= order._id %></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Order Date</div>
+                    <div class="info-value"><%= new Date(order.createdAt).toLocaleString() %></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Order Status</div>
+                    <div class="info-value">
+                        <span class="status status-<%= order.orderStatus ? order.orderStatus.toLowerCase() : 'pending' %>">
+                            <%= order.orderStatus || 'Pending' %>
+                        </span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Payment Method</div>
+                    <div class="info-value"><%= order.payment_method || 'N/A' %></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Payment Status</div>
+                    <div class="info-value">
+                        <span class="status status-<%= order.payment_status ? 'paid' : 'pending' %>">
+                            <%= order.payment_status ? 'Paid' : 'Pending' %>
+                        </span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Total Amount</div>
+                    <div class="info-value">₹<%= order.totalAmount || 0 %></div>
                 </div>
             </div>
-            <div class="info-item">
-                <div class="info-label">Payment Method</div>
-                <div class="info-value"><%- order.paymentMethod %></div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Payment Status</div>
-                <div class="info-value">
-                    <span class="status status-paid"><%- order.status %></span>
-                </div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Total Amount</div>
-                <div class="info-value">₹<%- order.totalAmount %></div>
+        </div>
+
+        <!-- Delivery Address Section -->
+        <div class="card">
+            <h2 class="section-title">Delivery Address</h2>
+            <div class="info-grid">
+                <% if (order.address && Object.keys(order.address).length > 0) { %>
+                    <div class="info-item">
+                        <div class="info-label">Customer Name</div>
+                        <div class="info-value"><%= order.address.name || 'N/A' %></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Phone Number</div>
+                        <div class="info-value">
+                            <%= order.address.phone || 'N/A' %>
+                            <% if (order.address.altPhone) { %>
+                                <br>Alt: <%= order.address.altPhone %>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Address Type</div>
+                        <div class="info-value"><%= order.address.addressType || 'N/A' %></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Address</div>
+                        <div class="info-value">
+                            <% if (order.address.landMark) { %>
+                                <%= order.address.landMark %><br>
+                            <% } %>
+                            <%= order.address.city || '' %>
+                            <% if (order.address.state) { %>
+                                , <%= order.address.state %>
+                            <% } %>
+                            <% if (order.address.pincode) { %>
+                                <%= order.address.pincode %>
+                            <% } %>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="info-item">
+                        <div class="info-value">Address information not available</div>
+                    </div>
+                <% } %>
             </div>
         </div>
-    </div>
 
-    <!-- Delivery Address Section -->
-    <div class="card">
-        <h2 class="section-title">Delivery Address</h2>
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">Customer Name</div>
-                <div class="info-value"><%- order.name %></div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Phone Number</div>
-                <div class="info-value">+1 (555) 123-4567</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Address</div>
-                <div class="info-value">123 Main Street, Apt 4B<br>New York, NY 10001<br>United States</div>
+        <!-- Ordered Items Section -->
+        <div class="card">
+            <h2 class="section-title">Ordered Items</h2>
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (order.order_items && order.order_items.length > 0) { %>
+                        <% order.order_items.forEach(item => { %>
+                            <% if (item && item.productId) { %>
+                                <tr>
+                                    <td>
+                                        <img src="/uploads/product-images/<%= item.productId.productImages ? item.productId.productImages[0] : 'default.jpg' %>" 
+                                            alt="<%= item.productId.productName || 'Product Image' %>" 
+                                            class="product-image">
+                                    </td>
+                                    <td class="product-name"><%= item.productId.productName || 'N/A' %></td>
+                                    <td>₹<%= item.price || item.productId.price || 0 %></td>
+                                    <td><%= item.quantity || 1 %></td>
+                                    <td>₹<%= (item.price || item.productId.price || 0) * (item.quantity || 1) %></td>
+                                </tr>
+                            <% } %>
+                        <% }); %>
+                        <tr class="total-row">
+                            <!-- <td> <a href="/cancelOrder/<%= order._id %>" ><button class="btn-cancel">Cancel Order</button></a></td> -->
+                            <td colspan="4" style="text-align: right;">Total Amount:</td>
+                            <td>₹<%= order.totalAmount || order.total || 0 %></td>
+                        </tr>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="5" class="text-center">No items found in this order.</td>
+                        </tr>
+                    <% } %>
+                   
+                </tbody>
+                
+            </table>
+            
+        </div>
+    <% } else { %>
+        <div class="card">
+            <div class="text-center">
+                <h2>Order not found</h2>
+                <p>The requested order could not be found.</p>
+                <a href="/profile" class="btn btn-primary">Back to Profile</a>
             </div>
         </div>
-    </div>
-
-    <!-- Ordered Items Section -->
-    <div class="card">
-        <h2 class="section-title">Ordered Items</h2>
-        <table class="products-table">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <img src="https://via.placeholder.com/80" alt="Product 1" class="product-image">
-                    </td>
-                    <td class="product-name">Wireless Headphones</td>
-                    <td>$79.99</td>
-                    <td>2</td>
-                    <td>$159.98</td>
-                </tr>
-                <tr>
-                    <td>
-                        <img src="https://via.placeholder.com/80" alt="Product 2" class="product-image">
-                    </td>
-                    <td class="product-name">Smart Watch</td>
-                    <td>$89.99</td>
-                    <td>1</td>
-                    <td>$89.99</td>
-                </tr>
-                <tr class="total-row">
-                    <td colspan="4" style="text-align: right;">Total Amount:</td>
-                    <td>$249.97</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <% } %>
 </div>
-
 
 <%- include("../../views/partials/user/footer") %>
