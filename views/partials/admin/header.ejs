@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,63 +9,258 @@
     <link rel="stylesheet" href="/css/admin/dashboard.css">
     <link rel="stylesheet" href="/css/admin/customers.css">
     <link rel="stylesheet" href="/css/admin/category.css">
-</head>
+    <style>
+        .sidebar {
+            width: 250px;
+            height: 100%;
+            background: #2c3e50;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            padding-top: 70px;
+        }
 
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #3498db;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #3498db;
+        }
+
+        .nav-item i {
+            width: 20px;
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px 0 280px;
+            z-index: 99;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            text-decoration: none;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .logo-text::before {
+            content: 'T';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 20px;
+            -webkit-text-fill-color: white;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-icon i {
+            font-size: 20px;
+            color: #666;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .profile-dropdown {
+            position: relative;
+        }
+
+        .profile-img {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 25px;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+        .profile-img:hover {
+            background: #e9ecef;
+        }
+
+        .profile-img i {
+            font-size: 18px;
+            color: #2c3e50;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: none;
+            min-width: 200px;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9fa;
+            color: #3498db;
+        }
+
+        .dropdown-item i {
+            font-size: 16px;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding-top: 70px;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+
+        .dashboard-grid {
+            padding: 20px;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+    </style>
+</head>
 <body>
-    <!-- Sidebar -->
     <div class="sidebar">
         <nav>
-            <a href="/admin/" class="nav-item" data-page="Dashboard">
-                <i class="fas fa-chart-line"></i>
+            <a href="/admin/" class="nav-item">
+                <i class="fas fa-chart-pie"></i>
                 Dashboard
             </a>
-            <a href="/admin/products" class="nav-item" data-page="Products">
-                <i class="fas fa-box"></i>
+            <a href="/admin/products" class="nav-item">
+                <i class="fas fa-box-open"></i>
                 Products
             </a>
-            <a href="/admin/addProducts" class="nav-item" data-page="Products">
-                <i class="fas fa-box"></i>
+            <a href="/admin/addProducts" class="nav-item">
+                <i class="fas fa-plus-circle"></i>
                 Add Products
             </a>
-
-            <a href="#" class="nav-item" data-page="Orders">
-                <i class="fas fa-shopping-cart"></i>
+            <a href="#" class="nav-item">
+                <i class="fas fa-shopping-bag"></i>
                 Orders
             </a>
-            <a href="/admin/customers" class="nav-item" data-page="Customers">
+            <a href="/admin/customers" class="nav-item">
                 <i class="fas fa-users"></i>
                 Customers
             </a>
-            <a href="#" class="nav-item" data-page="Reviews">
+            <a href="#" class="nav-item">
                 <i class="fas fa-star"></i>
                 Reviews
             </a>
-            <a href="#" class="nav-item" data-page="Offers">
-                <i class="fas fa-gift"></i>
+            <a href="#" class="nav-item">
+                <i class="fas fa-percent"></i>
                 Offers
             </a>
-            <a href="#" class="nav-item" data-page="Coupon Management">
+            <a href="#" class="nav-item">
                 <i class="fas fa-ticket-alt"></i>
-                Coupon Management
+                Coupons
             </a>
-            <a href="#" class="nav-item" data-page="Banner Management">
+            <a href="#" class="nav-item">
                 <i class="fas fa-image"></i>
-                Banner Management
+                Banners
             </a>
-            <a href="/admin/brands" class="nav-item" data-page="Brands">
-                <i class="fas fa-box"></i>
+            <a href="/admin/brands" class="nav-item">
+                <i class="fas fa-copyright"></i>
                 Brands
             </a>
-            <a href="/admin/category" class="nav-item" data-page="Categories">
-                <i class="fas fa-list"></i>
+            <a href="/admin/category" class="nav-item">
+                <i class="fas fa-sitemap"></i>
                 Categories
             </a>
         </nav>
     </div>
 
-    <!-- Header -->
     <header class="header">
-        <div class="brand">Timeless Aura </div>
+        <a href="/admin" class="logo-container">
+            <div class="logo-text">Timeless Aura</div>
+        </a>
         <div class="header-right">
             <div class="notification-icon">
                 <i class="fas fa-bell"></i>
@@ -74,11 +268,12 @@
             </div>
             <div class="profile-dropdown">
                 <div class="profile-img" id="profile-toggle">
+                    <i class="fas fa-user-circle"></i>
                     Admin
                 </div>
                 <div class="dropdown-menu">
                     <a href="#" class="dropdown-item">
-                        <i class="fas fa-user"></i>
+                        <i class="fas fa-user-cog"></i>
                         Profile Settings
                     </a>
                     <a href="/admin/logout" class="dropdown-item">
@@ -87,26 +282,38 @@
                     </a>
                 </div>
             </div>
-
-
-
         </div>
     </header>
+
     <script>
+        // Add active class to current page
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            navItems.forEach(item => {
+                if (item.getAttribute('href') === currentPath) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Profile dropdown
         const profileToggle = document.getElementById('profile-toggle');
         const dropdownMenu = document.querySelector('.dropdown-menu');
 
-        // Toggle dropdown visibility on click
-        profileToggle.addEventListener('click', function (e) {
-            e.stopPropagation(); // Prevent the click from bubbling up
+        profileToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
             dropdownMenu.classList.toggle('show');
         });
 
-        // Hide dropdown when clicking outside
-        document.addEventListener('click', function () {
-            if (dropdownMenu.classList.contains('show')) {
-                dropdownMenu.classList.remove('show');
-            }
+        document.addEventListener('click', function() {
+            dropdownMenu.classList.remove('show');
         });
 
+        dropdownMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
     </script>
+</body>
+</html>
