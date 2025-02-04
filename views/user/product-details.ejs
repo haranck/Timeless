@@ -251,6 +251,11 @@
                                 <li><span>Categories:</span>
                                     <%= product.category.name %>
                                 </li>
+                                <% if (product.brand && product.brand.brandName) { %>
+                                <li><span>Brand:</span>
+                                    <%= product.brand.brandName %>
+                                </li>
+                                <% } %>
                                 <!-- <li><span>Tag:</span> Clothes, Skin, Body</li> -->
                             </ul>
                         </div>

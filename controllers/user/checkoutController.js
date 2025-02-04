@@ -218,6 +218,7 @@ const placeOrder = async (req, res) => {
 
         return res.status(200).json({         
             success: true, 
+            orderId:newOrder._id,
             message: 'Order placed successfully' 
         });
         

@@ -8,13 +8,15 @@ const customerController = require("../controllers/admin/customerController")
 const categoryController = require('../controllers/admin/categoryController')
 const productController = require('../controllers/admin/productController')
 const brandController = require('../controllers/admin/brandController')
+const orderController = require('../controllers/admin/orderController')
+
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         if (req.originalUrl.includes('/addBrand')) {
             cb(null, path.join(__dirname, '../public/uploads/brands'))
         } else {
-            cb(null, path.join(__dirname, '../public/uploads/products'))
+            cb(null, path.join(__dirname, '../public/uploads/product-images'))
         }
     },
     filename: function (req, file, cb) {
@@ -73,5 +75,9 @@ router.post('/addBrand', adminAuth, uploads.single("image"), brandController.add
 router.get('/blockBrand', adminAuth, brandController.blockBrand)
 router.get('/unblockBrand', adminAuth, brandController.unblockBrand)
 router.get('/deleteBrand', adminAuth, brandController.deleteBrand)
+
+//order mgt
+
+router.get('/orders', adminAuth, orderController.getOrdersPage)
 
 module.exports = router

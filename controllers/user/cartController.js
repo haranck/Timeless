@@ -22,7 +22,7 @@ const loadCart = async (req, res) => {
         // Calculate total price
         cart.totalPrice = cart.items.reduce((total, item) => total + item.totalPrice, 0);
 
-        res.render("cart", { cart });
+        res.render("cart", {user:req.session.userData, cart });
 
     } catch (error) {
         console.error("Error loading cart:", error);

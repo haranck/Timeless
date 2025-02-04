@@ -6,13 +6,16 @@ const path = require('path')
 const sharp = require('sharp')
 const { addCategory } = require('./categoryController')
 const Product = require('../../models/productSchema')
+const { isBlocked } = require('../../middlewares/auth')
+const Brand = require('../../models/brandSchema')
 
 
 const getProductAddPage = async (req, res) => {
    try {
 
       const category = await Category.find({ isListed: true })
-      res.render('product-add', { cat: category })
+      const brand = await Brand.find({ isBlocked: false })
+      res.render('product-add', { cat: category, brand: brand })
 
    } catch (error) {
       res.redirect('/pageerror')
@@ -46,6 +49,10 @@ const addProducts = async (req, res) => {
          if (!categoryId) {
             return res.status(400).json({ message: "Category not found" })
          }
+         const brandId = await Brand.findOne({ brandName: products.brand })
+         if(!brandId){
+            return res.status(400).json({ message: "Brand not found" })
+         }
 
 
          const newProduct = new product({
@@ -59,7 +66,7 @@ const addProducts = async (req, res) => {
             productImages: images,
             isListed: products.isListed,
             quantity: products.quantity,
-            size: products.size,
+            brand: brandId._id,
             status: "available"
          })
          await newProduct.save();
@@ -68,7 +75,8 @@ const addProducts = async (req, res) => {
       else {
 
          const category = await Category.find({ isListed: true })
-         return res.render('product-add', { cat: category, message: "product already exists" })
+         const brand = await Brand.find({ isBlocked: false })
+         return res.render('product-add', { cat: category,brand, message: "product already exists" })
       }
 
 

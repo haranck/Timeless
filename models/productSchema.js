@@ -24,6 +24,11 @@ const productSchema = new Schema({
       ref: "Category",
       required: true,
    },
+   brand: {
+      type: Schema.Types.ObjectId,
+      ref: "Brand",
+      required: true,
+   },
    quantity: {
       type: Number,
       default: 0,
@@ -42,7 +47,7 @@ const productSchema = new Schema({
    }, 
    status: {
       type: String,
-      enum: ["available", "out of stock", "Discontinued"],
+      enum: ["available", "out of stock"],
       required: true,
       default: "available",
    },
