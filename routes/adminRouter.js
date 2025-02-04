@@ -7,18 +7,21 @@ const { userAuth, adminAuth } = require("../middlewares/auth")
 const customerController = require("../controllers/admin/customerController")
 const categoryController = require('../controllers/admin/categoryController')
 const productController = require('../controllers/admin/productController')
-
+const brandController = require('../controllers/admin/brandController')
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../public/uploads/products'))
+        if (req.originalUrl.includes('/addBrand')) {
+            cb(null, path.join(__dirname, '../public/uploads/brands'))
+        } else {
+            cb(null, path.join(__dirname, '../public/uploads/products'))
+        }
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
         cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
     }
 })
-
 
 const fileFilter = (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
@@ -27,7 +30,6 @@ const fileFilter = (req, file, cb) => {
         cb(new Error('Not an image! Please upload an image.'), false)
     }
 }
-
 
 const uploads = multer({
     storage: storage,
@@ -63,5 +65,13 @@ router.patch('/toggleCategory/:id', adminAuth, categoryController.toggleCategory
 router.get('/editProduct', adminAuth, productController.getEditProduct)
 router.post("/editProduct/:id", adminAuth, uploads.array("images", 4), productController.editProduct)
 router.post('/deleteImage', adminAuth, productController.deleteSingleImage)
+
+//brand mgt
+
+router.get('/brands', adminAuth, brandController.getBrandPage)
+router.post('/addBrand', adminAuth, uploads.single("image"), brandController.addBrand)
+router.get('/blockBrand', adminAuth, brandController.blockBrand)
+router.get('/unblockBrand', adminAuth, brandController.unblockBrand)
+router.get('/deleteBrand', adminAuth, brandController.deleteBrand)
 
 module.exports = router

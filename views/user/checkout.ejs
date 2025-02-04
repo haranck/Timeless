@@ -825,7 +825,7 @@
                         });
 
                         // Redirect to orders page after success
-                        window.location.replace('/viewOrder/<%- cart._id %>');
+                        window.location.replace('/userProfile');
                     } else {
                         throw new Error(data.message || 'Order failed');
                     }

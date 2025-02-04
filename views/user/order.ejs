@@ -152,29 +152,38 @@
     .modal {
         display: none;
         position: fixed;
-        top: 0;
+        z-index: 1000;
         left: 0;
+        top: 0;
         width: 100%;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        justify-content: center;
-        align-items: center;
+        backdrop-filter: blur(5px);
+        animation: fadeIn 0.3s ease-out;
     }
 
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Modal Content */
     .modal-content {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        width: 90%;
-        max-width: 500px;
         position: relative;
-        animation: modalSlideIn 0.3s ease-out;
+        background-color: #fff;
+        margin: 15vh auto;
+        padding: 0;
+        width: 90%;
+        max-width: 450px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        transform-origin: top;
+        animation: slideIn 0.4s ease-out;
     }
 
-    @keyframes modalSlideIn {
+    @keyframes slideIn {
         from {
-            transform: translateY(-100px);
+            transform: translateY(-30px);
             opacity: 0;
         }
         to {
@@ -183,89 +192,149 @@
         }
     }
 
+    /* Modal Header */
     .modal-header {
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #dee2e6;
+        padding: 1rem;
+        border-bottom: 1px solid #edf2f7;
+        position: relative;
     }
 
     .modal-header h2 {
         margin: 0;
-        font-size: 1.5rem;
-        color: #333;
+        color: #2d3748;
+        font-size: 1.25rem;
+        font-weight: 600;
     }
 
-    .modal-body {
-        margin-bottom: 20px;
-    }
-
-    .modal-body p {
-        color: #666;
-        margin-bottom: 20px;
-    }
-
-    .modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        padding-top: 15px;
-        border-top: 1px solid #dee2e6;
-    }
-
+    /* Close Button */
     .close-btn {
         position: absolute;
-        right: 15px;
-        top: 10px;
-        font-size: 24px;
+        right: 1rem;
+        top: 0.75rem;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
-        color: #666;
-        transition: color 0.3s;
+        font-size: 1.5rem;
+        color: #718096;
+        transition: color 0.2s;
+        background: none;
+        border: none;
+        padding: 0;
+        z-index: 1001;
     }
 
     .close-btn:hover {
-        color: #333;
+        color: #2d3748;
     }
 
+    /* Modal Body */
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .modal-body p {
+        color: #4a5568;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+        font-size: 0.95rem;
+    }
+
+    /* Form Elements */
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 1rem;
     }
 
     .form-group label {
         display: block;
-        margin-bottom: 8px;
-        color: #333;
+        margin-bottom: 0.5rem;
+        color: #4a5568;
         font-weight: 500;
+        font-size: 0.95rem;
     }
 
-    .form-group select {
+    #cancelReason {
         width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 14px;
-        color: #333;
+        padding: 0.5rem 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        color: #2d3748;
         background-color: #fff;
+        transition: all 0.2s;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1em;
     }
 
-    .form-group select:focus {
+    #cancelReason:focus {
         outline: none;
-        border-color: #80bdff;
-        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        border-color: #4299e1;
+        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+    }
+
+    /* Modal Footer */
+    .modal-footer {
+        padding: 1rem;
+        border-top: 1px solid #edf2f7;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    /* Buttons */
+    .btn-cancel,
+    .btn-confirm {
+        min-width: 100px;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-cancel {
+        background-color: #e53e3e;
+        color: #fff;
+        border: 2px solid #e53e3e;
+    }
+
+    .btn-cancel:hover {
+        background-color: #c53030;
+        border-color: #c53030;
     }
 
     .btn-confirm {
-        background-color: #28a745;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.3s;
+        background-color: #fff;
+        color: #4a5568;
+        border: 2px solid #e2e8f0;
     }
 
     .btn-confirm:hover {
-        background-color: #218838;
+        background-color: #f7fafc;
+        border-color: #cbd5e0;
+    }
+
+    @media (max-width: 640px) {
+        .modal-content {
+            margin: 10vh auto;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 1rem;
+        }
+
+        .btn-cancel,
+        .btn-confirm {
+            min-width: 120px;
+        }
     }
 
     @media (max-width: 768px) {
@@ -479,10 +548,14 @@
     }
 
     function closeModal() {
-        const modal = document.getElementById("cancelOrderModal");
-        if (modal) {
-            modal.style.display = "none";
-            document.body.style.overflow = 'auto';
+        document.getElementById('cancelOrderModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('cancelOrderModal');
+        if (event.target === modal) {
+            closeModal();
         }
     }
 
@@ -538,14 +611,6 @@
         // location.reload();
         
     }
-
-    window.onclick = function(event) {
-        const modal = document.getElementById("cancelOrderModal");
-        if (event.target === modal) {
-            closeModal();
-        }
-    }
-
 </script>
 
 <%- include("../../views/partials/user/footer") %>
