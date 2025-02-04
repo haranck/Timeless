@@ -313,9 +313,13 @@
                 <div class="info-item">
                     <div class="info-label">Payment Status</div>
                     <div class="info-value">
-                        <span class="status status-<%= order.payment_status ? 'paid' : 'pending' %>">
-                            <%= order.payment_status ? 'Paid' : 'Pending' %>
-                        </span>
+                        <% if(order.orderStatus === 'cancelled') {%> 
+                        <span class="status status-cancelled">Cancelled</span>
+                        <% } else { %>
+                            <span class="status status-<%= order.payment_status ? 'paid' : 'pending' %>">
+                                <%= order.payment_status ? 'Paid' : 'Pending' %>
+                            </span>
+                        <% } %>
                     </div>
                 </div>
                 <div class="info-item">

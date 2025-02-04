@@ -89,7 +89,7 @@ const addToCart = async (req, res) => {
             if(newQuantity >5){
                 return res.status(400).json({ 
                     success: false,
-                    // message: "You can only order up to 5 items" 
+                    message: "You can only order up to 5 items" 
                 });
             }
             if(newQuantity > product.quantity){
@@ -101,7 +101,7 @@ const addToCart = async (req, res) => {
             if(newQuantity <1){
                 return res.status(400).json({ 
                     success: false,
-                    // message: "You can not order less than 1 item" 
+                    message: "You can not order less than 1 item" 
                 });
             }
 
@@ -136,6 +136,7 @@ const addToCart = async (req, res) => {
             message: "Product added to cart successfully",
             cartTotal: cart.cartTotal,
             itemsCount: cart.items.length
+        
         });
 
     } catch (error) {

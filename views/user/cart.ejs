@@ -240,11 +240,23 @@
             let newQuantity = currentQuantity;
             newQuantity = action === 'increase' ? currentQuantity + 1 : currentQuantity - 1 ;
             if(newQuantity > 5){
-                Swal.fire('Error!', 'You can only order up to 5 items.', 'error');
+                Swal.fire({
+                    title:'Error!', 
+                    text:'You can only order up to 5 items.',
+                    icon:'error',
+                    showConfirmButton:false,
+                    timer:1500
+                }); 
                 return;
             }
             if(newQuantity < 1){
-                Swal.fire('Error!', 'You can not order less than 1 item.', 'error'); 
+                Swal.fire({
+                    title:'Error!', 
+                    text:'You can not order less than 1 item.',
+                    icon:'error',
+                    showConfirmButton:false,
+                    timer:1500
+                }); 
                 return;
             }
             const response = await fetch('/addToCart', {
@@ -263,9 +275,15 @@
                 return;
             }
  
-            await Swal.fire('Success!', '', 'success');
+            // await Swal.fire('Success!', '', 'success');
+            await Swal.fire({
+                title: 'Success!',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1000
+            })
 
-            if (newQuantity !== currentQuantity) {// If quantity changed
+            if (newQuantity !== currentQuantity) {  // If quantity changed
                 quantityInput.value = newQuantity;
                 
                 // Update the price for this item

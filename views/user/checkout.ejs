@@ -688,10 +688,13 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-
+        const sanitizeQuotes = (string) => {
+            if (typeof string !== 'string') return string;
+            return string.replace(/'/g , '"');
+        }
         // Function to Open Modal with address data
         function openEditAddressModal(addressId) {
-            const addresses = "<%-JSON.stringify(userAddress)%>"
+            const addresses = '<%-JSON.stringify(userAddress)%>';
             const address = addresses.find(addr => addr._id === addressId);
 
             if (address) {
@@ -755,15 +758,15 @@
                 });
             }
         });
-
+        
         async function placeOrder() {
             try {
                 // Get all required order details
                 const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
                 const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
                 const totalAmount = document.getElementById('total-amount').textContent.replace('₹', '');
-                const orderedItems = "<%- JSON.stringify(cart.items) %>"
-
+                const sanitizedOrderItems = sanitizeQuotes(<%- JSON.stringify(cart.items) %>)
+                const orderedItems = sanitizedOrderItems
                 console.log('Order Details:', {
                     shippingAddress,
                     paymentMethod,

@@ -59,7 +59,7 @@ const getEditCategory = async (req, res) => {
    try {
       const id = req.query.id
 
-      const category = await Category.findById({ _id: id });
+      const category = await Category.findById({ _id: id });   
 
       res.render("edit-category", { category })
    } catch (error) {

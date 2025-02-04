@@ -1,6 +1,8 @@
 <%- include("../../views/partials/user/header") %>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
     <style>
         .product__details__pic__item {
             position: relative;
@@ -87,6 +89,7 @@
             border-radius: 4px;
             overflow: hidden;
             width: fit-content;
+            margin-left: 217px;
         }
 
         .quantity-btn {
@@ -186,7 +189,7 @@
                             <p>
                                 <%= product.description %>
                             </p>
-                            <div class="product__details__option">
+                            <!-- <div class="product__details__option">
                                 <div class="product__details__option__size">
                                     <span>Size:</span>
                                     <label for="xxl">30mm
@@ -202,25 +205,8 @@
                                         <input type="radio" id="sm">
                                     </label>
                                 </div>
-                                <!-- <div class="product__details__option__color">
-                                    <span>Color:</span>
-                                    <label class="c-1" for="sp-1">
-                                        <input type="radio" id="sp-1">
-                                    </label>
-                                    <label class="c-2" for="sp-2">
-                                        <input type="radio" id="sp-2">
-                                    </label>
-                                    <label class="c-3" for="sp-3">
-                                        <input type="radio" id="sp-3">
-                                    </label>
-                                    <label class="c-4" for="sp-4">
-                                        <input type="radio" id="sp-4">
-                                    </label>
-                                    <label class="c-9" for="sp-9">
-                                        <input type="radio" id="sp-9">
-                                    </label>
-                                </div> -->
-                            </div>
+                               
+                            </div> -->
 
                             <!-- <div class="product__details__cart__option">
                                 <div class="quantity">
@@ -232,22 +218,23 @@
                             <!-- <td class="quantity__item"> -->
                             <div class="custom-quantity-input">
                                 <button class="quantity-btn"
-                                    onclick="updateItemQuantity('<%= item.productId._id %>', 'decrease')">-</button>
-                                <input type="number" class="quantity-value" value="<%= item.quantity %>" min="1"
-                                    onchange="updateItemQuantity('<%= item.productId._id %>', 'set', this.value)"
-                                    readonly>
+                                    onclick="updateQuantity('decrease')">-</button>
+                                <input type="number" class="quantity-value" id="product-quantity" value="1" min="1" max="5" readonly>
                                 <button class="quantity-btn"
-                                    onclick="updateItemQuantity('<%= item.productId._id %>', 'increase')">+</button>
+                                    onclick="updateQuantity('increase')">+</button>
+
+
+                                    <button onclick="addToCart('<%= product._id %>')" class="primary-btn" style="margin-left: 20px;">
+                                        Add to Cart
+                                    </button>
+        
                             </div>
                             <!-- </td> -->
 
 
                             <!-- <a href="#" class="primary-btn">add to cart</a> -->
 
-                            <button onclick="addToCart('<%= product._id %>')" class="primary-btn">
-                                Add to Cart
-                            </button>
-
+                            
 
                         </div>
                         <div class="product__details__btns__option">
@@ -458,10 +445,18 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
 
         async function addToCart(productId) {
             try {
+                const quantity = parseInt(document.getElementById('product-quantity').value);
+
+                if (quantity > <%= product.quantity %> ) {
+                    Swal.fire('Error!', 'you cannot order more than <%= product.quantity %> items.', 'error');
+                    event.preventDefault();
+                    return;
+                }
                 const response = await fetch('/addToCart', {
                     method: 'POST',
                     headers: {
@@ -469,7 +464,7 @@
                     },
                     body: JSON.stringify({
                         productId: productId,
-                        quantity: 1
+                        quantity: quantity
                     })
                 });
 
@@ -530,47 +525,71 @@
             }
         }
 
+        function updateQuantity(action) {
+            const quantityInput = document.getElementById('product-quantity');
+            let currentQuantity = parseInt(quantityInput.value);
+            
+            if (action === 'increase' && currentQuantity < 5) {
+                quantityInput.value = currentQuantity + 1;
+            } else if (action === 'decrease' && currentQuantity > 1) {
+                quantityInput.value = currentQuantity - 1;
+            } else if (action === 'increase' && currentQuantity >= 5) {
+                Toastify({
+                    text: "Error\nYou can only order up to 5 items",
+                    duration: 2000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    stopOnFocus: true,
+                    style: {
+                        background: "#ffffff",
+                        color: "#dc3545",
+                        boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)",
+                        padding: "12px 20px",
+                        borderRadius: "10px",
+                        borderLeft: "5px solid #dc3545",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        textAlign: "left",
+                        animation: "fadeInUp 0.5s ease-in-out"
+                    },
+                    avatar: "https://cdn-icons-png.flaticon.com/512/190/190406.png",
+                }).showToast();
+            }
+        }
 
 
+        //zzoom
         $(document).ready(function () {
-            // Create zoom elements
             const $zoomContainer = $('<div class="image-zoom-container"></div>').appendTo('body');
             const $zoomLens = $('<div class="zoom-lens"></div>');
 
-            // Function to set up zoom for an image
             function setupZoom($image) {
-                // Remove previous event handlers
+    
                 $image.off('mousemove mouseleave');
 
-                // Add zoom lens to image container
                 $image.closest('.product__details__pic__item').append($zoomLens);
 
-                // Mouse move event
                 $image.on('mousemove', function (e) {
                     const $this = $(this);
                     const offset = $this.offset();
                     const containerWidth = $this.width();
                     const containerHeight = $this.height();
 
-                    // Calculate mouse position relative to image
                     const x = e.pageX - offset.left;
                     const y = e.pageY - offset.top;
 
-                    // Show zoom elements
                     $zoomLens.show();
                     $zoomContainer.show();
 
-                    // Position the lens
                     $zoomLens.css({
                         left: x - 50,
                         top: y - 50
                     });
 
-                    // Calculate zoom background position
                     const percentX = (x / containerWidth) * 100;
                     const percentY = (y / containerHeight) * 100;
 
-                    // Set zoom container background
                     $zoomContainer.css({
                         backgroundImage: `url(${$this.attr('src')})`,
                         backgroundPosition: `${percentX}% ${percentY}%`,
@@ -578,73 +597,22 @@
                     });
                 });
 
-                // Mouse leave event
                 $image.on('mouseleave', function () {
                     $zoomLens.hide();
                     $zoomContainer.hide();
                 });
             }
 
-            // Initial setup for first image
             $('.tab-pane.active img').each(function () {
                 setupZoom($(this));
             });
 
-            // Handle tab change events
             $('a[data-toggle="tab"]').on('shown.bs.tab', function () {
-                // Find the image in the newly activated tab
+
                 const $activeImage = $($(this).attr('href')).find('img');
                 setupZoom($activeImage);
             });
         });
-
-        document.addEventListener('DOMContentLoaded', calculateTotalPrice);
-
-        async function updateItemQuantity(productId, action, value = null) {
-            let quantityInput = event.target.parentElement.querySelector('.quantity-value');
-            let currentQuantity = parseInt(quantityInput.value);
-            let newQuantity = currentQuantity;
-            newQuantity = action === 'increase' ? currentQuantity + 1 : currentQuantity - 1 ;
-            if(newQuantity > 5){
-                Swal.fire('Error!', 'You can only order up to 5 items.', 'error');
-                return;
-            }
-            if(newQuantity < 1){
-                Swal.fire('Error!', 'You can not order less than 1 item.', 'error'); 
-                return;
-            }
-            const response = await fetch('/addToCart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    productId: productId,
-                    quantity: action === 'increase' ? 1 : -1
-                })
-            } )
-            const data = await response.json();
-            if(!response.ok){
-                Swal.fire('Error!', data.message, 'error');
-                return;
-            }
- 
-            await Swal.fire('Success!', '', 'success');
-
-            if (newQuantity !== currentQuantity) {// If quantity changed
-                quantityInput.value = newQuantity;
-                
-                // Update the price for this item
-                const pricePerUnit = parseFloat(quantityInput.closest('tr').querySelector('.product__cart__item__text h5').textContent.replace('₹', ''));
-                const totalPriceElement = quantityInput.closest('tr').querySelector('.cart__price');
-                totalPriceElement.textContent = `₹${(pricePerUnit * newQuantity).toFixed(2)}`;
-
-                // Recalculate total cart price
-                calculateTotalPrice()            
-            }
-        }
-
-
 
     </script>
 

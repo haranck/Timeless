@@ -294,13 +294,20 @@ const cancelOrder = async (req, res) => {
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
-        if(order.status === 'pending'){
+        for (let item of order.order_items) {
+            const updatedProduct = await Product.findByIdAndUpdate(item.productId,
+                {$inc:{quantity:item.quantity}},
+                {new: true}
+            )
+        }
             order.status = 'cancelled';
             await order.save();
-        }
         return res.status(200).json({ success: true, message: 'Order cancelled successfully' });
 
+        
+
     } catch (error) {
+        console.error('Error cancelling order:', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
