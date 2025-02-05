@@ -9,17 +9,15 @@ const env = require('dotenv').config()
 const loadHompage = async (req, res) => {
    try {
       const user = req.session.user;
-      const categories = await Category.find({ isListed: true })   /////////////////
+      const categories = await Category.find({ isListed: true })   
       let productData = await Product.find({
          isListed: true,
          category: { $in: categories.map(category => category._id) }, quantity: { $gt: 0 }
       })
-         .sort({ createdOn: -1 }).limit(8)
+      .sort({ createdOn: -1 }).limit(8)
 
       // productData.sort((a,b) => new Date(b.createdOn)-new Date(a.createdOn))  //new arrivals decendint ayit latest addythe items  
       // productData = productData.slice(0,4)   // for only displaying 4 products
-
-
 
       if (user) {
          const userData = await User.findById(user);
