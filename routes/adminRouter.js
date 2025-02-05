@@ -79,5 +79,8 @@ router.get('/deleteBrand', adminAuth, brandController.deleteBrand)
 //order mgt
 
 router.get('/orders', adminAuth, orderController.getOrdersPage)
+router.post('/updateOrder', adminAuth, orderController.updateOrder)
+// router.post('/deleteOrder', adminAuth, orderController.deleteOrder)
+
 
 module.exports = router
