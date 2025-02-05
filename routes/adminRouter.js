@@ -80,7 +80,7 @@ router.get('/deleteBrand', adminAuth, brandController.deleteBrand)
 
 router.get('/orders', adminAuth, orderController.getOrdersPage)
 router.post('/updateOrder', adminAuth, orderController.updateOrder)
-// router.post('/deleteOrder', adminAuth, orderController.deleteOrder)
+router.post('/cancelOrder', adminAuth, orderController.cancelOrder)
 
 
 module.exports = router

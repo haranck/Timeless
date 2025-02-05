@@ -10,6 +10,7 @@ const loadCart = async (req, res) => {
         const cart = await Cart.findOne({ userId }).populate("items.productId");// product details populate cheythedukkunnu
 
         // If cart is empty, return a default structure
+       
         if (!cart) {
             return res.render("cart", {
                 cart: {

@@ -1,383 +1,498 @@
 <%- include("../../views/partials/admin/header") %>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-<style>
-    /* Existing table styles remain the same */
-    .main-content {
-        margin-left: var(--sidebar-width);
-        margin-top: var(--header-height);
-        padding: 2rem;
-        background: #f8f9fa;
-    }
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        /* Existing table styles remain the same */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 2rem;
+            background: #f8f9fa;
+        }
 
-    .orders-table {
-        width: 100%;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-top: 1rem;
-    }
+        .orders-table {
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 1rem;
+        }
 
-    .orders-table th,
-    .orders-table td {
-        padding: 1rem;
-        text-align: left;
-        border-bottom: 1px solid #eee;
-    }
+        .orders-table th,
+        .orders-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
 
-    .orders-table th {
-        background: #000;
-        color: white;
-        font-weight: 500;
-    }
+        .orders-table th {
+            background: #000;
+            color: white;
+            font-weight: 500;
+        }
 
-    .orders-table th:first-child {
-        border-top-left-radius: 8px;
-    }
+        .orders-table th:first-child {
+            border-top-left-radius: 8px;
+        }
 
-    .orders-table th:last-child {
-        border-top-right-radius: 8px;
-    }
+        .orders-table th:last-child {
+            border-top-right-radius: 8px;
+        }
 
-    .orders-table tr:hover {
-        background: #f8f9fa;
-    }
+        .orders-table tr:hover {
+            background: #f8f9fa;
+        }
 
-    .status-select {
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background: white;
-    }
+        .status-select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
 
-    .btn {
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        cursor: pointer;
-        border: none;
-        font-size: 14px;
-        transition: all 0.3s;
-    }
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
 
-    .btn-view {
-        background: #007bff;
-        color: white;
-        margin-right: 0.5rem;
-    }
+        .btn-view {
+            background: linear-gradient(45deg, #ffa500, #ffd700);
+            color: white;
+            margin-right: 0.5rem;
+        }
 
-    .btn-cancel {
-        background: #dc3545;
-        color: white;
-    }
+        .btn-cancel {
+            background: linear-gradient(45deg, #d30808, #ca1b1b);
+            color: white;
+            border: none;
+            padding: 7px 10px;
+            font-size: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
 
-    .btn-view:hover {
-        background: #0056b3;
-        transform: translateY(-1px);
-    }
+        .btn-view:hover {
+            background: linear-gradient(45deg, #ff8c00, #ffc000);
+            transform: translateY(-1px);
+        }
 
-    .btn-cancel:hover {
-        background: #c82333;
-        transform: translateY(-1px);
-    }
+        .btn-cancel:hover {
+            background: linear-gradient(45deg, #b30000, #e60000);
+            transform: scale(1.05);
+        }
 
-    /* Updated Modal Styles */
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-    }
+        /* Updated Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
 
-    .modal.show {
-        display: block;
-    }
+        .modal.show {
+            display: block;
+        }
 
-    .modal-content {
-        background: white;
-        width: 90%;
-        max-width: 900px;
-        margin: 2rem auto;
-        border-radius: 8px;
-        position: relative;
-        max-height: 90vh;
-        overflow-y: auto;
-    }
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 900px;
+            margin: 2rem auto;
+            border-radius: 8px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
 
-    .modal-header {
-        padding: 1.5rem;
-        background: #000;
-        color: white;
-        border-radius: 8px 8px 0 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: sticky;
-        top: 0;
-    }
+        .modal-header {
+            padding: 1.5rem;
+            background: #000;
+            color: white;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+        }
 
-    .modal-body {
-        padding: 1.5rem;
-    }
+        .modal-body {
+            padding: 1.5rem;
+        }
 
-    .close {
-        color: white;
-        font-size: 1.5rem;
-        cursor: pointer;
-        background: none;
-        border: none;
-    }
+        .close {
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
 
-    /* New Order Details Styles */
-    .order-info-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 2rem;
-        margin-bottom: 2rem;
-        padding: 1.5rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-    }
+        /* New Order Details Styles */
+        .order-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
 
-    .order-info-section h4 {
-        color: #2c3e50;
-        margin-bottom: 1rem;
-        font-size: 1.1rem;
-    }
+        .order-info-section h4 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
 
-    .info-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.8rem;
-        padding-bottom: 0.8rem;
-        border-bottom: 1px solid #dee2e6;
-    }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #dee2e6;
+        }
 
-    .info-row:last-child {
-        border-bottom: none;
-    }
+        .info-row:last-child {
+            border-bottom: none;
+        }
 
-    .info-label {
-        color: #6c757d;
-        font-weight: 500;
-    }
+        .info-label {
+            color: #6c757d;
+            font-weight: 500;
+        }
 
-    .info-value {
-        color: #2c3e50;
-        font-weight: 600;
-    }
+        .info-value {
+            color: #2c3e50;
+            font-weight: 600;
+        }
 
-    .highlight-value {
-        color: #007bff;
-        font-size: 1.2rem;
-        font-weight: 700;
-    }
+        .highlight-value {
+            color: #bc2b2b;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
 
-    .discount-tag {
-        background: #28a745;
-        color: white;
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.875rem;
-    }
+        .discount-tag {
+            background: #28a745;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
 
-    /* Products Table Styles */
-    .products-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1.5rem;
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
-    }
+        /* Products Table Styles */
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
 
-    .products-table th {
-        background: #f8f9fa;
-        color: #2c3e50;
-        padding: 1rem;
-        text-align: left;
-        border-bottom: 2px solid #dee2e6;
-    }
+        .products-table th {
+            background: #f8f9fa;
+            color: #2c3e50;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+        }
 
-    .products-table td {
-        padding: 1rem;
-        border-bottom: 1px solid #dee2e6;
-        vertical-align: middle;
-    }
+        .products-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
 
-    .product-img {
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-        border-radius: 4px;
-    }
+        .product-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
 
-    .products-section {
-        margin-top: 2rem;
-    }
+        .products-section {
+            margin-top: 2rem;
+        }
 
-    .products-section h4 {
-        color: #2c3e50;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #dee2e6;
-    }
-    .option[value="cancelled"] {
-        color: red;
-        font-weight: bold;
-    }
-</style>
+        .products-section h4 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #dee2e6;
+        }
 
-<main class="main-content">
-    <div class="container">
-        <h2>Order Management</h2>
-        <table class="orders-table">
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Customer Name</th>
-                    <th>Order Date</th>
-                    <th>Status</th>
-                    <th>Payment Method</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% orders.forEach((order, index) => { %>
-                <tr>
-                    <td><%= order._id %></td>
-                    <td><%= order.user_id.name %></td>
-                    <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
-                    <td>
-                        <select class="status-select" onchange="updateOrderStatus('<%= order._id %>', this)">
-                            <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Pending</option>
-                            <option value="shipped" <%= order.status === 'shipped' ? 'selected' : '' %>>Shipped</option>
-                            <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
-                            <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
-                        </select>
-                    </td>
-                    <td><%= order.payment_method %></td>
-                    <td>
-                        <button class="btn btn-view" onclick="openModal(<%= index %>)">View</button>
-                        <% if (order.status !== 'cancelled') { %>
-                        <button class="btn btn-cancel" onclick="cancelOrder('<%= order._id %>')">Cancel Order</button>
-                        <% } %>
-                    </td>
-                </tr>
-                <% }); %>
-            </tbody>
-        </table>
-    </div>
+        .option[value="cancelled"] {
+            color: red;
+            font-weight: bold;
+        }
 
-    <!-- Order Details Modal -->
-    <div id="orderModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalOrderId">Order Details</h3>
-                <button class="close" onclick="closeModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <!-- Order Information Grid -->
-                <div class="order-info-grid">
-                    <!-- Order Details Section -->
-                    <div class="order-info-section">
-                        <h4>Order Information</h4>
-                        <div class="info-row">
-                            <span class="info-label">Order ID:</span>
-                            <span class="info-value" id="modalOrderIdValue"></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Order Date:</span>
-                            <span class="info-value" id="modalOrderDate"></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Payment Method:</span>
-                            <span class="info-value" id="modalPaymentMethod"></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Status:</span>
-                            <span class="info-value" id="modalOrderStatus"></span>
-                        </div>
-                    </div>
+        /*  */
+        /*  */
 
-                    <!-- Payment Summary Section -->
-                    <div class="order-info-section">
-                        <h4>Payment Summary</h4>
-                        <div class="info-row">
-                            <span class="info-label">Subtotal:</span>
-                            <span class="info-value" id="modalSubtotal"></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Discount:</span>
-                            <span class="info-value">
-                                <span class="discount-tag" id="modalDiscount">₹0</span>
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Coupon Applied:</span>
-                            <span class="info-value" id="modalCoupon">Nil</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Final Amount:</span>
-                            <span class="highlight-value" id="modalFinalAmount"></span>
-                        </div>
-                    </div>
+        .orders-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .pagination {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .page-item {
+            margin: 0;
+        }
+
+        .page-link {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #000000;
+            font-weight: bold;
+            border: 1px solid #ddd;
+            background: #fff;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .page-link:hover {
+            background: #2b2d2f;
+            color: #fff;
+        }
+
+        .page-item.active .page-link {
+            background: #000000;
+            color: white;
+            border: 1px solid #000000;
+        }
+
+        .page-item:first-child .page-link,
+        .page-item:last-child .page-link {
+            font-size: 18px;
+            padding: 10px 18px;
+            font-weight: bold;
+        }
+    </style>
+
+    <main class="main-content">
+        <div class="container">
+            <h2>Order Management</h2>
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer Name</th>
+                        <th>Order Date</th>
+                        <th>Status</th>
+                        <th>Payment Method</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% orders.forEach((order, index)=> { %>
+                        <tr data-order-id="<%= order._id %>">
+                            <td>
+                                #<%= order._id %>
+                            </td>
+                            <td>
+                                <%= order.user_id.name %>
+                            </td>
+                            <td>
+                                <%= new Date(order.createdAt).toLocaleDateString() %>
+                            </td>
+                            <td>
+                                <select class="status-select" onchange="updateOrderStatus('<%= order._id %>', this)"
+                                    style="color: <%= order.status === 'pending' ? 'orange' 
+                                    : order.status === 'shipped' ? 'blue' 
+                                    : order.status === 'delivered' ? 'green' 
+                                    : order.status === 'cancelled' ? 'red' 
+                                    : 'black' %>" <%=order.status==='cancelled' ? 'disabled' : '' %>>
+                                    <option value="pending" <%=order.status==='pending' ? 'selected' : '' %>>Pending
+                                    </option>
+                                    <option value="shipped" <%=order.status==='shipped' ? 'selected' : '' %>>Shipped
+                                    </option>
+                                    <option value="delivered" <%=order.status==='delivered' ? 'selected' : '' %>
+                                        >Delivered</option>
+                                    <option value="cancelled" <%=order.status==='cancelled' ? 'selected' : '' %>
+                                        >Cancelled</option>
+                                </select>
+                            </td>
+                            <td>
+                                <%= order.payment_method %>
+                            </td>
+                            <td>
+                                <button class="btn btn-view" onclick="openModal(<%= index %>)">View</button>
+                                <% if (order.status !=='cancelled' ) { %>
+                                    <button class="btn btn-cancel" onclick="cancelOrder('<%= order._id %>')">Cancel
+                                        Order</button>
+                                    <% } %>
+                            </td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Order Details Modal -->
+        <div id="orderModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalOrderId">Order Details</h3>
+                    <button class="close" onclick="closeModal()">&times;</button>
                 </div>
+                <div class="modal-body">
+                    <!-- Order Information Grid -->
+                    <div class="order-info-grid">
+                        <!-- Order Details Section -->
+                        <div class="order-info-section">
+                            <h4>Order Information</h4>
+                            <div class="info-row">
+                                <span class="info-label">Order ID:</span>
+                                <span class="info-value" id="modalOrderIdValue"></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Order Date:</span>
+                                <span class="info-value" id="modalOrderDate"></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Payment Method:</span>
+                                <span class="info-value" id="modalPaymentMethod"></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Status:</span>
+                                <span class="info-value" id="modalOrderStatus"></span>
+                            </div>
+                        </div>
 
-                <!-- Products Section -->
-                <div class="products-section">
-                    <h4>Ordered Products</h4>
-                    <table class="products-table">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Name</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="modalProductsList">
-                            <!-- Products will be loaded here -->
-                        </tbody>
-                    </table>
+                        <!-- Payment Summary Section -->
+                        <div class="order-info-section">
+                            <h4>Payment Summary</h4>
+                            <div class="info-row">
+                                <span class="info-label">Subtotal:</span>
+                                <span class="info-value" id="modalSubtotal"></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Discount:</span>
+                                <span class="info-value">
+                                    <span class="discount-tag" id="modalDiscount">₹0</span>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Coupon Applied:</span>
+                                <span class="info-value" id="modalCoupon">Nil</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Final Amount:</span>
+                                <span class="highlight-value" id="modalFinalAmount"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Products Section -->
+                    <div class="products-section">
+                        <h4>Ordered Products</h4>
+                        <table class="products-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalProductsList">
+                                <!-- Products will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</main>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    // Store orders data in JavaScript
-    const ordersData = <%- JSON.stringify(orders) %>;
+        <div class="row">
+            <div class="col-12 d-flex justify-content-center">
+                <nav aria-label="Product pagination" class="orders-pagination">
+                    <ul class="pagination">
+                        <% if (currentPage> 1) { %>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <% } %>
 
-    function openModal(index) {
-        const order = ordersData[index];
-        
-        
-        document.getElementById('modalOrderId').textContent = `Order Details #${order._id}`;
-        document.getElementById('modalOrderIdValue').textContent = `#${order._id}`;
-        document.getElementById('modalOrderDate').textContent = new Date(order.createdAt).toLocaleDateString();
-        document.getElementById('modalPaymentMethod').textContent = order.payment_method;
-        document.getElementById('modalOrderStatus').textContent = order.status;
-    
-        document.getElementById('modalSubtotal').textContent = `₹${order.total}`;
-        document.getElementById('modalFinalAmount').textContent = `₹${order.finalAmount}`;
-        
-        // Update products list
-        const productsList = document.getElementById('modalProductsList');
-        productsList.innerHTML = '';
-        
-        order.order_items.forEach(item => {
-            const row = document.createElement('tr');
-            const imageUrl = item.productId.productImages && item.productId.productImages.length > 0 
-                ? `/uploads/product-images/${item.productId.productImages[0]}` 
-                : '/uploads/product-images/default.jpg';
-                
-            row.innerHTML = `
+                                <% for (let p=1; p <=totalPages; p++) { %>
+                                    <li class="page-item <%= p === currentPage ? 'active' : '' %>">
+                                        <a class="page-link" href="?page=<%= p %>">
+                                            <%= p %>
+                                        </a>
+                                    </li>
+                                    <% } %>
+
+                                        <% if (currentPage < totalPages) { %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<%= currentPage + 1 %>"
+                                                    aria-label="Next">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                            <% } %>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Store orders data in JavaScript
+        const ordersData = <%- JSON.stringify(orders) %>;
+
+        function openModal(index) {
+            const order = ordersData[index];
+
+
+            document.getElementById('modalOrderId').textContent = `Order Details #${order._id}`;
+            document.getElementById('modalOrderIdValue').textContent = `#${order._id}`;
+            document.getElementById('modalOrderDate').textContent = new Date(order.createdAt).toLocaleDateString();
+            document.getElementById('modalPaymentMethod').textContent = order.payment_method;
+            // Update order status color
+            const modalOrderStatus = document.getElementById('modalOrderStatus');
+            modalOrderStatus.textContent = order.status;
+            modalOrderStatus.style.color = { pending: 'orange', shipped: 'blue', delivered: 'green', cancelled: 'red' }[order.status] || 'black';
+
+
+            document.getElementById('modalSubtotal').textContent = `₹${order.total}`;
+            document.getElementById('modalFinalAmount').textContent = `₹${order.finalAmount}`;
+
+            // Update products list
+            const productsList = document.getElementById('modalProductsList');
+            productsList.innerHTML = '';
+
+            order.order_items.forEach(item => {
+                const row = document.createElement('tr');
+                const imageUrl = item.productId.productImages && item.productId.productImages.length > 0
+                    ? `/uploads/product-images/${item.productId.productImages[0]}`
+                    : '/uploads/product-images/default.jpg';
+
+                row.innerHTML = `
                 <td>
                     <img src="${imageUrl}" 
                          alt="${item.productId.productName}" 
@@ -388,74 +503,141 @@
                 <td>₹${item.price}</td>
                 <td>₹${item.price * item.quantity}</td>
             `;
-            productsList.appendChild(row);
-        });
+                productsList.appendChild(row);
+            });
 
-        document.getElementById('orderModal').classList.add('show');
-    }
+            document.getElementById('orderModal').classList.add('show');
+        }
 
-    function closeModal() {
-        document.getElementById('orderModal').classList.remove('show');
-    }
+        function closeModal() {
+            document.getElementById('orderModal').classList.remove('show');
+        }
 
-    async function updateOrderStatus(orderId, status) {
-        try {
-        const status = status.value;
-        const response = await fetch('/admin/orders/updateOrder',{
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ orderId, status })
-        })
-        const data = await response.json();
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: 'Order status updated successfully',
-                showConfirmButton: false,
-                timer: 1500
-            })
-            if(status === 'cancelled'){
-                status.disabled = true;
+        async function updateOrderStatus(orderId, selectElement) {
+            try {
+                const status = selectElement.value;
+
+                const response = await fetch('/admin/updateOrder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderId, status })
+                })
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Order status updated successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                    if (status.toLowerCase() === 'cancelled') {
+                        selectElement.disabled = true;
+                    }
+                    window.location.reload();
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: data.message || 'Failed to update order status',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Something went wrong',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
             }
-
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: data.message || 'Failed to update order status',
-                showConfirmButton: false,
-                timer: 1500
-            })
         }
-    }catch (error) {
-        console.error(error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: error.message || 'Something went wrong',
-            showConfirmButton: false,
-            timer: 1500
-        })
-    }
-    }
 
-    function cancelOrder(orderId) {
-        if (confirm('Are you sure you want to cancel this order?')) {
-            // Add your cancel order logic here
-            console.log(`Cancelling order ${orderId}`);
+
+
+        async function cancelOrder(orderId) {
+            try {
+                const result = await Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning!',
+                    text: 'Are you sure you want to cancel this order?',
+                    showConfirmButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    reverseButtons: true
+                });
+
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                const response = await fetch('/admin/cancelOrder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderId })
+                });
+
+                const data = await response.json();
+                console.log(data);
+
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Order cancelled successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    const orderRow = document.querySelector(`tr[data-order-id="${orderId}"]`);
+                    if (orderRow) {
+                        const statusSelect = orderRow.querySelector('.status-select');
+                        if (statusSelect) {
+                            statusSelect.value = 'cancelled';
+                            statusSelect.style.color = 'red';
+                            statusSelect.disabled = true;
+                        }
+                        const cancelButton = orderRow.querySelector('.btn-cancel');
+                        if (cancelButton) {
+                            cancelButton.remove();
+                        }
+                    }
+                    window.location.reload();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: data.message || 'Failed to cancel order',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Something went wrong',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
         }
-    }
 
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        const modal = document.getElementById('orderModal');
-        if (event.target == modal) {
-            closeModal();
+        window.onclick = function (event) {
+            const modal = document.getElementById('orderModal');
+            if (event.target == modal) {
+                closeModal();
+            }
         }
-    }
-</script>
+    </script>
 
-<%- include("../../views/partials/admin/footer") %>
+    <%- include("../../views/partials/admin/footer") %>

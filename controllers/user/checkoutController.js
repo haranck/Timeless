@@ -276,7 +276,7 @@ const viewOrder = async (req, res) => {
             orderStatus: order.status 
         };
         
-        return res.render("order", { order: orderData });
+        return res.render("order", { order: orderData,user: req.session.userData });
     } catch (error) {
         console.error('View order error:', error);
         return res.redirect('/profile');

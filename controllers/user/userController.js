@@ -263,7 +263,6 @@ const loadShoppingPage = async (req, res) => {
          _id: category._id.toString(),
          name: category.name,
          description: category.description,
-
       }));
 
       res.render('shop', {

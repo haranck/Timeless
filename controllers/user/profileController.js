@@ -310,7 +310,7 @@ const getAllAddresses = async (req, res) => {
             userAddress = addressData.address
         }
 
-        res.render("address", { userAddress: userAddress })
+        res.render("address", { userAddress: userAddress ,user: req.session.userData})
     } catch (error) {
         console.error("Error in getAllAddresses:", error)
         res.redirect("/pageNotFound")
