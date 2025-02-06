@@ -769,13 +769,7 @@
                     const totalAmount = document.getElementById('total-amount').textContent.replace('₹', '');
                     const sanitizedOrderItems = sanitizeQuotes(<% - JSON.stringify(cart.items) %>)
                     const orderedItems = sanitizedOrderItems
-                    console.log('Order Details:', {
-                        shippingAddress,
-                        paymentMethod,
-                        totalAmount,
-                        orderedItems
-                    });
-                    // First SweetAlert - Confirmation
+
                     const confirmResult = await Swal.fire({
                         title: 'Confirm Order',
                         text: 'Are you sure you want to place this order?',

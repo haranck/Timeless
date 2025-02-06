@@ -488,12 +488,12 @@
             <% if (order.order_items && order.order_items.length > 0) { %>
                 <div class="action-row">
 
-                    <% if(order.status !== 'cancelled') { %>
+                    <% if(order.status !== 'cancelled' && order.status !== 'delivered') { %>
                     <button class="btn-cancel" onclick="openModal()">
                         <i class="fas fa-times-circle"></i> Cancel Order
                     </button>
                     <% } %>
-
+                    
                 </div>
             <% } %>
         </div>

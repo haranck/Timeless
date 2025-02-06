@@ -18,7 +18,7 @@ router.post("/resend-otp", userController.resendOtp);
 //shoopp
 
 router.get("/shop", userController.loadShoppingPage)
-router.post("/filter",isBlocked , userController.filterProducts)
+router.post("/filter", userController.filterProducts)
 
 //product management
 

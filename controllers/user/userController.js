@@ -2,6 +2,7 @@
 const User = require('../../models/userSchema')
 const Category = require('../../models/categorySchema')
 const Product = require('../../models/productSchema')
+const Brand = require('../../models/brandSchema')
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const env = require('dotenv').config()
@@ -242,7 +243,9 @@ const loadShoppingPage = async (req, res) => {
 
       const user = req.session.user;
       const categories = await Category.find({ isListed: true })   /////////////////
+      const brands = await Brand.find({isBlocked:false})
       const userData = await User.findOne({ _id: user });
+      const brandIds = brands.map(brand => brand._id.toString());
       const categoryIds = categories.map(category => category._id.toString());
       const page = parseInt(req.query.page) || 1;
       const limit = 9
@@ -250,13 +253,15 @@ const loadShoppingPage = async (req, res) => {
       const products = await Product.find({
          isListed: true,
          category: { $in: categoryIds },
-         quantity: { $gt: 0 }
+         quantity: { $gt: 0 },
+         // brand: { $in: brandIds }
       }).sort({ createdAt: 1 }).skip(skip).limit(limit)
 
       const totalProducts = await Product.countDocuments({
          isListed: true,
          category: { $in: categoryIds },
-         quantity: { $gt: 0 }
+         quantity: { $gt: 0 },
+         // brand: { $in: brandIds }
       })
       const totalPages = Math.ceil(totalProducts / limit);
       const categoriesWithIds = categories.map(category => ({
@@ -264,60 +269,101 @@ const loadShoppingPage = async (req, res) => {
          name: category.name,
          description: category.description,
       }));
+      const brandsWithIds = brands.map(brand => ({
+         _id: brand._id.toString(),
+         brandName: brand.brandName,
+         brandImage: brand.brandImage
+      }));
 
       res.render('shop', {
          user: userData,
          products: products,
          categories: categoriesWithIds,
-         category: categories,
+         brands: brandsWithIds,
+         category: categories, 
+         brand: brands,
          totalProducts: totalProducts,
          currentPage: page,
          totalPages: totalPages
       })
 
-
-
    } catch (error) {
       // console.log("loadShoppingPage error", error);
-      throw error
-      res.redirect('/pageNotFound')
-
+      throw new Error
 
    }
 }
 const filterProducts = async (req, res) => {
-   const { categories, price, sizes } = req.body;
 
    try {
-      let query = {};
+      let { categories, priceRange, sortBy } = req.body;
+      let filter ={}
 
-      if (categories.length > 0) {
-         query.category = { $in: categories };
+      if(categories && categories.length>0){
+         filter.category = {$in:categories}
       }
 
-      if (price) {
-         const [min, max] = price.split("-");
-         if (max) {
-            query.price = { $gte: parseInt(min), $lte: parseInt(max) };
-         } else {
-            query.price = { $gte: parseInt(min) };
-         }
+      if(priceRange){
+         let [minPrice,maxPrice] = priceRange.split('-').map(Number);
+         filter.price = maxPrice ? {$gte:minPrice,$lte:maxPrice} : {$gte:minPrice}
       }
 
-      if (sizes.length > 0) {
-         query.size = { $in: sizes };
+      let query = Product.find(filter)
+
+      if (sortBy) {
+         if(sortBy === "A-Z") query= query.sort({name:1})
+         else if (sortBy ==="Z-A") query= query.sort({name:-1})
+         else if (sortBy ==="price-low-high") query= query.sort({price:1})
+         else if (sortBy ==="price-high-low") query= query.sort({price:-1})
+         else if(sortBy ==="new-arrivals") query = query.sort({createdAt:-1})
       }
 
-      // Fetch filtered products
-      const products = await Product.find(query);
+      const products = await query.exec()
 
-      // Return filtered products as JSON
-      res.json(products);
+      res.json({success:true,products})
 
 
    } catch (error) {
-      throw error
+      console.log("error filtering products", error)
+      res.status(500).json({success:false,message:"internal server error"})
    }
+
+
+
+
+
+//    const { categories, price, sizes } = req.body;
+
+//    try {
+//       let query = {};
+
+//       if (categories.length > 0) {
+//          query.category = { $in: categories };
+//       }
+
+//       if (price) {
+//          const [min, max] = price.split("-");
+//          if (max) {
+//             query.price = { $gte: parseInt(min), $lte: parseInt(max) };
+//          } else {
+//             query.price = { $gte: parseInt(min) };
+//          }
+//       }
+
+//       if (sizes.length > 0) {
+//          query.size = { $in: sizes };
+//       }
+
+//       // Fetch filtered products
+//       const products = await Product.find(query);
+
+//       // Return filtered products as JSON
+//       res.json(products);
+
+
+//    } catch (error) {
+//       throw error
+//    }
 }
 
 

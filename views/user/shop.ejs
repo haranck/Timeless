@@ -475,7 +475,33 @@
                                 </div>
 
 
-
+                                <!-- brand -->
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseTwo">Brands</a>
+                                    </div>
+                                    <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__categories">
+                                                <ul class="nice-scroll">
+                                                    <% if (brand && brand.length> 0) { %>
+                                                        <% for (let i=0; i < brand.length; i++) { %>
+                                                            <li>
+                                                                <label>
+                                                                    <input type="checkbox" class="filter-category"
+                                                                        value="<%= brand[i]._id %>" />
+                                                                    <%= brand[i].brandName %> <img style="margin-left: 5px; max-width: 42px;" src="/uploads/brands/<%= brand[i].brandImage %>" alt="<%= brand[i].brandName %>">
+                                                                </label>
+                                                            </li>
+                                                            <% } %>
+                                                                <% } else { %>
+                                                                    <li>No brands available</li>
+                                                                    <% } %>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <div class="card">
                                     <div class="card-heading">
@@ -488,43 +514,50 @@
                                                     <li>
                                                         <label>
                                                             <input type="radio" name="filter-price" class="filter-price"
-                                                                value="0-50" />
-                                                            ₹1000 - ₹5000
+                                                                value="1000-10000" />
+                                                            ₹1000 - ₹10000
                                                         </label>
                                                     </li>
                                                     <li>
                                                         <label>
                                                             <input type="radio" name="filter-price" class="filter-price"
-                                                                value="50-100" />
-                                                            ₹5000 - ₹10000
+                                                                value="10000-50000" />
+                                                            ₹10000 - ₹50000
                                                         </label>
                                                     </li>
                                                     <li>
                                                         <label>
                                                             <input type="radio" name="filter-price" class="filter-price"
-                                                                value="100-150" />
-                                                            ₹10000 - ₹15000
+                                                                value="50000-100000" />
+                                                            ₹50000 - ₹100000
                                                         </label>
                                                     </li>
                                                     <li>
                                                         <label>
                                                             <input type="radio" name="filter-price" class="filter-price"
-                                                                value="150-200" />
-                                                            ₹15000 - ₹20000
+                                                                value="100000-1000000" />
+                                                            ₹100000 - ₹1000000 
                                                         </label>
                                                     </li>
                                                     <li>
                                                         <label>
                                                             <input type="radio" name="filter-price" class="filter-price"
-                                                                value="200-250" />
-                                                            ₹20000 - ₹40000
+                                                                value="1000000-2000000" />
+                                                            ₹1000000 - ₹2000000
                                                         </label>
                                                     </li>
                                                     <li>
                                                         <label>
                                                             <input type="radio" name="filter-price" class="filter-price"
-                                                                value="250+" />
-                                                            ₹50000+
+                                                                value="2000000-4000000" />
+                                                            ₹2000000 - ₹4000000
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="5000000+" />
+                                                            ₹500000+
                                                         </label>
                                                     </li>
                                                 </ul>
@@ -534,7 +567,7 @@
                                 </div>
                                 <!-- end category -->
                                 <!-- start size -->
-                                <div class="card">
+                                <!-- <div class="card">
                                     <div class="card-heading">
                                         <a data-toggle="collapse" data-target="#collapseFour">Size</a>
                                     </div>
@@ -559,7 +592,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                                 <!-- end size -->
 
 
@@ -584,7 +617,7 @@
 
                                 <div class="apply-filter">
                                     <button id="applyFilter" class="btn "
-                                        style="background-color: #333333; color: white;">Apply Filter</button>
+                                        style="background-color: #0c0c0c; color: white;">Apply Filter</button>
                                 </div>
 
                             </div>
@@ -605,10 +638,10 @@
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="shop__product__option__right">
                                     <p>Sort by Price:</p>
-                                    <select>
+                                    <select onchange="applyFilter()">
                                         <option value="">Low To High</option>
-                                        <option value="">$0 - $55</option>
-                                        <option value="">$55 - $100</option>
+                                        <option value="">₹0 - ₹55</option>
+                                        <option value="">₹55 - ₹100</option>
                                     </select>
                                 </div>
                             </div>
@@ -777,62 +810,78 @@
             }
         }
 
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('applyFilter').addEventListener('click',function(){
 
-        document.getElementById("applyFilter").addEventListener("click", async () => {
-            // Get selected categories
-            const selectedCategories = Array.from(
-                document.querySelectorAll(".filter-category:checked")
-            ).map((checkbox) => checkbox.value);
+                applyFilter()
+            })
+            document.getElementById('.shop__product__option__right select').addEventListener('change',function(){
+                applyFilter()
+            })
+        })
 
-            // Get selected price range
-            const selectedPrice = document.querySelector(".filter-price:checked")
-                ? document.querySelector(".filter-price:checked").value
-                : null;
+        async function applyFilter() {
+            try{
+            let selelctedCategories =[]
 
-            // Get selected sizes
-            const selectedSizes = Array.from(
-                document.querySelectorAll(".filter-size:checked")
-            ).map((checkbox) => checkbox.value);
+            document.querySelectorAll('.filter-category:checked').forEach((checkbox) => {
+                selelctedCategories.push(checkbox.value)
+            })
 
-            // Prepare filter data
-            const filterData = {
-                categories: selectedCategories,
-                price: selectedPrice,
-                sizes: selectedSizes,
-            };
+            console.log(selelctedCategories)
 
-            // Send the filter data to the backend via AJAX
-            try {
-                const response = await fetch("/filter", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(filterData),
-                });
+            let selectedPrice = document.querySelector('.filter-price:checked')?.value||"";
+            let sortBy = document.querySelector(".shop__product__option__right select").value;
 
-                // Get the filtered results
-                const filteredProducts = await response.json();
+            const response = await fetch('/filter',{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    categories:selelctedCategories,
+                    priceRange:selectedPrice,
+                    sortBy
+                })
+            })
+            const data= await response.json()
 
-                // Dynamically update the product list
-                const productList = document.getElementById("product-list");
-                productList.innerHTML = filteredProducts
-                    .map(
-                        (product) => `
-                    <div class="product">
-                        <h4>${product.name}</h4>
-                        <p>${product.category}</p>
-                        <p>${product.price}</p>
-                    </div>
-        `
-                    )
-                    .join("");
-            } catch (error) {
-                console.error("Error applying filters:", error);
+            if(data.success){
+                renderProducts(data.products)
             }
-        });
+        }catch(error){
+            console.log(error)
+        }
+
+    }
+
+    function renderProducts(products) {
+        let  productContainer = document.querySelector(".shop__product__option")
+        productContainer.innerHTML=""
+
+        if(products.length===0){
+            productContainer.innerHTML= "<p>No products found.</p>"
+            return
+        }
+        products.forEach((product)=> {
+            let productHTML = `
+                <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="product__item">
+                        <div class="product__item__pic">
+                            <img src="/uploads/product-images/${product.productImages[0]}" alt="${product.productName}" class="img-fluid">
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="/productDetails?id=${product._id}">${product.productName}</a></h6>
+                            <div class="product__item__price">₹${product.salePrice.toLocaleString('en-IN')}</div>
+                        </div>
+                    </div>
+                </div>
+            `
+            productContainer.innerHTML += productHTML
+        })
 
 
+    }
 
     </script>
 
