@@ -49,7 +49,8 @@ app.use("/error", (req, res, next) => {
 app.use('*', (req, res) => {
       res.status(404).render('error', {
             title: 'Oops!',
-            message: 'The page you\'re looking for doesn\'t exist.'
+            message: 'The page you\'re looking for doesn\'t exist.',
+            user: req.session.userData
       });
 })
 
@@ -57,7 +58,8 @@ app.use((err, req, res, next) => {
       console.error(err.stack);
       res.status(500).render('error', {
             title: 'Oops!',
-            message: err.message || 'Something went wrong!'
+            message: err.message || 'Something went wrong!',
+            user: req.session.userData
       });
 });
 

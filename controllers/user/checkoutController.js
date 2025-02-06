@@ -17,6 +17,7 @@ const loadCheckout = async (req, res) => {
             userAddress = addressDoc.address;
         }
         cart.totalPrice = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+        cart.items = cart.items.filter(item => item.productId);
         res.render("checkout", {
             cart,
             user,

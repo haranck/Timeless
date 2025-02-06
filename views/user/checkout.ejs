@@ -487,6 +487,7 @@
                                             <tbody>
                                                 <% if(cart.items.length> 0) { %>
                                                     <% cart.items.forEach(item=> { %>
+                                                        <% if (item.productId) { %>
                                                         <tr>
                                                             <td>
                                                                 <%= item.productId.productName %>
@@ -498,13 +499,13 @@
                                                             <td class="text-end">₹<%= item.totalPrice %>
                                                             </td>
                                                         </tr>
-                                                        <% }); %>
                                                             <% } else { %>
                                                                 <tr>
-                                                                    <td colspan="4" class="text-center">No products in
-                                                                        the cart</td>
+                                                                    <td colspan="4" class="text-center">No products in the cart</td>
                                                                 </tr>
-                                                                <% } %>
+                                                            <% } %>
+                                                    <% }); %>
+                                                    <% } %>
                                             </tbody>
                                         </table>
                                     </div>
@@ -767,7 +768,7 @@
                     const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
                     const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
                     const totalAmount = document.getElementById('total-amount').textContent.replace('₹', '');
-                    const sanitizedOrderItems = sanitizeQuotes(<% - JSON.stringify(cart.items) %>)
+                    const sanitizedOrderItems = sanitizeQuotes(<%- JSON.stringify(cart.items) %>)
                     const orderedItems = sanitizedOrderItems
 
                     const confirmResult = await Swal.fire({

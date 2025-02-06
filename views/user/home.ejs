@@ -164,10 +164,11 @@
                                 <!-- <button onclick="addToCart('<%= products[i]._id %>')" class="btn">Add to
                                             Cart</button> -->
 
-
+                                
                                 <button onclick="addToCart('<%= products[i]._id %>')" class="product-card__cart-btn">
                                     <i class="fa-solid fa-cart-plus"></i>Add to Cart
                                 </button>
+                                
 
 
                             </div>
@@ -481,19 +482,22 @@
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        
         async function addToCart(productId) {
+            
             try {
                 const response = await fetch('/addToCart', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
+                    
                     body: JSON.stringify({
                         productId: productId,
                         quantity: 1
                     })
                 });
-
+                
                 const data = await response.json();
 
                 if (data.success) {
@@ -519,7 +523,6 @@
                         },
                         avatar: "https://cdn-icons-png.flaticon.com/512/845/845646.png",
                     }).showToast();
-
 
                 } else {
                     throw new Error(data.message || 'Failed to add product to cart');

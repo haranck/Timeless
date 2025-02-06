@@ -7,15 +7,19 @@ const loadCart = async (req, res) => {
     try {
         const userId = req.session.user;
         
-        const cart = await Cart.findOne({ userId }).populate("items.productId");// product details populate cheythedukkunnu
+        const cart = await Cart.findOne({ userId }).populate("items.productId");
 
+        // Before rendering the cart, filter out items where productId is null
+        cart.items = cart.items.filter(item => item.productId);
+        
+        console.log("cart",cart)
+        
         // If cart is empty, return a default structure
-       
         if (!cart) {
             return res.render("cart", {
                 cart: {
                     items: [],
-                    totalPrice: 0
+                    totalPrice: 0,
                 }
             });
         }
@@ -36,6 +40,8 @@ const addToCart = async (req, res) => {
         console.log('Request body:', req.body);
         const { productId, quantity } = req.body;
         const userId = req.session.user;
+
+        
 
         // Input validation
         if (!productId) {

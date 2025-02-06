@@ -20,6 +20,7 @@ router.post("/resend-otp", userController.resendOtp);
 router.get("/shop", userController.loadShoppingPage)
 router.post("/filter", userController.filterProducts)
 
+
 //product management
 
 router.get('/productDetails', userAuth, productController.productDetails)
@@ -67,7 +68,7 @@ router.get("/deleteAddress", userAuth, profileController.deleteAddress)
 
 // Cart Management
 router.get("/cart", userAuth, cartController.loadCart);
-router.post("/addToCart", userAuth, cartController.addToCart);
+router.post("/addToCart", cartController.addToCart);
 router.delete("/cart/remove/:productId", cartController.removeCartItem);
 
 //checkout management

@@ -437,9 +437,9 @@
                 <div class="col-lg-3">
                     <div class="shop__sidebar">
                         <div class="shop__sidebar__search">
-                            <form action="#">
-                                <input type="text" placeholder="Search...">
-                                <button type="submit"><span class="icon_search"></span></button>
+                            <form action="" method="post">
+                                <input type="text" placeholder="Search..." id="searchInput">
+                                <button type="submit"><i class="fa fa-search"></i></button>
                             </form>
                         </div>
                         <div class="shop__sidebar__accordion">
@@ -490,13 +490,16 @@
                                                                 <label>
                                                                     <input type="checkbox" class="filter-category"
                                                                         value="<%= brand[i]._id %>" />
-                                                                    <%= brand[i].brandName %> <img style="margin-left: 5px; max-width: 42px;" src="/uploads/brands/<%= brand[i].brandImage %>" alt="<%= brand[i].brandName %>">
+                                                                    <%= brand[i].brandName %> <img
+                                                                            style="margin-left: 5px; max-width: 42px; border-radius: 23px;"
+                                                                            src="/uploads/brands/<%= brand[i].brandImage %>"
+                                                                            alt="<%= brand[i].brandName %>">
                                                                 </label>
                                                             </li>
                                                             <% } %>
                                                                 <% } else { %>
                                                                     <li>No brands available</li>
-                                                                    <% } %>
+                                                                <% } %>
                                                 </ul>
                                             </div>
                                         </div>
@@ -536,7 +539,7 @@
                                                         <label>
                                                             <input type="radio" name="filter-price" class="filter-price"
                                                                 value="100000-1000000" />
-                                                            ₹100000 - ₹1000000 
+                                                            ₹100000 - ₹1000000
                                                         </label>
                                                     </li>
                                                     <li>
@@ -637,11 +640,16 @@
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="shop__product__option__right">
-                                    <p>Sort by Price:</p>
-                                    <select onchange="applyFilter()">
-                                        <option value="">Low To High</option>
-                                        <option value="">₹0 - ₹55</option>
-                                        <option value="">₹55 - ₹100</option>
+                                    <p>Sort by :</p>
+                                    <select id="priceFilter" onchange="applyFilter()">
+                                        <option value="price-low-high">Price: Low to High</option>
+                                        <option value="price-high-low">Price: High to Low</option>
+                                        <!-- <option value="0-55">₹0 - ₹55</option>
+                                        <option value="55-100">₹55 - ₹100</option>
+                                        <option value="100">Above ₹100</option> -->
+                                        <option value="new-arrivals">New Arrivals</option>
+                                        <option value="a-z">A-Z</option>
+                                        <option value="z-a">Z-A</option>
                                     </select>
                                 </div>
                             </div>
@@ -702,28 +710,9 @@
                         <div class="col-12">
                             <nav aria-label="Product pagination" class="shop-pagination">
                                 <ul class="pagination justify-content-center">
-                                    <% if (currentPage> 1) { %>
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page=<%= currentPage - 1 %>"
-                                                aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        <% } %>
-
-                                    <% for (let p=1; p <=totalPages; p++) { %>
-                                        <li class="page-item <%= p === currentPage ? 'active' : '' %>">
-                                            <a class="page-link" href="?page=<%= p %>">
-                                                <%= p %>
-                                            </a>
-                                        </li>
-                                    <% } %>
-
-                                    <% if (currentPage < totalPages) { %>
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
-                                                <span aria-hidden="true">&raquo;</span>
-                                            </a>
+                                    <% for (let i = 1; i <= totalPages; i++) { %>
+                                        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                            <a class="page-link" href="#" onclick="applyFilter(<%= i %>)"><%= i %></a>
                                         </li>
                                     <% } %>
                                 </ul>
@@ -810,78 +799,201 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('applyFilter').addEventListener('click',function(){
 
-                applyFilter()
-            })
-            document.getElementById('.shop__product__option__right select').addEventListener('change',function(){
-                applyFilter()
-            })
-        })
+        
 
-        async function applyFilter() {
-            try{
-            let selelctedCategories =[]
+        async function applyFilter(page = 1) {
+            try {
+                // Show loading state
+                const productContainer = document.querySelector(".product__filter");
+                productContainer.innerHTML = '<div class="col-12 text-center">Loading...</div>';
 
-            document.querySelectorAll('.filter-category:checked').forEach((checkbox) => {
-                selelctedCategories.push(checkbox.value)
-            })
+                // Gather filter values
+                const selectedCategories = Array.from(document.querySelectorAll('.filter-category:checked')).map(cb => cb.value);
+                const selectedPrice = document.querySelector('.filter-price:checked')?.value || "";
+                const sortBy = document.querySelector(".shop__product__option__right select").value;
+                const searchQuery = document.querySelector(".shop__sidebar__search input").value.trim()
 
-            console.log(selelctedCategories)
+                const response = await fetch('/filter', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        categories: selectedCategories,
+                        priceRange: selectedPrice,
+                        sortBy,
+                        searchQuery,
+                        page
+                    })
+                });
 
-            let selectedPrice = document.querySelector('.filter-price:checked')?.value||"";
-            let sortBy = document.querySelector(".shop__product__option__right select").value;
+                const data = await response.json();
 
-            const response = await fetch('/filter',{
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify({
-                    categories:selelctedCategories,
-                    priceRange:selectedPrice,
-                    sortBy
-                })
-            })
-            const data= await response.json()
-
-            if(data.success){
-                renderProducts(data.products)
+                if (data.success) {
+                    renderProducts(data.products);
+                    updatePagination(data.currentPage, data.totalPages);
+                    updateProductCount(data.totalProducts);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error("Filter error:", error);
+                showErrorMessage("Failed to apply filters. Please try again.");
             }
-        }catch(error){
-            console.log(error)
         }
 
-    }
+        document.querySelector(".shop__sidebar__search form").addEventListener("submit", function (e) {
+            e.preventDefault(); // Prevent page reload
+            applyFilter(); // Trigger filtering when searching
+        });
 
-    function renderProducts(products) {
-        let  productContainer = document.querySelector(".shop__product__option")
-        productContainer.innerHTML=""
 
-        if(products.length===0){
-            productContainer.innerHTML= "<p>No products found.</p>"
-            return
-        }
-        products.forEach((product)=> {
-            let productHTML = `
-                <div class="col-lg-4 col-md-6 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic">
-                            <img src="/uploads/product-images/${product.productImages[0]}" alt="${product.productName}" class="img-fluid">
+        function renderProducts(products) {
+            const productContainer = document.querySelector(".product__filter");
+            productContainer.innerHTML = "";
+
+            if (products.length === 0) {
+                productContainer.innerHTML = `
+            <div class="col-12 text-center">
+                <p class="my-5">No products found matching your criteria.</p>
+            </div>`;
+                return;
+            }
+
+            products.forEach(product => {
+                const productHTML = `
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                <div class="product-card">
+                    <div class="product-card__image">
+                        <a href="/productDetails?id=${product._id}">
+                            <img src="/uploads/product-images/${product.productImages[0]}" 
+                                 alt="${product.productName}" 
+                                 class="img-fluid">
+                        </a>
+                        <div class="product-card__actions">
+                            <a href="/addToWishlist?id=${product._id}" 
+                               class="product-card__wishlist-btn" 
+                               title="Add to Wishlist">
+                                <i class="fa-regular fa-heart"></i>
+                            </a>
                         </div>
-                        <div class="product__item__text">
-                            <h6><a href="/productDetails?id=${product._id}">${product.productName}</a></h6>
-                            <div class="product__item__price">₹${product.salePrice.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div class="product-card__details">
+                        <h6 class="product-card__title">${product.productName}</h6>
+                        <div class="product-card__pricing">
+                            <span class="product-card__sale-price">
+                                ₹${product.salePrice.toLocaleString('en-IN')}
+                            </span>
+                            <span class="product-card__regular-price">
+                                ₹${product.regularPrice.toLocaleString('en-IN')}
+                            </span>
+                        </div>
+                        <div class="product-card__rating">
+                            ${generateRatingStars(product.rating)}
+                            <span class="product-card__rating-count">
+                                (${product.rating || 0}/5)
+                            </span>
+                        </div>
+                        <div class="product-card__cta">
+                            <button onclick="addToCart('${product._id}')" 
+                                    class="product-card__cart-btn">
+                                <i class="fa-solid fa-cart-plus"></i>
+                                Add to Cart
+                            </button>
                         </div>
                     </div>
                 </div>
-            `
-            productContainer.innerHTML += productHTML
-        })
+            </div>`;
+                productContainer.innerHTML += productHTML;
+            });
+        }
 
+        function generateRatingStars(rating) {
+            let starsHTML = '';
+            for (let i = 0; i < 5; i++) {
+                starsHTML += `<i class="fa-solid fa-star ${i < Math.round(rating || 0) ? 'active' : ''}"></i>`;
+            }
+            return starsHTML;
+        }
 
-    }
+        function updatePagination(currentPage, totalPages) {
+            const paginationContainer = document.querySelector('.shop-pagination .pagination');
+            let paginationHTML = '';
+
+            if (currentPage > 1) {
+                paginationHTML += `
+            <li class="page-item">
+                <a class="page-link" href="javascript:void(0)" onclick="applyFilter(${currentPage - 1})" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>`;
+            }
+
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHTML += `
+            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="applyFilter(${i})">${i}</a>
+            </li>`;
+            }
+
+            if (currentPage < totalPages) {
+                paginationHTML += `
+            <li class="page-item">
+                <a class="page-link" href="javascript:void(0)" onclick="applyFilter(${currentPage + 1})" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>`;
+            }
+
+            paginationContainer.innerHTML = paginationHTML;
+        }
+
+        function updateProductCount(totalProducts) {
+            const countElement = document.querySelector('.shop__product__option__left p');
+            if (countElement) {
+                countElement.textContent = `Showing 1–12 of ${totalProducts} results`;
+            }
+        }
+
+        function showErrorMessage(message) {
+            Toastify({
+                text: message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "#ffffff",
+                    color: "#dc3545",
+                    boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)",
+                    padding: "12px 20px",
+                    borderRadius: "10px",
+                    borderLeft: "5px solid #dc3545"
+                }
+            }).showToast();
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function () {
+            // Filter button click
+            document.getElementById('applyFilter').addEventListener('click', applyFilter);
+
+            // Sort select change
+            const sortSelect = document.querySelector('.shop__product__option__right select');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', applyFilter);
+            }
+
+            // Load initial products
+            applyFilter();
+        });
+
+        function changePage(page) {
+            // Update current page and reapply filters
+            document.querySelector('input[name="page"]').value = page;
+            applyFilter();
+        }
 
     </script>
 

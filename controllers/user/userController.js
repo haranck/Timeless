@@ -1,4 +1,3 @@
-
 const User = require('../../models/userSchema')
 const Category = require('../../models/categorySchema')
 const Product = require('../../models/productSchema')
@@ -27,7 +26,7 @@ const loadHompage = async (req, res) => {
       } else {
          return res.render('home', { products: productData })
       }
-      return res.render('home', { user: null });
+     
    } catch (error) {
       console.log('error loading home page');
       res.status(500).send('Internal server error');
@@ -293,79 +292,64 @@ const loadShoppingPage = async (req, res) => {
 
    }
 }
+
 const filterProducts = async (req, res) => {
-
    try {
-      let { categories, priceRange, sortBy } = req.body;
-      let filter ={}
+       const { categories, priceRange,searchQuery, sortBy, page = 1 } = req.body;
+       const limit = 12; // Products per page
+       const skip = (page - 1) * limit;
 
-      if(categories && categories.length>0){
-         filter.category = {$in:categories}
-      }
+       let filter = {};
 
-      if(priceRange){
-         let [minPrice,maxPrice] = priceRange.split('-').map(Number);
-         filter.price = maxPrice ? {$gte:minPrice,$lte:maxPrice} : {$gte:minPrice}
-      }
+       if (categories && categories.length > 0) {
+           filter.category = { $in: categories };
+       }
 
-      let query = Product.find(filter)
+       if (priceRange) {
+           const [min, max] = priceRange.split('-').map(Number);
+           filter.salePrice = max ? { $gte: min, $lte: max } : { $gte: min };
+       }
+       if(searchQuery){
+           filter.productName = { $regex: searchQuery, $options: 'i' };
+       }
 
-      if (sortBy) {
-         if(sortBy === "A-Z") query= query.sort({name:1})
-         else if (sortBy ==="Z-A") query= query.sort({name:-1})
-         else if (sortBy ==="price-low-high") query= query.sort({price:1})
-         else if (sortBy ==="price-high-low") query= query.sort({price:-1})
-         else if(sortBy ==="new-arrivals") query = query.sort({createdAt:-1})
-      }
+       let query = Product.find(filter).skip(skip).limit(limit);
 
-      const products = await query.exec()
+       if (sortBy) {
+           switch (sortBy) {
+               case 'price-low-high':
+                   query = query.sort({ salePrice: 1 });
+                   break;
+               case 'price-high-low':
+                   query = query.sort({ salePrice: -1 });
+                   break;
+               case 'new-arrivals':
+                   query = query.sort({ createdAt: -1 });
+                   break;
+               case 'a-z':
+                   query = query.sort({ productName: 1 });
+                   break;
+               case 'z-a':
+                   query = query.sort({ productName: -1 });
+                   break;
+           }
+       }
 
-      res.json({success:true,products})
+       const products = await query.exec();
+       const totalProducts = await Product.countDocuments(filter);
 
+       res.json({
+           success: true,
+           products,
+           totalPages: Math.ceil(totalProducts / limit),
+           currentPage: page
+       });
 
    } catch (error) {
-      console.log("error filtering products", error)
-      res.status(500).json({success:false,message:"internal server error"})
+       console.log("error filtering products", error);
+       res.status(500).json({ success: false, message: "Internal server error" });
    }
-
-
-
-
-
-//    const { categories, price, sizes } = req.body;
-
-//    try {
-//       let query = {};
-
-//       if (categories.length > 0) {
-//          query.category = { $in: categories };
-//       }
-
-//       if (price) {
-//          const [min, max] = price.split("-");
-//          if (max) {
-//             query.price = { $gte: parseInt(min), $lte: parseInt(max) };
-//          } else {
-//             query.price = { $gte: parseInt(min) };
-//          }
-//       }
-
-//       if (sizes.length > 0) {
-//          query.size = { $in: sizes };
-//       }
-
-//       // Fetch filtered products
-//       const products = await Product.find(query);
-
-//       // Return filtered products as JSON
-//       res.json(products);
-
-
-//    } catch (error) {
-//       throw error
-//    }
-}
-
+};
 
 module.exports = {
    loadHompage,
