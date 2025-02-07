@@ -3,6 +3,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
+    
+
     <style>
         .product__details__pic__item {
             position: relative;
@@ -123,7 +125,7 @@
     </style>
 
     <!-- Shop Details Section Begin -->
-    <section class="shop-details">
+    <section class="shop-details" style="    overflow-x: hidden;">
         <div class="product__details__pic">
             <div class="container">
                 <div class="row">
@@ -249,7 +251,7 @@
                                     <%= product.quantity %> in stock
                                 </li>
                                 <li><span>Categories:</span>
-                                    <%= product.category.name %>
+                                    <%= category.name %>
                                 </li>
                                 <% if (product.brand && product.brand.brandName) { %>
                                 <li><span>Brand:</span>
