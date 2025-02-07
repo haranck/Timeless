@@ -12,11 +12,11 @@ const productDetails = async (req, res) => {
         const userData = await User.findById(userId)
         const productId = req.query.id
         const product = await Product.findById(productId)
-            .populate("category")
-            .populate({
-                path: "brand",
-                select: "brandName"
-            })
+            // .populate("category",{isListed: true})
+            // .populate({
+            //     path: "brand",
+            //     select: "brandName"
+            // })
         // console.log("Product data:", JSON.stringify(product, null, 2))
         const findCategory = product.category
         const findBrand = product.brand
@@ -26,7 +26,7 @@ const productDetails = async (req, res) => {
             _id: { $ne: productId }
         }).limit(4)
 
-
+        console.log(product)
         res.render("product-details", {
             product: product,
             user: userData,

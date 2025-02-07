@@ -4,6 +4,7 @@ const Product = require('../../models/productSchema')
 const Brand = require('../../models/brandSchema')
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
+const mongoose = require('mongoose')
 const env = require('dotenv').config()
 
 const loadHompage = async (req, res) => {
@@ -245,23 +246,27 @@ const loadShoppingPage = async (req, res) => {
       const brands = await Brand.find({isBlocked:false})
       const userData = await User.findOne({ _id: user });
       const brandIds = brands.map(brand => brand._id.toString());
-      const categoryIds = categories.map(category => category._id.toString());
+      const categoryIds = categories.filter(category => category.isListed).map(category => category._id);
       const page = parseInt(req.query.page) || 1;
       const limit = 9
       const skip = (page - 1) * limit;
-      const products = await Product.find({
+      const query = {
          isListed: true,
          category: { $in: categoryIds },
          quantity: { $gt: 0 },
          // brand: { $in: brandIds }
-      }).sort({ createdAt: 1 }).skip(skip).limit(limit)
-
+      }
+      // console.log(query)
+      const products = await Product.find(query).sort({ createdAt: 1 }).skip(skip).limit(limit)
+   
+      // products.forEach(product=>console.log(product.productName))
       const totalProducts = await Product.countDocuments({
          isListed: true,
          category: { $in: categoryIds },
          quantity: { $gt: 0 },
          // brand: { $in: brandIds }
       })
+
       const totalPages = Math.ceil(totalProducts / limit);
       const categoriesWithIds = categories.map(category => ({
          _id: category._id.toString(),
@@ -301,8 +306,13 @@ const filterProducts = async (req, res) => {
 
        let filter = {};
 
-       if (categories && categories.length > 0) {
-           filter.category = { $in: categories };
+       const listedCategories = await Category.find({ isListed:true}).lean()
+       const filteredCategories = listedCategories.filter((cat)=>categories.includes(cat._id.toString()))
+       console.log(listedCategories)
+       if (filteredCategories && filteredCategories.length > 0) {
+           filter.category = { $in: filteredCategories , $ne: null};
+       }else{
+         filter.category = { $in: listedCategories , $ne: null};
        }
 
        if (priceRange) {
@@ -312,8 +322,8 @@ const filterProducts = async (req, res) => {
        if(searchQuery){
            filter.productName = { $regex: searchQuery, $options: 'i' };
        }
-
-       let query = Product.find(filter).skip(skip).limit(limit);
+       console.log(filter)
+       let query = Product.find({isListed:true}).find(filter).skip(skip).limit(limit);
 
        if (sortBy) {
            switch (sortBy) {

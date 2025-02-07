@@ -37,7 +37,7 @@ const addProducts = async (req, res) => {
             for (let i = 0; i < req.files.length; i++) {
                const originalImagePath = req.files[i].path;
 
-               const resizedImagePath = path.join("public", "uploads", "product-images", req.files[i].filename)
+               const resizedImagePath = path.join("public", "uploads", "product-images", `resized-${req.files[i].filename}`)
 
                await sharp(originalImagePath).resize({ width: 440, height: 440 }).toFile(resizedImagePath)
 
@@ -96,7 +96,8 @@ const getAllProducts = async (req, res) => {
 
       const productData = await Product.find({
          $or: [
-            { productName: { $regex: new RegExp(".*" + search + ".*", "i") } }
+            { productName: { $regex: new RegExp(".*" + search + ".*", "i") } },
+            
          ]
       })
          .limit(limit)
@@ -107,12 +108,13 @@ const getAllProducts = async (req, res) => {
 
       const count = await Product.find({
          $or: [
-            { productName: { $regex: new RegExp(".*" + search + ".*", "i") } }
+            { productName: { $regex: new RegExp(".*" + search + ".*", "i") } },
          ]
       }).countDocuments();
 
 
       const category = await Category.find({ isListed: true });
+      const brand = await Brand.find({ isBlocked: false });
 
 
       res.render('products', {
@@ -120,7 +122,8 @@ const getAllProducts = async (req, res) => {
          currentPage: page,
          totalPages: Math.ceil(count / limit),
          cat: category,
-         searchTerm: search
+         searchTerm: search,
+         brand: brand
       });
 
    } catch (error) {
@@ -143,10 +146,8 @@ const toggleProductList = async (req, res) => {
             success: false
          });
       }
-
-
       productToToggle.isListed = isListed;
-      await productToToggle.save();
+      await productToToggle.save({validateBeforeSave:false});
 
 
       res.json({
@@ -166,17 +167,27 @@ const toggleProductList = async (req, res) => {
 
 const getEditProduct = async (req, res) => {
    try {
-      const id = req.query.id
-      const product = await Product.findOne({ _id: id })
-      const category = await Category.find({})
+      const id = req.query.id;
+      if (!id) {
+          return res.redirect('/admin/products');
+      }
 
+      const product = await Product.findById(id).populate('category');
+      if (!product) {
+          return res.redirect('/admin/products');
+      }
+
+      const categories = await Category.find({});
+      
       res.render("edit-product", {
-         product: product,
-         cat: category
-      })
-   } catch (error) {
-      res.redirect("/pageerror")
-   }
+          product,
+          cat: categories,
+          message: ''
+      });
+  } catch (error) {
+      console.error("Error in getEditProduct:", error);
+      res.redirect("/admin/products");
+  }
 }
 
 const editProduct = async (req, res) => {
@@ -184,35 +195,34 @@ const editProduct = async (req, res) => {
       const id = req.params.id
 
       const data = req.body
-      const files = req.files
-
-
       let deletedImages = [];
-      if (data.deletedImages) {
-         try {
-            deletedImages = JSON.parse(data.deletedImages);
-         } catch (parseError) {
-            console.error('Error parsing deleted images:', parseError);
-         }
+      try {
+         deletedImages = data.deletedImages ? JSON.parse(data.deletedImages) : [];
+      } catch (error) {
+         console.error('Error parsing deletedImages:', error);
       }
 
+      // const files = req.files
 
-      if (!data.productName || !data.category) {
+
+
+      if (!data.productName || !data.category ) {
          return res.status(400).render('edit-product', {
-            message: 'Product Name and Category are required',
+            message: 'Product Name, Category are required',
             product: await Product.findById(id),
-            cat: await Category.find({})
+            cat: await Category.find({}),
          });
       }
 
 
       const existingProduct = await Product.findById(id);
       if (!existingProduct) {
-         return res.status(404).render('edit-product', {
-            message: 'Product not found',
-            product: null,
-            cat: await Category.find({})
-         });
+         return res.status(404).json({success:false, message:"Product not found"})
+         // .render('edit-product', {
+         //    message: 'Product not found',
+         //    product: null,
+         //    cat: await Category.find({}),
+         // });
       }
 
 
@@ -220,46 +230,106 @@ const editProduct = async (req, res) => {
          image => !deletedImages.includes(image)
       );
 
+      console.log("Uploaded files:", req.files);  
+
       const newImages = [];
-      if (files && files.length > 0) {
-         for (let i = 0; i < files.length; i++) {
-            const originalImagePath = files[i].path;
-            const resizedImagePath = path.join("public", "uploads", "product-images", files[i].filename);
+      if (req.files && req.files.length > 0) {
+         for (let i = 0; i < req.files.length; i++) {
+            const originalImagePath = req.files[i].path;
+            const resizedImagePath = path.join("public", "uploads", "product-images", `resized-${req.files[i].filename}`);
 
             await sharp(originalImagePath)
                .resize({ width: 440, height: 440 })
                .toFile(resizedImagePath);
 
-            newImages.push(files[i].filename);
+            newImages.push(`resized-${req.files[i].filename}`);
          }
       }
 
+      // const newImages = [];
+      // if (req.files && req.files.length > 0) {
+      //    for (const file of req.files) {
+      //       const resizedFilename = `resized-${file.filename}`;
+      //       const resizedImagePath = path.join("public", "uploads", "product-images", resizedFilename);
+
+      //       await sharp(file.path)
+      //          .resize({ width: 440, height: 440 })
+      //          .toFile(resizedImagePath);
+
+      //       newImages.push(resizedFilename);
+      //    }
+      // }
+
+
+      // const images = []
+      // if (req.files && req.files.length > 0) {
+      //    for (let i = 0; i < req.files.length; i++) {
+      //       const originalImagePath = req.files[i].path;
+
+      //       const resizedImagePath = path.join("public", "uploads", "product-images", `resized-${req.files[i].filename}`)
+
+      //       await sharp(originalImagePath).resize({ width: 440, height: 440 }).toFile(resizedImagePath)
+
+      //       images.push(req.files[i].filename)
+      //    }
+      // }
+
+      
+      // let deletedImages = [];
+      // if (data.deletedImages) {
+      //    try {
+      //       deletedImages = JSON.parse(data.deletedImages);
+      //    } catch (parseError) {
+      //       console.error('Error parsing deleted images:', parseError);
+      //    }
+      // }
+      // console.log("Deleted Images:", deletedImages);
+
+
+
+
+
+      // const croppedImages = [];
+      // for (let i = 1; i <= 3; i++) {
+      //    const croppedImageKey = `croppedImage${i}`;
+      //    if (data[croppedImageKey]) {
+      //       // Convert base64 to file
+      //       const base64Data = data[croppedImageKey].replace(/^data:image\/\w+;base64,/, '');
+      //       const buffer = Buffer.from(base64Data, 'base64');
+      //       const filename = `cropped-${Date.now()}-${i}.jpg`;
+      //       const filepath = path.join("public", "uploads", "product-images", filename);
+
+      //       // Save cropped image
+      //       await fs.promises.writeFile(filepath, buffer);
+      //       croppedImages.push(filename);
+      //    }
+      // }
 
       const croppedImages = [];
-      for (let i = 1; i <= 3; i++) {
+      for (let i = 1; i <= 4; i++) {
          const croppedImageKey = `croppedImage${i}`;
          if (data[croppedImageKey]) {
-            // Convert base64 to file
             const base64Data = data[croppedImageKey].replace(/^data:image\/\w+;base64,/, '');
             const buffer = Buffer.from(base64Data, 'base64');
             const filename = `cropped-${Date.now()}-${i}.jpg`;
             const filepath = path.join("public", "uploads", "product-images", filename);
-
-            // Save cropped image
+            
             await fs.promises.writeFile(filepath, buffer);
             croppedImages.push(filename);
          }
       }
 
+
       // Combine remaining and new images
-      const updatedImages = [...remainingImages, ...newImages, ...croppedImages];
+      const updatedImages = [...remainingImages,  ...croppedImages];
 
       // Validate total image count
       if (updatedImages.length < 3 || updatedImages.length > 4) {
          return res.status(400).render('edit-product', {
             message: 'You must have between 3 and 4 images',
             product: existingProduct,
-            cat: await Category.find({})
+            cat: await Category.find({}),
+         
          });
       }
 
@@ -269,9 +339,22 @@ const editProduct = async (req, res) => {
          return res.status(400).render('edit-product', {
             message: 'Category not found',
             product: existingProduct,
-            cat: await Category.find({})
+            cat: await Category.find({}),
          });
       }
+
+      // const brandId = await Brand.findOne({ brandName: data.brand });
+      // if (!brandId) {
+      //    return res.status(400).render('edit-product', {
+      //       message: 'Brand not found',
+      //       product: existingProduct,
+      //       cat: await Category.find({}),
+      //       brand: await Brand.find({})
+      //    });
+      // }
+
+      console.log("Final Images Array:", updatedImages);
+
 
       // Update product details
       existingProduct.productName = data.productName;
@@ -298,15 +381,11 @@ const editProduct = async (req, res) => {
       }
 
 
-      return res.redirect('/admin/products');
+      return res.status(200).json({success:true, message:"product updation successful"})
 
    } catch (error) {
       console.error("Error editing product:", error);
-      return res.status(500).render('edit-product', {
-         message: 'An error occurred while updating the product',
-         product: null,
-         cat: await Category.find({})
-      });
+      return res.status(500).json({success:true, message:error.message})
    }
 }
 

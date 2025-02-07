@@ -165,6 +165,7 @@
                 <tr>
                     <th>Product Name</th>
                     <th>Category</th>
+                    
                     <th>Sale Price</th>
                     <th>Regular Price</th>
                     <th>Quantity</th>
@@ -176,7 +177,7 @@
                 <% data.forEach(function(product) { %>   
                 <tr data-product-id="<%= product._id %>">
                     <td><%= product.productName %></td>
-                    <td><%= product.category.name %></td>
+                    <td><%= product.category ? product.category.name : 'No Category' %></td>
                     <td>₹<%= product.salePrice %></td>
                     <td>₹<%= product.regularPrice %></td>
                     <td><%= product.quantity %></td>
@@ -227,6 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const isListed = this.checked;
 
             // Show confirmation dialog
+
             Swal.fire({
                 title: 'Confirm Status Change',
                 text: `Are you sure you want to ${isListed ? 'list' : 'unlist'} this product?`,

@@ -18,11 +18,7 @@ const categorySchema = new Schema({
       type: Boolean,
       default: true
    },
-   products:[{
-      type: Schema.Types.ObjectId,
-      ref: "Product",
-      required: true
-   }],
+
    // createdAt:{
    //    type: Date,
    //    default: Date.now
@@ -30,4 +26,4 @@ const categorySchema = new Schema({
 })
 const Category = mongoose.model('Category', categorySchema);
 
-module.exports = Category; 
+module.exports = Category;
