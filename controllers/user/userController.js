@@ -10,10 +10,12 @@ const env = require('dotenv').config()
 const loadHompage = async (req, res) => {
    try {
       const user = req.session.user;
-      const categories = await Category.find({ isListed: true })   
+      const categories = await Category.find({ isListed: true })
+      const brands = await Brand.find({isBlocked:false})   
       let productData = await Product.find({
          isListed: true,
-         category: { $in: categories.map(category => category._id) }, quantity: { $gt: 0 }
+         category: { $in: categories.map(category => category._id) }, quantity: { $gt: 0 },
+         
       })
       .sort({ createdOn: -1 }).limit(8)
 
@@ -23,9 +25,9 @@ const loadHompage = async (req, res) => {
       if (user) {
          const userData = await User.findById(user);
 
-         return res.render('home', { user: userData, products: productData });
+         return res.render('home', { user: userData, products: productData ,brands:brands});
       } else {
-         return res.render('home', { products: productData })
+         return res.render('home', { products: productData,brands:brands})
       }
      
    } catch (error) {

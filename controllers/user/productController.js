@@ -4,44 +4,41 @@ const Category = require("../../models/categorySchema");
 const Brand = require("../../models/brandSchema");
 
 
-
 const productDetails = async (req, res) => {
     try {
+        const userId = req.session.user;
+        const userData = await User.findById(userId);
+        const productId = req.query.id;
 
-        const userId = req.session.user
-        const userData = await User.findById(userId)
-        const productId = req.query.id
+        
         const product = await Product.findById(productId)
-            // .populate("category",{isListed: true})
-            // .populate({
-            //     path: "brand",
-            //     select: "brandName"
-            // })
-        // console.log("Product data:", JSON.stringify(product, null, 2))
-        const findCategory = product.category
-        const findBrand = product.brand
+            .populate("category","name", { isListed: true }) 
+            .populate("brand", "brandName"); 
+
+        if (!product) {
+            return res.redirect("/pageNotFound"); 
+        }
 
         const relatedProducts = await Product.find({
-            category: findCategory,
+            category: product.category._id, 
             _id: { $ne: productId }
-        }).limit(4)
+        }).limit(4);
 
-        console.log(product)
         res.render("product-details", {
             product: product,
             user: userData,
             quantity: product.quantity,
-            category: findCategory,
-            brand: findBrand,
+            category: product.category, 
+            brand: product.brand, 
             relatedProducts: relatedProducts
-        })
+        });
 
     } catch (error) {
-        console.log("error in product details", error)
-        res.redirect("/pageNotFound")
+        console.log("error in product details", error);
+        res.redirect("/pageNotFound");
     }
+};
 
-}
 module.exports = {
     productDetails
-}
+};
