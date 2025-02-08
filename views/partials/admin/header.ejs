@@ -17,7 +17,7 @@
             position: fixed;
             left: 0;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
             padding-top: 70px;
         }
 
@@ -72,17 +72,19 @@
         .logo-text {
             font-size: 24px;
             font-weight: 700;
-            background: linear-gradient(45deg, #2c3e50, #3498db);
+            background: linear-gradient(45deg, #7b3333, #db3434);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-transform: uppercase;
             letter-spacing: 2px;
             position: relative;
-            padding-left: 40px;
+            padding-left: 21px;
+            margin-bottom: 45px;
+            margin-top: -44px;
         }
 
-        .logo-text::before {
-            content: 'T';
+        /* .logo-text::before {
+            content: '✝️';
             position: absolute;
             left: 0;
             top: 50%;
@@ -97,12 +99,13 @@
             border-radius: 8px;
             font-size: 20px;
             -webkit-text-fill-color: white;
-        }
+        } */
 
         .header-right {
             display: flex;
             align-items: center;
             gap: 20px;
+            margin-left: 1045px;
         }
 
         .notification-icon {
@@ -210,6 +213,9 @@
 <body>
     <div class="sidebar">
         <nav>
+            <a href="/admin" class="logo-container">
+                <div class="logo-text">Timeless Aura</div>
+            </a>
             <a href="/admin/" class="nav-item">
                 <i class="fas fa-chart-pie"></i>
                 Dashboard
@@ -258,9 +264,7 @@
     </div>
 
     <header class="header">
-        <a href="/admin" class="logo-container">
-            <div class="logo-text">Timeless Aura</div>
-        </a>
+        
         <div class="header-right">
             <div class="notification-icon">
                 <i class="fas fa-bell"></i>

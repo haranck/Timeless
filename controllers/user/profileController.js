@@ -57,7 +57,6 @@ const sendVerificationEmail = async (email, otp) => {
     }
 }
 
-
 const forgotEmailValid = async (req, res) => {
     try {
 
@@ -74,10 +73,10 @@ const forgotEmailValid = async (req, res) => {
                 res.render("forgotPass-otp")
                 console.log('otp sent', otp);
             } else {
-                res.json({ success: false, message: "Failed to send OTP. Please try again." })
+                res.render("forgot-password", { message: "Failed to send OTP. Please try again." })
             }
         } else {
-            res.render('forgot-password', { message: "User with this email not found" })
+            res.render("forgot-password", { message: "User with this email not found" })
         }
 
     } catch (error) {
@@ -87,7 +86,7 @@ const forgotEmailValid = async (req, res) => {
 
 const verifyForgotPassOtp = async (req, res) => {
     try {
-        const enteredOtp = req.body.otp
+        const enteredOtp = req.body.otp 
         if (enteredOtp === req.session.userOtp) {
             res.json({
                 success: true,
@@ -134,6 +133,7 @@ const resendtOTP = async (req, res) => {
 const postNewPassword = async (req, res) => {
     try {
         const { newPass1, newPass2 } = req.body
+        console.log(newPass1, newPass2)
         const email = req.session.email
         if (newPass1 === newPass2) {
             const hashedPassword = await bcrypt.hash(newPass1, 10);
@@ -166,6 +166,12 @@ const userProfile = async (req, res) => {
 const changeEmail = async (req, res) => {
 
     try {
+
+        const { email } = req.body
+        const userExists = await User.findOne({ email: email })
+        if (userExists) {
+            res.render("change-email", { message: "User with this email already exists" })
+        }
         res.render("change-email")
     } catch (error) {
         res.redirect('/pageNotFound')

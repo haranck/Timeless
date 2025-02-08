@@ -1849,6 +1849,7 @@ ol {
 
 .product__details__last__option ul {
 	padding-top: 40px;
+	text-align: center;
 }
 
 .product__details__last__option ul li {
@@ -1898,7 +1899,8 @@ ol {
 }
 
 .product__details__tab__content {
-	padding-top: 35px;
+	
+	padding: 69px;
 }
 
 .note {
