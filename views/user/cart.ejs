@@ -123,7 +123,11 @@
                                 <a href="/shop">Continue Shopping</a>
                             </div>
                         </div>
-
+                        <!-- <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="continue__btn update__btn">
+                                <a href="#"><i class="fa fa-spinner"></i> Update cart</a>
+                            </div>
+                        </div> -->
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -176,10 +180,10 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Remove the item from DOM
+                            
                             cartRow.remove();
                             
-                            // Recalculate total price
+                        
                             calculateTotalPrice();
                             
                             // Check if cart is empty

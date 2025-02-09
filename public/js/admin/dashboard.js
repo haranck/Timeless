@@ -4,9 +4,9 @@ new Chart(document.getElementById('salesChart'), {
    data: {
        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
        datasets: [{
-           label: 'Sales ($)',
+           label: 'Sales (₹)',
            data: [12000, 19000, 15000, 25000, 22000, 30000],
-           borderColor: '#3b82f6',
+           borderColor: 'lightgreen',
            tension: 0.4
        }]
    },
@@ -24,7 +24,7 @@ new Chart(document.getElementById('customersChart'), {
        datasets: [{
            label: 'New Customers',
            data: [50, 65, 75, 85, 95, 100],
-           backgroundColor: '#3b82f6'
+           backgroundColor: 'lightgreen'
        }]
    },
    options: {
@@ -41,7 +41,7 @@ new Chart(document.getElementById('ordersChart'), {
        datasets: [{
            label: 'Orders',
            data: [150, 200, 175, 250, 220, 300],
-           borderColor: '#3b82f6',
+           borderColor: 'lightgreen',
            tension: 0.4
        }]
    },
@@ -58,7 +58,7 @@ new Chart(document.getElementById('bestSellingChart'), {
        labels: ['Men\'s Watches', 'Women\'s Watches'],
        datasets: [{
            data: [60, 40],
-           backgroundColor: ['#3b82f6', '#ec4899']
+           backgroundColor: ['lightgreen', 'orange']
        }]
    },
    options: {

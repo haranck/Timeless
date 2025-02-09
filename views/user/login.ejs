@@ -171,11 +171,11 @@
 <body>
   <div class="form-container">
     <h1 class="title">LOGIN</h1>
-    <% if (typeof message !=='undefined' ) { %>
+    <% if (typeof message !== 'undefined') { %>
       <p class="message" style="color: red; text-align: center;">
         <%= message %>
       </p>
-      <% } %>
+    <% } %>
        
         <form id="signform" class="form" action="/login" method="POST">
           <div class="input-group">

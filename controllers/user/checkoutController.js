@@ -30,14 +30,6 @@ const loadCheckout = async (req, res) => {
     }
 }
 
-// const postCheckout = async (req, res) => {
-//     try {
-
-//     } catch (error) {
-
-//     }
-// }
-
 const editCheckoutAddress = async (req, res) => {
     try {
         const userId = req.session.user;
@@ -58,12 +50,13 @@ const editCheckoutAddress = async (req, res) => {
             return res.status(400).json({ error: "Invalid address ID" });
         }
 
-        const address = await Address.findOne({ userId: userId, "address._id": address_id });// If the user has multiple saved addresses, this ensures we fetch the correct document.
+        const address = await Address.findOne({ userId: userId, "address._id": address_id });// If the user has multiple address it help find curnt indx
         if (!address) {
             return res.status(404).json({ error: "Address not found" });
         }
 
         // Find and update the specific address in the array
+
         const addressIndex = address.address.findIndex(addr => addr._id.toString() === address_id);
         if (addressIndex === -1) {
             return res.status(404).json({ error: "Address not found in array" });
@@ -103,11 +96,9 @@ const addCheckoutAddress = async (req, res) => {
             altPhone
         } = req.body;
 
-        // Check if user already has an address document
         let addressDoc = await Address.findOne({ userId });
 
         if (addressDoc) {
-            // If exists, add new address to array
             addressDoc.address.push({
                 name,
                 addressType,
@@ -120,7 +111,6 @@ const addCheckoutAddress = async (req, res) => {
             });
             await addressDoc.save();
         } else {
-            // If no address document exists, create new one
             addressDoc = new Address({
                 userId,
                 address: [{
@@ -137,7 +127,6 @@ const addCheckoutAddress = async (req, res) => {
             await addressDoc.save();
         }
 
-        // Redirect back to checkout page
         res.redirect('/checkout');
     } catch (error) {
         console.log("error in addCheckoutAddress", error);
@@ -162,8 +151,6 @@ const placeOrder = async (req, res) => {
             return res.status(400).json({ success: false, error: "Please fill all the fields" });
         }
 
-        console.log(cleanedTotal)
-
         const orderedItemsWithDetails = await Promise.all(orderedItems.map(async (item) => {
             const product = await Product.findById(item.productId);
             
@@ -178,7 +165,6 @@ const placeOrder = async (req, res) => {
             };
         }));
 
-        //format ordered items according to the schema
         
         const formattedItems = orderedItemsWithDetails.map(item => ({
             productId: item.productId,
@@ -188,7 +174,6 @@ const placeOrder = async (req, res) => {
 
         }));
 
-        // Create new order
         const newOrder = new Order({
             user_id:userId,
             address_id:shippingAddress,
@@ -199,11 +184,8 @@ const placeOrder = async (req, res) => {
             total:cleanedTotal
         });
                                                                
-        // Save the order
         await newOrder.save();
 
-        // decreasing quantity
-     
         orderedItems.forEach(async (item) => {
             await Product.updateOne(
                 { _id: item.productId._id},
@@ -211,7 +193,6 @@ const placeOrder = async (req, res) => {
             );
         });
 
-        // Clear the user's cart after successful order
         await Cart.findOneAndUpdate(   
             { userId },
             { $set: { items: [] } }
@@ -237,39 +218,32 @@ const viewOrder = async (req, res) => {
         const userId = req.session.user;
         const orderId = req.params.orderId;
         
-        // Find order and populate product details
         const order = await Order.findById(orderId)
             .populate({
                 path: 'order_items.productId',
                 select: 'productName productImages price'
-            });
+            }).sort({ createdAt: -1 });
 
         if (!order) {
             console.log("Order not found in database");
             return res.redirect('/userProfile');
         }
 
-        // Ensure the order belongs to the logged-in user
         if (order.user_id && order.user_id.toString() !== userId) {
             console.log("Order does not belong to current user");
             return res.redirect('/profile');
         }
 
-        // Get the address from Address collection
         const addressDoc = await Address.findOne({ userId: userId });
-        console.log('Address Doc:', addressDoc);
-        console.log('Order address_id:', order.address_id);
-
+    
         let deliveryAddress = null;
         if (addressDoc && addressDoc.address && addressDoc.address.length > 0) {
-            // Find the specific address used in this order
             deliveryAddress = addressDoc.address.find(addr => 
                 addr._id && order.address_id && addr._id.toString() === order.address_id.toString()
             );
-            console.log('Found delivery address:', deliveryAddress);
+            console.log("its delivery addrress",deliveryAddress);
         }
 
-        // Pass the order and address to the view
         const orderData = {
             ...order.toObject(),
             address: deliveryAddress,
@@ -278,6 +252,7 @@ const viewOrder = async (req, res) => {
         };
         
         return res.render("order", { order: orderData,user: req.session.userData });
+
     } catch (error) {
         console.error('View order error:', error);
         return res.redirect('/profile');
@@ -305,8 +280,6 @@ const cancelOrder = async (req, res) => {
             order.status = 'cancelled';
             await order.save();
         return res.status(200).json({ success: true, message: 'Order cancelled successfully' });
-
-        
 
     } catch (error) {
         console.error('Error cancelling order:', error);

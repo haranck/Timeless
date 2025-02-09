@@ -48,7 +48,6 @@ const sendVerificationEmail = async (email, otp) => {
         };
         const info = await transporter.sendMail(mailOptions);
         // return info.response;
-        console.log("info", info)
         return true
 
     } catch (error) {
@@ -69,7 +68,7 @@ const forgotEmailValid = async (req, res) => {
             if (emailSent) {
                 req.session.userOtp = otp
                 req.session.userData = { email }
-                // res.render('verify-otp')  ////////////////
+                
                 res.render("forgotPass-otp")
                 console.log('otp sent', otp);
             } else {
@@ -88,6 +87,13 @@ const verifyForgotPassOtp = async (req, res) => {
     try {
         const enteredOtp = req.body.otp 
         if (enteredOtp === req.session.userOtp) {
+            if (!req.session.userData) {
+                return res.json({
+                    success: false,
+                    message: "Session expired. Please try again."
+                })
+            }
+            
             res.json({
                 success: true,
                 message: "OTP verified successfully",
@@ -100,6 +106,7 @@ const verifyForgotPassOtp = async (req, res) => {
             })
         }
     } catch (error) {
+        console.error("Error in verifyForgotPassOtp:", error)
         res.status(500).json({ success: false, message: "Internal server error" })
     }
 }
@@ -133,19 +140,37 @@ const resendtOTP = async (req, res) => {
 const postNewPassword = async (req, res) => {
     try {
         const { newPass1, newPass2 } = req.body
-        console.log(newPass1, newPass2)
-        const email = req.session.email
+        const email = req.session.userData?.email 
+        
+        if (!email) {
+            return res.render("reset-password", { message: "Session expired. Please try again." })
+        }
+
         if (newPass1 === newPass2) {
             const hashedPassword = await bcrypt.hash(newPass1, 10);
-            const user = await User.findOneAndUpdate({ email: email }, { password: hashedPassword })
-            res.render("login")
+            const user = await User.findOneAndUpdate(
+                { email: email }, 
+                { password: hashedPassword },
+                { new: true } 
+            )
+            
+            if (!user) {
+                return res.render("reset-password", { message: "User not found" })
+            }
+
+            req.session.userData = null
+            req.session.userOtp = null
+
+            return res.render("login", {success: true, message: "Password updated successfully. Please login." })
         } else {
-            res.render("reset-password", { success: false, message: "Passwords do not match" })
+            return res.render("reset-password", { message: "Passwords do not match" })
         }
     } catch (error) {
-        res.redirect('/pageNotFound')
+        console.error("Error in postNewPassword:", error)
+        res.render("reset-password", { message: "An error occurred. Please try again." })
     }
 }
+
 
 const userProfile = async (req, res) => {
     try {
@@ -233,7 +258,7 @@ const updateEmail = async (req, res) => {
 
         const newEmail = req.body.newEmail
         const userId = req.session.user
-        await User.findByIdAndUpdate(userId, { email: newEmail })
+        await User.findByIdAndUpdate(userId, { email: newEmail },{new:true})
         res.redirect("/userProfile")
 
 
@@ -323,14 +348,6 @@ const getAllAddresses = async (req, res) => {
     }
 }
 
-// const addAddress =async (req, res) => {
-//     try {
-//         const user = req.session.user
-//         res.render("add-address",{user:user})
-//     } catch (error) {
-//         res.redirect('/pageNotFound')
-//     }
-// }
 
 
 const addAddress = async (req, res) => {
@@ -349,8 +366,6 @@ const addAddress = async (req, res) => {
         res.redirect("/pageNotFound")
     }
 }
-
-
 
 
 const postAddAddress = async (req, res) => {
@@ -376,6 +391,7 @@ const postAddAddress = async (req, res) => {
                 ],
             })
             await newAddress.save()
+            
         } else {
             userAddress.address.push({
                 addressType,
