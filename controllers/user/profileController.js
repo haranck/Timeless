@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer')
 const bcrypt = require('bcrypt')
 const env = require('dotenv').config()
 const session = require('express-session')
-
+const Wallet = require('../../models/walletSchema')
 
 
 function generateOtp() {
@@ -175,15 +175,20 @@ const postNewPassword = async (req, res) => {
 const userProfile = async (req, res) => {
     try {
         const userId = req.session.user
-        const userData = await User.findById(userId)
-        const addressData = await Address.findOne({ userId: userId })
         if(!userId){
             res.redirect("/login")
         }
-
+        const userData = await User.findById(userId)
+        if(!userData) {
+            return res.redirect("/login")
+        }
+        const addressData = await Address.findOne({ userId: userId })
+        const walletData = await Wallet.findOne({ userId: userId })
         const orders = await Order.find({user_id: userId}).populate("order_items.productId")
-        res.render("profile", { user: userData, userAddress: addressData, orders })
+        
+        res.render("profile", { user: userData, userAddress: addressData, orders,wallet:walletData })
     } catch (error) {
+        console.error("Error in userProfile:", error)
         res.redirect('/pageNotFound')
     }
 }

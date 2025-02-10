@@ -97,7 +97,7 @@
         }
 
         .product-card__rating .fa-star {
-            color: #e0e0e0;
+            color: #FFD700;
             margin-right: 3px;
         }
 
@@ -105,6 +105,7 @@
             color: #FFD700;
             /* Vibrant gold color */
         }
+        
 
         .product-card__rating-count {
             color: #888;
@@ -683,6 +684,7 @@
                                                 ₹<%= products[i].regularPrice.toLocaleString('en-IN') %>
                                             </span>
                                         </div>
+                                        
                                         <div class="product-card__rating">
                                             <% for(let j=0; j < 5; j++) { %>
                                                 <i
@@ -712,7 +714,7 @@
                                 <ul class="pagination justify-content-center">
                                     <% for (let i = 1; i <= totalPages; i++) { %>
                                         <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                                            <a class="page-link" href="#" onclick="applyFilter(<%= i %>)"><%= i %></a>
+                                            <a class="page-link" href="#" onclick="applyFilter('<%= i %>')"><%= i %></a>
                                         </li>
                                     <% } %>
                                 </ul>

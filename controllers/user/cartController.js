@@ -47,7 +47,7 @@ const addToCart = async (req, res) => {
                 message: "Product ID is required" 
             });
         }
-        co
+        
 
         const product = await Product.findById(productId);
         console.log("product",product);

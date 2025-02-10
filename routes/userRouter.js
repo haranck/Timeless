@@ -8,6 +8,7 @@ const profileController = require('../controllers/user/profileController')
 const cartController = require("../controllers/user/cartController");
 const checkoutController = require("../controllers/user/checkoutController");
 const wishlistController = require("../controllers/user/wishlistController")
+const walletController = require("../controllers/user/walletController")
 
 
 router.get('/', isBlocked, userController.loadHompage);
@@ -85,6 +86,9 @@ router.patch("/cancelOrder/:orderId", userAuth, checkoutController.cancelOrder)
 router.get("/wishlist",userAuth,wishlistController.loadWishlist)
 router.post("/addToWishlist", userAuth, wishlistController.addToWishlist)
 router.delete("/wishlist/remove/:productId", userAuth, wishlistController.removeWishlistItem)
+
+//wallet management
+router.post("/addMoney", userAuth, walletController.addMoney)
 
 
 

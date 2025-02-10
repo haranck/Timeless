@@ -150,6 +150,14 @@
                                     <span class="product-card__regular-price">
                                         ₹<%= products[i].regularPrice.toLocaleString('en-IN') %>
                                     </span>
+                                   
+                                </div>
+                                <div>
+                                    <% if(products[i].quantity > 0){ %>
+                                        <span style="color: rgb(0, 134, 18);">In Stock</span>
+                                        <% } else { %>
+                                        <span style="color: red;">Out of stock</span>
+                                        <% } %>
                                 </div>
                                 <div class="product-card__rating">
                                     <% for(let j=0; j < 5; j++) { %>
@@ -328,6 +336,7 @@
             overflow: hidden;
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 16px;
         }
 
         .product-card:hover {
@@ -412,7 +421,7 @@
         }
 
         .product-card__rating .fa-star {
-            color: #e0e0e0;
+            color: #FFD700;
             margin-right: 3px;
         }
 

@@ -3,7 +3,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
-    
+
 
     <style>
         .product__details__pic__item {
@@ -122,6 +122,24 @@
             -webkit-appearance: none;
             margin: 0;
         }
+
+        .buy-now-btn {
+            padding-right: 80px;
+            padding-left: 80px;
+            padding-top: 15px;
+            padding-bottom: 15px;
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #ffffff;
+            background: #000000;
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+            background-color: black;
+            color: white;
+            border-radius: 4px;
+        }
     </style>
 
     <!-- Shop Details Section Begin -->
@@ -218,25 +236,28 @@
                             </div> -->
 
                             <!-- <td class="quantity__item"> -->
+                            <div>
+                                <button class="buy-now-btn">Buy Now </button></a>
+                            </div>
                             <div class="custom-quantity-input">
-                                <button class="quantity-btn"
-                                    onclick="updateQuantity('decrease')">-</button>
-                                <input type="number" class="quantity-value" id="product-quantity" value="1" min="1" max="5" readonly>
-                                <button class="quantity-btn"
-                                    onclick="updateQuantity('increase')">+</button>
+                                <button class="quantity-btn" onclick="updateQuantity('decrease')">-</button>
+                                <input type="number" class="quantity-value" id="product-quantity" value="1" min="1"
+                                    max="5" readonly>
+                                <button class="quantity-btn" onclick="updateQuantity('increase')">+</button>
 
 
-                                    <button onclick="addToCart('<%= product._id %>')" class="primary-btn" style="margin-left: 20px;">
-                                        Add to Cart
-                                    </button>
-        
+                                <button onclick="addToCart('<%= product._id %>')" class="primary-btn"
+                                    style="margin-left: 20px;">
+                                    Add to Cart
+                                </button>
+
                             </div>
                             <!-- </td> -->
 
 
                             <!-- <a href="#" class="primary-btn">add to cart</a> -->
 
-                            
+
 
                         </div>
                         <div class="product__details__btns__option">
@@ -249,18 +270,24 @@
                             <h5 style="padding-left: 202px;"><span>Guaranteed Safe Checkout</span></h5>
                             <img src="img/shop-details/details-payment.png" alt="" style="padding-left: 147px;">
                             <ul>
-                                <li><span>Availability:</span>
-                                    <%= product.quantity %> in stock
-                                </li>
-                                <li><span>Categories:</span>
-                                    <%= product.category.name %>
-                                </li>
-                                <% if (product.brand && product.brand.brandName) { %>
-                                <li><span>Brand:</span>
-                                    <%= product.brand.brandName %>
-                                </li>
-                                <% } %>
-                                <!-- <li><span>Tag:</span> Clothes, Skin, Body</li> -->
+                                <% if(product.quantity> 0){ %>
+                                    <li style="color: rgb(0, 134, 18);"><span>Availability:</span>
+                                        <%= product.quantity %> in stock
+                                    </li>
+                                    <% } else { %>
+                                        <li style="color: red;"><span>Availability:</span>
+                                            Out of stock
+                                        </li>
+                                        <% } %>
+                                            <li><span>Categories:</span>
+                                                <%= product.category.name %>
+                                            </li>
+                                            <% if (product.brand && product.brand.brandName) { %>
+                                                <li><span>Brand:</span>
+                                                    <%= product.brand.brandName %>
+                                                </li>
+                                                <% } %>
+                                                    <!-- <li><span>Tag:</span> Clothes, Skin, Body</li> -->
                             </ul>
                         </div>
                     </div>
@@ -537,7 +564,7 @@
         function updateQuantity(action) {
             const quantityInput = document.getElementById('product-quantity');
             let currentQuantity = parseInt(quantityInput.value);
-            
+
             if (action === 'increase' && currentQuantity < 5) {
                 quantityInput.value = currentQuantity + 1;
             } else if (action === 'decrease' && currentQuantity > 1) {
@@ -574,7 +601,7 @@
             const $zoomLens = $('<div class="zoom-lens"></div>');
 
             function setupZoom($image) {
-    
+
                 $image.off('mousemove mouseleave');
 
                 $image.closest('.product__details__pic__item').append($zoomLens);

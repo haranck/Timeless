@@ -3,6 +3,7 @@
     <title>User Profile</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <style>
         /* Breadcrumb styles */
@@ -159,8 +160,80 @@
                 margin-bottom: 20px;
             }
         }
-        .cart-img{
+
+        .cart-img {
             max-width: 62%;
+        }
+
+        /* Wallet Tab Styles */
+        #wallet {
+            padding: 20px;
+            background-color: #ffffffa2;
+            border-radius: 10px;
+        }
+
+        #wallet .card-header {
+            background-color: #cccccc;
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+
+        #wallet h2 {
+            margin-top: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        #wallet h3 {
+            margin-top: 30px;
+            font-size: 20px;
+            color: #fb7806;
+        }
+
+        #wallet table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+        }
+
+        #wallet th,
+        #wallet td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        #wallet th {
+            background-color: #f2f2f2;
+        }
+
+        #wallet form {
+            margin-top: 20px;
+        }
+
+        #wallet input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        #wallet button {
+            margin-top: 10px;
+            background: linear-gradient(45deg, #ffa500, #ffd700);
+            border: none;
+            color: #000;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        #wallet button:hover {
+            background: linear-gradient(45deg, #ff8c00, #ffc000);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 165, 0, 0.2);
+            color: #000;
         }
     </style>
 
@@ -275,7 +348,9 @@
                                                             <% } else { %>
                                                                 <% orders.forEach(order=> { %>
                                                                     <tr>
-                                                                        <td> <img class="cart-img" src="/uploads/product-images/<%= order.order_items[0].productId.productImages[0] %>" alt=""></td>
+                                                                        <td> <img class="cart-img"
+                                                                                src="/uploads/product-images/<%= order.order_items[0].productId.productImages[0] %>"
+                                                                                alt=""></td>
                                                                         <td>
                                                                             <%= order.order_items[0].productId.productName
                                                                                 %>
@@ -286,11 +361,12 @@
                                                                         <td>₹<%= order.total %>
                                                                         </td>
                                                                         <td>
-                                                                            <a href="/viewOrder/<%= order._id %>" class="btn btn-sm btn-success ml-2">View</a>
+                                                                            <a href="/viewOrder/<%= order._id %>"
+                                                                                class="btn btn-sm btn-success ml-2">View</a>
                                                                         </td>
                                                                     </tr>
                                                                     <% }) %>
-                                                                <% } %>
+                                                                        <% } %>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -306,18 +382,52 @@
                                         <div class="card-body contact-from-area">
                                             <div class="row">
                                                 <div class="col-lg-8 mx-auto text-center mt-90">
-                                                    <form>
-                                                        <div class="form-group">
-                                                            <label for="walletAmount" class="h4">Amount</label>
-                                                            <div class="h3"></div>
-                                                        </div>
-                                                        <!-- Rest of wallet content -->
+                                                    <h2>My Wallet</h2>
+                                                    <p><strong>Wallet Balance:</strong> ₹<%= wallet ? wallet.balance : 0 %></p>
+
+                                                    <!-- <h3>Transaction History</h3>
+                                                    <table border="1">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Type</th>
+                                                                <th>Amount</th>
+                                                                <th>Description</th>
+                                                                <th>Status</th>
+                                                                <th>Date</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>Credit</td>
+                                                                <td>₹5000</td>
+                                                                <td>Wallet Recharge</td>
+                                                                <td>Completed</td>
+                                                                <td>2024-10-20</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table> -->
+
+                                                    <h3>Add Money to Wallet</h3>
+                                                    <form onsubmit="addMoney()">
+                                                        <input type="number" name="amount" placeholder="Enter amount"
+                                                            required>
+                                                        <button type="submit" >ADD MONEY</button>
                                                     </form>
+
+                                                    <!-- <h3>Use Wallet Balance</h3>
+                                                    <form action="/wallet/use" method="POST">
+                                                        <input type="number" name="amount" placeholder="Enter amount"
+                                                            required>
+                                                        <button type="submit">Use Balance</button>
+                                                    </form> -->
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
+
+
                             </div>
                         </div>
                     </div>
@@ -329,8 +439,53 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+         function addMoney() {
+            event.preventDefault(); 
+            
+            const amount = document.querySelector('input[name="amount"]').value; 
+
+            fetch('/addMoney', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ amount: amount }), 
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: data.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.reload(); 
+                        });
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            data.message,
+                            'error'
+                        )
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    Swal.fire(
+                        'Error!',
+                        'Something went wrong. Please try again later.',
+                        'error'
+                    )
+                });
+        }
+
+
+
         $(document).ready(function () {
             // Initialize Bootstrap tabs
             $('a[data-toggle="tab"]').on('click', function (e) {
