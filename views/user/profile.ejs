@@ -283,7 +283,12 @@
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" id="wallet-tab" data-toggle="tab" href="#wallet" role="tab">
-                                            <i class="fas fa-wallet"></i>Wallet Status
+                                            <i class="fas fa-wallet"></i>Wallet
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="walletHistory-tab" data-toggle="tab" href="#walletHistory" role="tab">
+                                            <i class="fas fa-wallet"></i>Wallet History
                                         </a>
                                     </li>
                                     <li class="nav-item">
@@ -425,8 +430,40 @@
                                         </div>
                                     </div>
                                 </div>
-
-
+                                    <div class="tab-pane fade" id="walletHistory" role="tabpanel" aria-labelledby="walletHistory-tab">
+                                    <div class="card">
+                                      <div class="card-header">
+                                        <h5 class="mb-0">Wallet History</h5>
+                                      </div>
+                                      <div class="card-body">
+                                        <div class="table-responsive">
+                                          <table class="table">
+                                            <thead>
+                                              <tr>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                                <th>Amount</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% wallet.transactions.forEach(transaction => { %> 
+                                              <tr>
+                                                <td><%= transaction.createdAt.getDate() %>/<%= transaction.createdAt.getMonth() %>/<%= transaction.createdAt.getFullYear() %></td>
+                                               <% if(transaction.type==="credit"){ %>
+                                                    <td style="color:green">credit</td>
+                                                <%  }else{ %>
+                                                <td style="color:red">debit</td>
+                                                <%  } %>
+                                                
+                                                <td style="color:black;font-weight:bold;"><%= transaction.amount %></td>
+                                              </tr>
+                                              <% }) %> 
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
 
                             </div>
                         </div>
