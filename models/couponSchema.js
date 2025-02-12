@@ -12,7 +12,7 @@ const couponSchema = new Schema({
     couponType: {
         type: String,
         required: true,
-        enum: ["percentage", "fixed"]
+        enum: ["percentage"]
     },
     couponDiscount: {
         type: Number,

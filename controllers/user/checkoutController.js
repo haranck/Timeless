@@ -222,7 +222,7 @@ const viewOrder = async (req, res) => {
             .populate({
                 path: 'order_items.productId',
                 select: 'productName productImages price'
-            }).sort({ createdAt: -1 });
+            }).sort({ createdAt: -1 })
 
         if (!order) {
             console.log("Order not found in database");

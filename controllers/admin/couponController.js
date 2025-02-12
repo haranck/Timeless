@@ -31,10 +31,10 @@ const addCoupon = async (req, res) => {
             });
         }
 
-        if (couponType !== 'percentage' && couponType !== 'fixed') {
+        if (couponType !== 'percentage') {
             return res.status(400).json({
                 success: false,
-                message: "Invalid coupon type. Must be 'percentage' or 'fixed'."
+                message: "Invalid coupon type. Must be 'percentage'."
             });
         }
 
@@ -50,6 +50,7 @@ const addCoupon = async (req, res) => {
         const parsedMinPurchase = parseFloat(minPurchase);
         const parsedMaxPurchase = parseFloat(maxPurchase);
 
+        // Validate discount based on coupon type
         if (isNaN(parsedDiscount) || parsedDiscount <= 0) {
             return res.status(400).json({
                 success: false,
@@ -57,6 +58,15 @@ const addCoupon = async (req, res) => {
             });
         }
 
+        // Additional validation for percentage and fixed discounts
+        if (couponType === 'percentage') {
+            if (parsedDiscount > 100) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Percentage discount cannot exceed 100%"
+                });
+            }
+        } 
         if (isNaN(parsedMinPurchase) || parsedMinPurchase < 0) {
             return res.status(400).json({
                 success: false,
@@ -77,12 +87,6 @@ const addCoupon = async (req, res) => {
                 message: "Expiry date must be in the future"
             });
         }
-        if (active !== 'yes' && active !== 'no') {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid active status. Must be 'yes' or 'no'."
-            });
-        }
 
         const newCoupon = new Coupon({
             couponCode,
@@ -91,7 +95,7 @@ const addCoupon = async (req, res) => {
             couponMinAmount: parsedMinPurchase,
             couponMaxAmount:parsedMaxPurchase,
             couponValidity: parsedExpiryDate,
-            isActive:
+            isActive:true
         });
 
         await newCoupon.save();
