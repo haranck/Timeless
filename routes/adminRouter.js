@@ -87,6 +87,7 @@ router.post('/cancelOrder', adminAuth, orderController.cancelOrder)
 
 router.get('/coupons', adminAuth, couponController.getCouponPage)
 router.post('/addCoupon', adminAuth, couponController.addCoupon)
+router.patch('/toggle-coupon/:id', adminAuth, couponController.toggleCoupon)
 
 
 module.exports = router

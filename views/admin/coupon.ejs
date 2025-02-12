@@ -124,6 +124,7 @@
                 transform: scale(0.95);
                 opacity: 0;
             }
+
             to {
                 transform: scale(1);
                 opacity: 1;
@@ -156,34 +157,55 @@
                             <tr>
                                 <th>Coupon Code</th>
                                 <th>Coupon Type</th>
-                                <th>Discount</th>
                                 <th>Coupon %</th>
+                                <th>Discount</th>
                                 <th>Minimum Purchase</th>
+                                <th>Maximum Purchase</th>
                                 <th>Expiration Date</th>
-                                <th>Status</th>
+                                <!-- <th>Status</th> -->
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>WELCOME_21</td>
-                                <td>Fixed</td>
-                                <td>₹ 200</td>
-                                <td>20%</td>
-                                <td>₹ 1000</td>
-                                <td>21-02-2025</td>
-                                <td>
-                                    <span class="badge bg-success">ACTIVE</span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm btn-action">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm btn-action">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
+                            <% coupons.forEach((coupon)=> { %>
+                                <tr>
+                                    <td>
+                                        <%= coupon.couponCode %>
+                                    </td>
+                                    <td>
+                                        <%= coupon.couponType %>
+                                    </td>
+                                    <td>₹0</td>
+                                    <td>
+                                        <%= coupon.couponDiscount %>
+                                    </td>
+                                    <td>
+                                        <%= coupon.couponMinAmount %>
+                                    </td>
+                                    <td>
+                                        <%= coupon.couponMaxAmount %>
+                                    </td>
+                                    <td>
+                                        <%= coupon.couponValidity.getDate() %>/<%= coupon.couponValidity.getMonth() %>/
+                                                <%= coupon.couponValidity.getFullYear() %>
+                                    </td>
+                                    <!-- <td>
+                                            <span class="badge bg-success">Active</span>
+                                    </td> -->
+                                    <td>
+                                        <div
+                                            class="form-check form-switch d-flex align-items-center justify-content-start">
+                                            <input type="checkbox" class="form-check-input toggle-status"
+                                                data-id="<%= coupon._id %>" <%=coupon.isActive ? 'checked' : '' %>
+                                            />
+                                            <span
+                                                class="status-label ms-2 <%= coupon.isActive ? 'text-success' : 'text-danger' %>">
+                                                <%= coupon.isActive ? 'Active' : 'Inactive' %>
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <% }); %>
                         </tbody>
                     </table>
                 </div>
@@ -213,6 +235,9 @@
                     <label for="minPurchase">Minimum Purchase Amount</label>
                     <input type="number" name="minPurchase" placeholder="Minimum Purchase Amount" required>
 
+                    <label for="maxPurchase">Maximum Purchase Amount</label>
+                    <input type="number" name="maxPurchase" placeholder="Maximum Purchase Amount" required>
+
                     <label for="expiryDate">Expiration Date</label>
                     <input type="date" name="expiryDate" required>
                 </div>
@@ -221,8 +246,10 @@
         </div>
     </div>
 
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const modal = document.getElementById('couponModal');
             const addCouponBtn = document.getElementById('addCouponBtn');
             const closeModalBtn = document.getElementById('closeModalBtn');
@@ -236,7 +263,7 @@
             function closeModal() {
                 modal.classList.remove('show');
                 document.body.style.overflow = '';
-                couponForm.reset(); 
+                couponForm.reset();
             }
 
             addCouponBtn.addEventListener('click', openModal);
@@ -249,54 +276,175 @@
             });
 
             // Handle form submission
-            couponForm.addEventListener('submit',async function(event) {
+            couponForm.addEventListener('submit', async function (event) {
                 event.preventDefault();
-                
-                
-                   const couponCode = document.querySelector("input[name='couponCode']").value
-                   const couponType = document.querySelector("select[name='couponType']").value
-                   const discount = document.querySelector("input[name='discount']").value
-                   const minPurchase = document.querySelector("input[name='minPurchase']").value
-                   const expiryDate = document.querySelector("input[name='expiryDate']").value
-                
+
+
+                const couponCode = document.querySelector("input[name='couponCode']").value
+                const couponType = document.querySelector("select[name='couponType']").value
+                const discount = document.querySelector("input[name='discount']").value
+                const minPurchase = document.querySelector("input[name='minPurchase']").value
+                const maxPurchase = document.querySelector("input[name='maxPurchase']").value
+                const expiryDate = document.querySelector("input[name='expiryDate']").value
+                const isActive = document.querySelector("input[name='isActive']").checked
+
                 try {
-                    const response = await fetch("/addCoupon",{
-                        method : "POST",
-                        headers : {
-                            "Content-Type" : "application/json"
+                    const response = await fetch("/admin/addCoupon", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
                         },
-                        body : JSON.stringify({
+                        body: JSON.stringify({
                             couponCode,
                             couponType,
                             discount,
                             minPurchase,
-                            expiryDate
+                            expiryDate,
+                            maxPurchase,
+                            isActive
                         })
-                    })
+                    });
 
-                    const data = await response.json()
-                    if(data.success){
-                        alert(data.message)
-                        closeModal();
-                        couponForm.reset();
-                    }else{
-                        alert(data.message)
+                    // // Log the full response for debugging
+                    // console.log('Response status:', response.status);
+                    // console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
+                    const data = await response.json();
+                    console.log('Response data:', data);
+
+                    if (response.ok) {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Your coupon has been added.',
+                                icon: 'success',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            window.location.reload();
+                            closeModal();
+                            couponForm.reset();
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: data.message || "Failed to add coupon",
+                                icon: 'error',
+                                showConfirmButton: false,
+                                timer: 1500
+                            })
+                        }
+                    } else {
+                        // Handle HTTP errors
+                        const errorMessage = data.message || `Error: ${response.status} ${response.statusText}`;
+                        console.error('Coupon submission error:', errorMessage);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: errorMessage,
+                            icon: 'error',
+                            showConfirmButton: false,
+                            timer: 150
+                        })
                     }
                 } catch (error) {
-                    console.log("error in add coupon", error);
-                    alert("Something went wrong. Please try again laterrrrr.")
+                    // Catch network errors or JSON parsing errors
+                    console.error("Detailed error in add coupon:", error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: `Network error: ${error.message}. Please check your connection and try again.`,
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
                 }
-
-
-
-                // Close modal after submission
-                // closeModal();
             });
 
-            
+
         });
+
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.toggle-status').forEach(toggle => {
+                toggle.addEventListener('change', function () {
+                    const couponId = this.getAttribute('data-id');
+                    const statusLabel = this.nextElementSibling;
+                    const isActive = this.checked;
+
+                    Swal.fire({
+                        title: 'Confirm Status Change',
+                        text: `Are you sure you want to ${isActive ? 'Activate' : 'Inactivate'} this coupon?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, change it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                        
+                            fetch(`/admin/toggle-coupon/${couponId}`, {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ isActive })
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        
+                                        if (data.isActive) {
+                                            statusLabel.textContent = 'Active';
+                                            statusLabel.classList.remove('text-danger');
+                                            statusLabel.classList.add('text-success');
+                                        } else {
+                                            statusLabel.textContent = 'Inactive';
+                                            statusLabel.classList.remove('text-success');
+                                            statusLabel.classList.add('text-danger');
+                                        }
+
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Coupon Status Updated',
+                                            text: data.message,
+                                            toast: true,
+                                            position: 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 2000
+                                        });
+                                    } else {
+                                        this.checked = !isActive;
+
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: data.message || 'Failed to update coupon status'
+                                        });
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+
+                                    // Revert toggle
+                                    this.checked = !isActive;
+
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Network Error',
+                                        text: 'Unable to update coupon status'
+                                    });
+                                });
+                        } else {
+                            // Revert toggle if user cancels
+                            this.checked = !isActive;
+                        }
+                    });
+                });
+            });
+        });
+
+
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<%- include("../../views/partials/admin/footer") %>
+    <%- include("../../views/partials/admin/footer") %>
