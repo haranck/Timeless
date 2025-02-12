@@ -1,0 +1,302 @@
+<%- include("../../views/partials/admin/header") %>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .page-header {
+            background-color: #fff;
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .table {
+            background-color: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge {
+            padding: 8px 12px;
+        }
+
+        .btn-action {
+            margin: 0 3px;
+        }
+
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .modal {
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            width: 420px;
+            max-width: 90%;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.3s ease-in-out;
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 22px;
+            cursor: pointer;
+            color: #555;
+            transition: 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #d9534f;
+        }
+
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-content label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .modal-content input,
+        .modal-content select {
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            width: 100%;
+            transition: 0.3s ease;
+        }
+
+        .modal-content input:focus,
+        .modal-content select:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+        }
+
+        .save-btn {
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background-color: #0056b3;
+        }
+
+        @keyframes fadeIn {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal.show {
+            display: flex;
+        }
+    </style>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2>Manage Coupons</h2>
+                    <button class="btn btn-primary" id="addCouponBtn">
+                        <i class="fas fa-plus"></i> Add Coupon
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-hover text-center">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Coupon Code</th>
+                                <th>Coupon Type</th>
+                                <th>Discount</th>
+                                <th>Coupon %</th>
+                                <th>Minimum Purchase</th>
+                                <th>Expiration Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>WELCOME_21</td>
+                                <td>Fixed</td>
+                                <td>₹ 200</td>
+                                <td>20%</td>
+                                <td>₹ 1000</td>
+                                <td>21-02-2025</td>
+                                <td>
+                                    <span class="badge bg-success">ACTIVE</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm btn-action">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm btn-action">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coupon Modal -->
+    <div id="couponModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModalBtn">&times;</span>
+            <h2 class="modal-title">Add Coupon</h2>
+            <form id="couponForm">
+                <div class="form-group">
+                    <label for="couponCode">Coupon Code</label>
+                    <input type="text" name="couponCode" placeholder="Enter Coupon Code" required>
+
+                    <label for="couponType">Coupon Type</label>
+                    <select name="couponType" required>
+                        <option value="percentage">Percentage</option>
+                        <option value="fixed">Fixed Amount</option>
+                    </select>
+
+                    <label for="discount">Discount Value</label>
+                    <input type="number" name="discount" placeholder="Discount Value" required>
+
+                    <label for="minPurchase">Minimum Purchase Amount</label>
+                    <input type="number" name="minPurchase" placeholder="Minimum Purchase Amount" required>
+
+                    <label for="expiryDate">Expiration Date</label>
+                    <input type="date" name="expiryDate" required>
+                </div>
+                <button type="submit" class="save-btn">Save Coupon</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('couponModal');
+            const addCouponBtn = document.getElementById('addCouponBtn');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const couponForm = document.getElementById('couponForm');
+
+            function openModal() {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+                couponForm.reset(); 
+            }
+
+            addCouponBtn.addEventListener('click', openModal);
+            closeModalBtn.addEventListener('click', closeModal);
+
+            window.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Handle form submission
+            couponForm.addEventListener('submit',async function(event) {
+                event.preventDefault();
+                
+                
+                   const couponCode = document.querySelector("input[name='couponCode']").value
+                   const couponType = document.querySelector("select[name='couponType']").value
+                   const discount = document.querySelector("input[name='discount']").value
+                   const minPurchase = document.querySelector("input[name='minPurchase']").value
+                   const expiryDate = document.querySelector("input[name='expiryDate']").value
+                
+                try {
+                    const response = await fetch("/addCoupon",{
+                        method : "POST",
+                        headers : {
+                            "Content-Type" : "application/json"
+                        },
+                        body : JSON.stringify({
+                            couponCode,
+                            couponType,
+                            discount,
+                            minPurchase,
+                            expiryDate
+                        })
+                    })
+
+                    const data = await response.json()
+                    if(data.success){
+                        alert(data.message)
+                        closeModal();
+                        couponForm.reset();
+                    }else{
+                        alert(data.message)
+                    }
+                } catch (error) {
+                    console.log("error in add coupon", error);
+                    alert("Something went wrong. Please try again laterrrrr.")
+                }
+
+
+
+                // Close modal after submission
+                // closeModal();
+            });
+
+            
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<%- include("../../views/partials/admin/footer") %>

@@ -17,12 +17,9 @@ const wishlistSchema = new Schema({
             ref: "Product",
             required: true
          },
-         // addedAt:{
-         //    type: Date,
-         //    default: Date.now
-         // }
       }]
 })
+
 
 const Wishlist = mongoose.model('Wishlist', wishlistSchema);
 module.exports = Wishlist;

@@ -1,38 +1,61 @@
-const mongoose = require('mongoose');
-const {Schema} = mongoose.Schema;
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const coupenSchema = new Schema({
-   name:{
-      type: String,
-      required: true,
-      unique: true
-   },
-   createdOn:{
-      type: Date,
-      default: Date.now,
-      required: true
-   },
-   expiredOn:{
-      type: Date,
-      required: true
-   },
-   offerPrice:{
-      type: Number,
-      required: true
-   },
-   minimumPrice:{
-      type: Number,
-      required: true
-   },
-   isList:{
-      type: Boolean,
-      default: true
-   },
-   userId:[{
-      type: Schema.Types.ObjectId,
-      ref: "User"
-   }]
-})   
+const couponSchema = new Schema({
+    couponCode: {
+        type: String,
+        required: true,
+        unique: true,
+        uppercase: true,
+        trim: true
+    },
+    couponType: {
+        type: String,
+        required: true,
+        enum: ["percentage", "fixed"]
+    },
+    couponDiscount: {
+        type: Number,
+        required: true
+    },
+    couponValidity: {
+        type: Date,
+        required: true
+    },
+    couponMinAmount: {
+        type: Number,
+        required: true
+    },
+    couponMaxDiscount: {  //// Optional
+        type: Number,
+        required: false
+    },
+    couponDescription: {  //// Optional
+        type: String,
+        required: false
+    },
+    // couponImage: {
+    //     type: String, // Store image URL
+    //     default: null // Optional
+    // },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+    limit: {
+        type: Number,
+        default: 1 // How many times a user can use this coupon
+    },
+    usageCount: {
+        type: Number,
+        default: 0 // Track how many times this coupon has been used
+    },
+    createdDate: {
+        type: Date,
+        default: Date.now
+    }
+})
 
-const Coupen = mongoose.model('Coupen', coupenSchema);
-module.exports = Coupen;
+const Coupon = mongoose.model("Coupon", couponSchema);
+
+module.exports = Coupon

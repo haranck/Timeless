@@ -42,7 +42,6 @@ const addMoney = async (req, res) => {
     } catch (error) {
         console.log("error in add money", error)
         return res.status(500).json({ success:false,message: 'Internal Server Error' });
-        
     }
 }
 

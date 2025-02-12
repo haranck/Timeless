@@ -9,9 +9,10 @@ const categoryController = require('../controllers/admin/categoryController')
 const productController = require('../controllers/admin/productController')
 const brandController = require('../controllers/admin/brandController')
 const orderController = require('../controllers/admin/orderController')
+const couponController = require('../controllers/admin/couponController')
 
 
-const storage = multer.diskStorage({
+const storage = multer.diskStorage({ 
     destination: function (req, file, cb) {
         if (req.originalUrl.includes('/addBrand')) {
             cb(null, path.join(__dirname, '../public/uploads/brands'))
@@ -81,6 +82,11 @@ router.get('/deleteBrand', adminAuth, brandController.deleteBrand)
 router.get('/orders', adminAuth, orderController.getOrdersPage)
 router.post('/updateOrder', adminAuth, orderController.updateOrder)
 router.post('/cancelOrder', adminAuth, orderController.cancelOrder)
+
+//coupon management
+
+router.get('/coupons', adminAuth, couponController.getCouponPage)
+router.post('/addCoupon', adminAuth, couponController.addCoupon)
 
 
 module.exports = router
