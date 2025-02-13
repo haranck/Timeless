@@ -247,7 +247,7 @@ const loadShoppingPage = async (req, res) => {
    try {
 
       const user = req.session.user;
-      const categories = await Category.find({ isListed: true })   /////////////////
+      const categories = await Category.find({ isListed: true })   
       const brands = await Brand.find({isBlocked:false})
       const userData = await User.findOne({ _id: user });
       const brandIds = brands.map(brand => brand._id.toString());

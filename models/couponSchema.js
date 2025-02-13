@@ -15,7 +15,7 @@ const couponSchema = new Schema({
         enum: ["percentage"]
     },
     couponDiscount: {
-        type: Number,
+        type: Number, 
         required: true
     },
     couponValidity: {
@@ -46,7 +46,7 @@ const couponSchema = new Schema({
         type: Number,
         default: 0 // Track how many times this coupon has been used
     },
-    createdDate: {
+    createdAt: {
         type: Date,
         default: Date.now
     }

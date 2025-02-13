@@ -167,7 +167,8 @@
                     <th>Category</th>
                     
                     <th>Sale Price</th>
-                    <th>Regular Price</th>
+                    <!-- <th>Regular Price</th> -->
+                    <th>Offer</th>
                     <th>Quantity</th>
                     <th>Edit</th>
                     <th>List / Unlist</th>
@@ -179,7 +180,7 @@
                     <td><%= product.productName %></td>
                     <td><%= product.category ? product.category.name : 'No Category' %></td>
                     <td>₹<%= product.salePrice %></td>
-                    <td>₹<%= product.regularPrice %></td>
+                    <td><%= product.productOffer %></td>
                     <td><%= product.quantity %></td>
                     <td>
                         <a href="/admin/editProduct?id=<%= product._id %>" class="btn btn-info">Edit</a>

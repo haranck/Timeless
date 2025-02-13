@@ -186,7 +186,7 @@ const userProfile = async (req, res) => {
         const walletData = await Wallet.findOne({ userId: userId })
         const orders = await Order.find({user_id: userId}).populate("order_items.productId")
         
-        res.render("profile", { user: userData, userAddress: addressData, orders,wallet:walletData })
+        res.render("profile", { user: userData, userAddress: addressData, orders,wallet:walletData||{transactions:[]} })
     } catch (error) {
         console.error("Error in userProfile:", error)
         res.redirect('/pageNotFound')

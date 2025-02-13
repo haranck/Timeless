@@ -2,8 +2,16 @@ const Coupon = require("../../models/couponSchema");
 
 const getCouponPage = async (req, res) => {
     try {
-        const coupons = await Coupon.find({})
-        res.render("coupon", { coupons })
+        let page = parseInt(req.query.page) || 1; 
+        let limit = 5; 
+        let skip = (page - 1) * limit; 
+        
+        const coupons = await Coupon.find().sort({couponValidity: -1}).skip(skip).limit(limit)
+        let totalCoupons = await Coupon.countDocuments();
+        let totalPages = Math.ceil(totalCoupons / limit);
+
+        res.render("coupon", { coupons, currentPage: page, totalPages })
+
     } catch (error) {
         console.log("error in coupon page", error)
         return res.status(500).json({ success: false, message: "Internal server error" })
@@ -12,10 +20,10 @@ const getCouponPage = async (req, res) => {
 
 const addCoupon = async (req, res) => {
     try {
-        const { couponCode, couponType, discount, minPurchase,maxPurchase, expiryDate,  } = req.body;
+        const { couponCode, couponType, discount, minPurchase,maxDiscount, expiryDate,  } = req.body;
 
         // Validate input fields
-        if (!couponCode || !couponType || !discount || !minPurchase || !expiryDate || !maxPurchase) {
+        if (!couponCode || !couponType || !discount || !minPurchase || !expiryDate || !maxDiscount) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required!",
@@ -24,7 +32,7 @@ const addCoupon = async (req, res) => {
                     couponType: !couponType,
                     discount: !discount,
                     minPurchase: !minPurchase,
-                    maxPurchase:!maxPurchase,
+                    maxDiscount:!maxDiscount,
                     expiryDate: !expiryDate,
                 
                 }
@@ -48,7 +56,7 @@ const addCoupon = async (req, res) => {
 
         const parsedDiscount = parseFloat(discount);
         const parsedMinPurchase = parseFloat(minPurchase);
-        const parsedMaxPurchase = parseFloat(maxPurchase);
+        const parsedMaxDiscount = parseFloat(maxDiscount);
 
         // Validate discount based on coupon type
         if (isNaN(parsedDiscount) || parsedDiscount <= 0) {
@@ -73,10 +81,10 @@ const addCoupon = async (req, res) => {
                 message: "Minimum purchase must be a non-negative number"
             });
         }
-        if(isNaN(parsedMaxPurchase) || parsedMaxPurchase < 0){
+        if(isNaN(parsedMaxDiscount) || parsedMaxDiscount < 0){
             return res.status(400).json({
                 success: false,
-                message: "Maximum purchase must be a non-negative number"
+                message: "Maximum discount must be a non-negative number"
             })
         }
 
@@ -93,7 +101,7 @@ const addCoupon = async (req, res) => {
             couponType,
             couponDiscount: parsedDiscount,
             couponMinAmount: parsedMinPurchase,
-            couponMaxAmount:parsedMaxPurchase,
+            couponMaxAmount:parsedMaxDiscount,
             couponValidity: parsedExpiryDate,
             isActive:true
         });

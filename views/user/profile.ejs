@@ -446,6 +446,7 @@
                                               </tr>
                                             </thead>
                                             <tbody>
+                                                <% if (wallet && wallet.transactions && wallet.transactions.length > 0) { %>
                                                 <% wallet.transactions.forEach(transaction => { %> 
                                               <tr>
                                                 <td><%= transaction.createdAt.getDate() %>/<%= transaction.createdAt.getMonth() %>/<%= transaction.createdAt.getFullYear() %></td>
@@ -458,6 +459,11 @@
                                                 <td style="color:black;font-weight:bold;"><%= transaction.amount %></td>
                                               </tr>
                                               <% }) %> 
+                                                <% } else { %>
+                                                <tr>
+                                                  <td colspan="3">No transactions found.</td>
+                                                </tr>
+                                                <% } %>
                                             </tbody>
                                           </table>
                                         </div>

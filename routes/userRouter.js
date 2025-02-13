@@ -82,6 +82,8 @@ router.post("/addCheckoutAddress", userAuth, checkoutController.addCheckoutAddre
 router.get("/viewOrder/:orderId", userAuth, checkoutController.viewOrder)
 router.patch("/cancelOrder/:orderId", userAuth, checkoutController.cancelOrder)
 
+router.post("/applyCoupon", userAuth, checkoutController.applyCoupon)
+
 //wishlist management
 router.get("/wishlist",userAuth,wishlistController.loadWishlist)
 router.post("/addToWishlist", userAuth, wishlistController.addToWishlist)

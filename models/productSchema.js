@@ -42,9 +42,13 @@ const productSchema = new Schema({
       default: Date.now,
    },
    isListed: {
-      type: Boolean,
+      type: Boolean, 
       default: false,
    }, 
+   productOffer:{
+      type: Number,
+      default: 0
+   },
    status: {
       type: String,
       enum: ["available", "out of stock"],

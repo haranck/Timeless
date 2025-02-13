@@ -4,7 +4,7 @@ const Category = require('../../models/categorySchema')
 const categoryInfo = async (req, res) => {
    try {
       const page = parseInt(req.query.page) || 1;
-      const limit = 4;
+      const limit = 5;
       const skip = (page - 1) * limit;
 
       const categoryData = await Category.find()
@@ -21,7 +21,7 @@ const categoryInfo = async (req, res) => {
    }
 }
 const addCategory = async (req, res) => {
-   const { name, description } = req.body
+   const { name, description , categoryOffer} = req.body
 
    try {
       const existingCategory = await Category.findOne({ name })
@@ -30,7 +30,7 @@ const addCategory = async (req, res) => {
 
       }
 
-      const newCategory = new Category({ name, description })
+      const newCategory = new Category({ name, description , categoryOffer})
       await newCategory.save()
       return res.status(201).json({ success: true, message: "Category created successfully" })
    } catch (error) {
@@ -69,32 +69,76 @@ const getEditCategory = async (req, res) => {
 
 const editCategory = async (req, res) => {
    try {
+       const { categoryName, categoryDescription, categoryOffer } = req.body;
+       const categoryId = req.params.id;
 
-      const id = req.params.id
-      const { categoryName, description } = req.body
-      const existingCategory = await Category.findOne({ name: categoryName })
+       if (!categoryName || categoryName.trim().length < 3) {
+           return res.status(400).json({ 
+               success: false, 
+               message: 'Category name must be at least 3 characters long' 
+           });
+       }
 
-      if (existingCategory) {
-         return res.status(400).json({ error: "Category exists, please choose another one" })
+       if (!categoryDescription || categoryDescription.trim().length < 10) {
+           return res.status(400).json({ 
+               success: false, 
+               message: 'Description must be at least 10 characters long' 
+           });
+       }
 
-      }
-      const updateCategory = await Category.findByIdAndUpdate(id, {
-         name: categoryName,
-         description: description
-      }, { new: true })
+       const offer = parseFloat(categoryOffer);
+       if (isNaN(offer) || offer < 0 || offer > 100) {
+           return res.status(400).json({ 
+               success: false, 
+               message: 'Category offer must be a number between 0 and 100' 
+           });
+       }
 
-      if (updateCategory) {
-         res.redirect('/admin/category')
-      } else {
-         res.status(404).json({ error: "category not found" })
-      }
+       const existingCategory = await Category.findOne({ 
+           name: { $regex: new RegExp(`^${categoryName}$`, 'i') },
+           _id: { $ne: categoryId } 
+       });
+
+       if (existingCategory) {
+           return res.status(400).json({ 
+               success: false, 
+               message: 'A category with this name already exists' 
+           });
+       }
+
+       const updatedCategory = await Category.findByIdAndUpdate(
+           categoryId, 
+           {
+               name: categoryName.trim(),
+               description: categoryDescription.trim(),
+               categoryOffer: offer
+           }, 
+           { new: true, runValidators: true }
+       );
+
+       if (!updatedCategory) {
+           return res.status(404).json({ 
+               success: false, 
+               message: 'Category not found' 
+           });
+       }
+
+       res.status(200).json({ 
+           success: true, 
+           message: 'Category updated successfully',
+           category: updatedCategory 
+       });
 
    } catch (error) {
-
-      throw error
-      res.status(500).json({ error: "internal server error" })
+       console.error('Edit Category Error:', error);
+       res.status(500).json({ 
+           success: false, 
+           message: 'An error occurred while updating the category',
+           error: error.message 
+       });
    }
-}
+};
+
 
 module.exports = {
    categoryInfo,

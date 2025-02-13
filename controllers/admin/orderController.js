@@ -16,7 +16,7 @@ const getOrdersPage = async (req, res) => {
 
         const orders = await Order.find()
             .populate('user_id', 'name email mobile')
-            .populate('order_items.productId', 'productName productImages price')
+            .populate('order_items.productId', 'productName productImages price ')
             .sort({ createdAt: -1 }).skip(skip).limit(limit)
         
 

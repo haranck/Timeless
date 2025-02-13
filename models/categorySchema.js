@@ -10,19 +10,19 @@ const categorySchema = new Schema({
       type: String,
       required: true
    },
-   // categoryOffer:{
-   //    type: Number,
-   //    default: 0
-   // },
+   categoryOffer:{
+      type: Number,
+      default: 0
+   },
    isListed:{
       type: Boolean,
       default: true
    },
 
-   // createdAt:{
-   //    type: Date,
-   //    default: Date.now
-   // }
+   createdAt:{
+      type: Date,
+      default: Date.now
+   }
 })
 const Category = mongoose.model('Category', categorySchema);
 

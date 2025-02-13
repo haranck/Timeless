@@ -132,6 +132,10 @@ body {
 }
 </style>
 
+<!-- Add SweetAlert2 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="layout">
    <!-- Sidebar -->
    <!-- <aside class="sidebar">
@@ -157,11 +161,15 @@ body {
          <form id="editCategoryForm" method="post" action="/admin/editCategory/<%= category ? category._id : '' %>">
              <div class="form-group">
                  <label for="categoryName">Category Name</label>
-                 <input type="text" id="categoryName" value="<%= category.name %>" name="categoryName" placeholder="Enter category name" required>
+                 <input type="text" id="categoryName" value="<%= category.name %>" name="categoryName" placeholder="Enter category name" >
              </div>
              <div class="form-group">
                  <label for="categoryDescription">Description</label>
-                 <textarea id="categoryDescription" name="categoryDescription" rows="4" placeholder="Enter description" required><%= category.description %></textarea>
+                 <textarea id="categoryDescription" name="categoryDescription" rows="4" placeholder="Enter description" ><%= category.description %></textarea>
+             </div>
+             <div class="form-group">
+                 <label for="categoryOffer">Category Offer</label>
+                 <input type="text" id="categoryOffer" value="<%= category.categoryOffer %>" name="categoryOffer" placeholder="Enter category offer" >
              </div>
              <button type="submit" class="update-btn">Update Category</button>
          </form>
@@ -169,5 +177,130 @@ body {
      
    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editCategoryForm');
+    const categoryNameInput = document.getElementById('categoryName');
+    const categoryDescriptionInput = document.getElementById('categoryDescription');
+    const categoryOfferInput = document.getElementById('categoryOffer');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        // Validation checks
+        const categoryName = categoryNameInput.value.trim();
+        const categoryDescription = categoryDescriptionInput.value.trim();
+        const categoryOffer = categoryOfferInput.value.trim();
+
+        // Validate Category Name
+        if (!categoryName) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Category name is required',
+                confirmButtonColor: '#3085d6'
+            });
+            return;
+        }
+
+        if (categoryName.length < 3) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Category name must be at least 3 characters long',
+                confirmButtonColor: '#3085d6'
+            });
+            return;
+        }
+
+        if (!categoryDescription) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Description is required',
+                confirmButtonColor: '#3085d6'
+            });
+            return;
+        }
+
+        if (categoryDescription.length < 10) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Description must be at least 10 characters long',
+                confirmButtonColor: '#3085d6'
+            });
+            return;
+        }
+
+        if (!categoryOffer) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Category offer is required',
+                confirmButtonColor: '#3085d6'
+            });
+            return;
+        }
+
+        const offer = parseFloat(categoryOffer);
+        if (isNaN(offer) || offer < 0 || offer > 100) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Category offer must be a number between 0 and 100',
+                confirmButtonColor: '#3085d6'
+            });
+            return;
+        }
+
+        const formData = {
+            categoryName: categoryName,
+            categoryDescription: categoryDescription,
+            categoryOffer: categoryOffer
+        };
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Category updated successfully',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = '/admin/category';
+                });
+            } else {
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: data.message || 'Failed to update category',
+                    confirmButtonColor: '#3085d6'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong! Please try again.',
+                confirmButtonColor: '#3085d6'
+            });
+        });
+    });
+});
+</script>
 
 <%- include("../../views/partials/admin/header") %>

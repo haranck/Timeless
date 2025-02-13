@@ -67,7 +67,9 @@ const addProducts = async (req, res) => {
             isListed: products.isListed,
             quantity: products.quantity,
             brand: brandId._id,
-            status: "available"
+            status: "available",
+            productOffer: (((products.regularPrice - products.salePrice) / products.regularPrice) * 100).toFixed(2)
+
          })
          await newProduct.save();
          return res.redirect('/admin/products')
@@ -190,47 +192,208 @@ const getEditProduct = async (req, res) => {
   }
 }
 
+// const editProduct = async (req, res) => {
+//    try {
+//       const id = req.params.id
+
+//       const data = req.body
+//       let deletedImages = [];
+//       try {
+//          deletedImages = data.deletedImages ? JSON.parse(data.deletedImages) : [];
+//       } catch (error) {
+//          console.error('Error parsing deletedImages:', error);
+//       }
+
+//       // const files = req.files
+
+
+
+//       if (!data.productName || !data.category ) {
+//          return res.status(400).render('edit-product', {
+//             message: 'Product Name, Category are required',
+//             product: await Product.findById(id),
+//             cat: await Category.find({}),
+//          });
+//       }
+
+
+//       const existingProduct = await Product.findById(id);
+//       if (!existingProduct) {
+//          return res.status(404).json({success:false, message:"Product not found"})
+//          // .render('edit-product', {
+//          //    message: 'Product not found',
+//          //    product: null,
+//          //    cat: await Category.find({}),
+//          // });
+//       }
+
+//       const productOffer = (((existingProduct.regularPrice - existingProduct.salePrice)/existingProduct.regularPrice)*100).toFixed(2)+"%"
+
+//       if(!productOffer){
+//          data.productOffer = ""
+//       }
+
+//       const remainingImages = existingProduct.productImages.filter(
+//          image => !deletedImages.includes(image)
+//       );
+
+//       console.log("Uploaded files:", req.files);  
+
+//       const newImages = [];
+//       if (req.files && req.files.length > 0) {
+//          for (let i = 0; i < req.files.length; i++) {
+//             const originalImagePath = req.files[i].path;
+//             const resizedImagePath = path.join("public", "uploads", "product-images", `resized-${req.files[i].filename}`);
+
+//             await sharp(originalImagePath)
+//                .resize({ width: 440, height: 440 })
+//                .toFile(resizedImagePath);
+
+//             newImages.push(`resized-${req.files[i].filename}`);
+//          }
+//       }
+
+     
+
+//       const croppedImages = [];
+//       for (let i = 1; i <= 4; i++) {
+//          const croppedImageKey = `croppedImage${i}`;
+//          if (data[croppedImageKey]) {
+//             const base64Data = data[croppedImageKey].replace(/^data:image\/\w+;base64,/, '');
+//             const buffer = Buffer.from(base64Data, 'base64');
+//             const filename = `cropped-${Date.now()}-${i}.jpg`;
+//             const filepath = path.join("public", "uploads", "product-images", filename);
+            
+//             await fs.promises.writeFile(filepath, buffer);
+//             croppedImages.push(filename);
+//          }
+//       }
+
+
+//       // Combine remaining and new images
+//       const updatedImages = [...remainingImages,  ...croppedImages];
+
+//       // Validate total image count
+//       if (updatedImages.length < 3 || updatedImages.length > 4) {
+//          return res.status(400).render('edit-product', {
+//             message: 'You must have between 3 and 4 images',
+//             product: existingProduct,
+//             cat: await Category.find({}),
+         
+//          });
+//       }
+
+//       // Find category
+//       const categoryId = await Category.findOne({ name: data.category });
+//       if (!categoryId) {
+//          return res.status(400).render('edit-product', {
+//             message: 'Category not found',
+//             product: existingProduct,
+//             cat: await Category.find({}),
+//          });
+//       }
+
+//       // const brandId = await Brand.findOne({ brandName: data.brand });
+//       // if (!brandId) {
+//       //    return res.status(400).render('edit-product', {
+//       //       message: 'Brand not found',
+//       //       product: existingProduct,
+//       //       cat: await Category.find({}),
+//       //       brand: await Brand.find({})
+//       //    });
+//       // }
+
+
+
+//       // Update product details
+//       existingProduct.productName = data.productName;
+//       existingProduct.description = data.description;
+//       existingProduct.category = categoryId._id;
+//       existingProduct.regularPrice = data.regularPrice;
+//       existingProduct.salePrice = data.salePrice;
+//       existingProduct.quantity = data.quantity;
+//       existingProduct.size = data.size;
+//       existingProduct.isListed = data.isListed === 'true';
+//       existingProduct.productImages = updatedImages;
+//       existingProduct.productOffer = productOffer;
+
+
+//       await existingProduct.save();
+
+
+//       for (const imageName of deletedImages) {
+//          try {
+//             const imagePath = path.join("public", "uploads", "product-images", imageName);
+//             await fs.promises.unlink(imagePath);
+//          } catch (unlinkError) {
+//             console.error(`Error deleting image ${imageName}:`, unlinkError);
+//          }
+//       }
+
+
+//       return res.status(200).json({success:true, message:"product updation successful"})
+
+//    } catch (error) {
+//       console.error("Error editing product:", error);
+//       return res.status(500).json({success:true, message:error.message})
+//    }
+// }
+
 const editProduct = async (req, res) => {
    try {
       const id = req.params.id
-
       const data = req.body
       let deletedImages = [];
+      
       try {
          deletedImages = data.deletedImages ? JSON.parse(data.deletedImages) : [];
       } catch (error) {
          console.error('Error parsing deletedImages:', error);
       }
 
-      // const files = req.files
 
-
-
-      if (!data.productName || !data.category ) {
-         return res.status(400).render('edit-product', {
-            message: 'Product Name, Category are required',
-            product: await Product.findById(id),
-            cat: await Category.find({}),
+      if (!data.productName || !data.category || !data.regularPrice || !data.salePrice) {
+         return res.status(400).json({
+            success: false, 
+            message: 'Product Name, Category, Regular Price, and Sale Price are required'
          });
       }
 
-
       const existingProduct = await Product.findById(id);
       if (!existingProduct) {
-         return res.status(404).json({success:false, message:"Product not found"})
-         // .render('edit-product', {
-         //    message: 'Product not found',
-         //    product: null,
-         //    cat: await Category.find({}),
-         // });
+         return res.status(404).json({
+            success: false, 
+            message: "Product not found"
+         });
       }
 
+      const regularPrice = parseFloat(data.regularPrice);
+      const salePrice = parseFloat(data.salePrice);
+      
+      if (isNaN(regularPrice) || isNaN(salePrice) || regularPrice <= 0 || salePrice <= 0) {
+         return res.status(400).json({
+            success: false, 
+            message: 'Invalid price values'
+         });
+      }
 
+    
+      const productOffer = salePrice < regularPrice ? (((regularPrice - salePrice) / regularPrice) * 100).toFixed(2) 
+         : "0%";
+
+      
+      const categoryId = await Category.findOne({ name: data.category });
+      if (!categoryId) {
+         return res.status(400).json({
+            success: false, 
+            message: 'Category not found'
+         });
+      }
+
+      // Handle image processing (existing code)
       const remainingImages = existingProduct.productImages.filter(
          image => !deletedImages.includes(image)
       );
-
-      console.log("Uploaded files:", req.files);  
 
       const newImages = [];
       if (req.files && req.files.length > 0) {
@@ -246,65 +409,6 @@ const editProduct = async (req, res) => {
          }
       }
 
-      // const newImages = [];
-      // if (req.files && req.files.length > 0) {
-      //    for (const file of req.files) {
-      //       const resizedFilename = `resized-${file.filename}`;
-      //       const resizedImagePath = path.join("public", "uploads", "product-images", resizedFilename);
-
-      //       await sharp(file.path)
-      //          .resize({ width: 440, height: 440 })
-      //          .toFile(resizedImagePath);
-
-      //       newImages.push(resizedFilename);
-      //    }
-      // }
-
-
-      // const images = []
-      // if (req.files && req.files.length > 0) {
-      //    for (let i = 0; i < req.files.length; i++) {
-      //       const originalImagePath = req.files[i].path;
-
-      //       const resizedImagePath = path.join("public", "uploads", "product-images", `resized-${req.files[i].filename}`)
-
-      //       await sharp(originalImagePath).resize({ width: 440, height: 440 }).toFile(resizedImagePath)
-
-      //       images.push(req.files[i].filename)
-      //    }
-      // }
-
-      
-      // let deletedImages = [];
-      // if (data.deletedImages) {
-      //    try {
-      //       deletedImages = JSON.parse(data.deletedImages);
-      //    } catch (parseError) {
-      //       console.error('Error parsing deleted images:', parseError);
-      //    }
-      // }
-      // console.log("Deleted Images:", deletedImages);
-
-
-
-
-
-      // const croppedImages = [];
-      // for (let i = 1; i <= 3; i++) {
-      //    const croppedImageKey = `croppedImage${i}`;
-      //    if (data[croppedImageKey]) {
-      //       // Convert base64 to file
-      //       const base64Data = data[croppedImageKey].replace(/^data:image\/\w+;base64,/, '');
-      //       const buffer = Buffer.from(base64Data, 'base64');
-      //       const filename = `cropped-${Date.now()}-${i}.jpg`;
-      //       const filepath = path.join("public", "uploads", "product-images", filename);
-
-      //       // Save cropped image
-      //       await fs.promises.writeFile(filepath, buffer);
-      //       croppedImages.push(filename);
-      //    }
-      // }
-
       const croppedImages = [];
       for (let i = 1; i <= 4; i++) {
          const croppedImageKey = `croppedImage${i}`;
@@ -319,58 +423,35 @@ const editProduct = async (req, res) => {
          }
       }
 
-
       // Combine remaining and new images
-      const updatedImages = [...remainingImages,  ...croppedImages];
+      const updatedImages = [...remainingImages, ...newImages, ...croppedImages];
 
       // Validate total image count
       if (updatedImages.length < 3 || updatedImages.length > 4) {
-         return res.status(400).render('edit-product', {
-            message: 'You must have between 3 and 4 images',
-            product: existingProduct,
-            cat: await Category.find({}),
-         
+         return res.status(400).json({
+            success: false, 
+            message: 'You must have between 3 and 4 images'
          });
       }
-
-      // Find category
-      const categoryId = await Category.findOne({ name: data.category });
-      if (!categoryId) {
-         return res.status(400).render('edit-product', {
-            message: 'Category not found',
-            product: existingProduct,
-            cat: await Category.find({}),
-         });
-      }
-
-      // const brandId = await Brand.findOne({ brandName: data.brand });
-      // if (!brandId) {
-      //    return res.status(400).render('edit-product', {
-      //       message: 'Brand not found',
-      //       product: existingProduct,
-      //       cat: await Category.find({}),
-      //       brand: await Brand.find({})
-      //    });
-      // }
-
-      console.log("Final Images Array:", updatedImages);
-
 
       // Update product details
       existingProduct.productName = data.productName;
       existingProduct.description = data.description;
       existingProduct.category = categoryId._id;
-      existingProduct.regularPrice = data.regularPrice;
-      existingProduct.salePrice = data.salePrice;
+      existingProduct.regularPrice = regularPrice;
+      existingProduct.salePrice = salePrice;
       existingProduct.quantity = data.quantity;
       existingProduct.size = data.size;
       existingProduct.isListed = data.isListed === 'true';
       existingProduct.productImages = updatedImages;
+      
+      // Explicitly set product offer
+      existingProduct.productOffer = productOffer;
 
-
+      // Save the updated product
       await existingProduct.save();
 
-
+      // Delete old images
       for (const imageName of deletedImages) {
          try {
             const imagePath = path.join("public", "uploads", "product-images", imageName);
@@ -380,14 +461,21 @@ const editProduct = async (req, res) => {
          }
       }
 
-
-      return res.status(200).json({success:true, message:"product updation successful"})
+      return res.status(200).json({
+         success: true, 
+         message: "Product updated successfully",
+         productOffer: productOffer
+      });
 
    } catch (error) {
       console.error("Error editing product:", error);
-      return res.status(500).json({success:true, message:error.message})
+      return res.status(500).json({
+         success: false, 
+         message: error.message
+      });
    }
 }
+
 
 const deleteSingleImage = async (req, res) => {
    try {

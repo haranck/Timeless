@@ -211,9 +211,9 @@
                                 <th>Coupon Code</th>
                                 <th>Coupon Type</th>
                                 <th>Coupon %</th>
-                                <th>Discount</th>
+                                <!-- <th>Discount</th> -->
                                 <th>Minimum Purchase</th>
-                                <th>Maximum Purchase</th>
+                                <th>Maximum Discount</th>
                                 <th>Expiration Date</th>
                                 <th>Actions</th>
                             </tr>
@@ -231,9 +231,9 @@
                                         <%= coupon.couponType==='percentage' ? `${coupon.couponDiscount.toFixed(2)}%` :
                                             `₹${coupon.couponDiscount.toFixed(2)}` %>
                                     </td>
-                                    <td>
-                                        <%= coupon.couponDiscount %>
-                                    </td>
+                                    <!-- <td>
+                                         coupon.couponDiscount 
+                                    </td> -->
                                     <td>
                                         <%= coupon.couponMinAmount %>
                                     </td>
@@ -266,7 +266,37 @@
                 </div>
             </div>
         </div>
+
+
+        <div class="d-flex justify-content-center mt-3">
+            <nav>
+                <ul class="pagination">
+                    <% if (currentPage > 1) { %>
+                        <li class="page-item">
+                            <a class="page-link bg-dark text-white" href="?page=<%= currentPage - 1 %>">Previous</a>
+                        </li>
+                    <% } %>
+        
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                            <a class="page-link bg-dark text-white <%= i === currentPage ? 'border-light' : '' %>" 
+                               href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+        
+                    <% if (currentPage < totalPages) { %>
+                        <li class="page-item">
+                            <a class="page-link bg-dark text-white" href="?page=<%= currentPage + 1 %>">Next</a>
+                        </li>
+                    <% } %>
+                </ul>
+            </nav>
+        </div>
+
+
     </div>
+
+
 
     <!-- Coupon Modal -->
     <div id="couponModal" class="modal">
@@ -285,14 +315,14 @@
                     </select>
                     <!-- <input type="text" name="couponType" value="percentage" placeholder="Enter Coupon Type" required> -->
 
-                    <label for="discount">Discount Value</label>
+                    <label for="discount">Discount Percentage</label>
                     <input type="number" name="discount" placeholder="Discount Value" required>
 
                     <label for="minPurchase">Minimum Purchase Amount</label>
                     <input type="number" name="minPurchase" placeholder="Minimum Purchase Amount" required>
 
-                    <label for="maxPurchase">Maximum Purchase Amount</label>
-                    <input type="number" name="maxPurchase" placeholder="Maximum Purchase Amount" required>
+                    <label for="maxDiscount">Maximum Discount</label>
+                    <input type="number" name="maxDiscount" placeholder="Maximum Discount" required>
 
                     <label for="expiryDate">Expiration Date</label>
                     <input type="date" name="expiryDate" required>
@@ -340,7 +370,7 @@
                 const couponType = document.querySelector("select[name='couponType']").value;
                 const discount = document.querySelector("input[name='discount']").value;
                 const minPurchase = document.querySelector("input[name='minPurchase']").value;
-                const maxPurchase = document.querySelector("input[name='maxPurchase']").value;
+                const maxDiscount = document.querySelector("input[name='maxDiscount']").value;
                 const expiryDate = document.querySelector("input[name='expiryDate']").value;
 
                 try {
@@ -355,7 +385,7 @@
                             discount,
                             minPurchase,
                             expiryDate,
-                            maxPurchase
+                            maxDiscount
                         })
                     });
 

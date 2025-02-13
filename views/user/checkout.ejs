@@ -348,6 +348,103 @@
                 margin-bottom: 15px;
             }
         }
+
+        .coupon-wrapper {
+            perspective: 1000px;
+        }
+
+        .coupon-container {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .coupon-container:hover {
+            transform: scale(1.03); /* Simple scale instead of 3D rotation */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .coupon-content {
+            padding: 20px;
+            position: relative;
+        }
+
+        .coupon-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px dashed #d1d8e0;
+            padding-bottom: 15px;
+        }
+
+        .coupon-code {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            letter-spacing: 2px;
+        }
+
+        .code-description {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .coupon-discount {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(45deg, #ffa500, #ffd700);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            width: 70px;
+        }
+
+        .btn-apply-coupon {
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-apply-coupon:hover {
+            background-color: #252424;
+            transform: translateY(-3px);
+        }
+
+        /* Additional hover effect for the entire coupon container */
+        .coupon-container {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .coupon-container:hover {
+            transform: scale(1.03);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        .site-btn{
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        .site-btn:hover {
+            background-color: #252424;
+            transform: translateY(-3px);
+        }
     </style>
 
 
@@ -488,24 +585,25 @@
                                                 <% if(cart.items.length> 0) { %>
                                                     <% cart.items.forEach(item=> { %>
                                                         <% if (item.productId) { %>
-                                                        <tr>
-                                                            <td>
-                                                                <%= item.productId.productName %>
-                                                            </td>
-                                                            <td class="text-end">₹<%= item.productId.salePrice %>
-                                                            </td>
-                                                            <td class="text-center">X<%= item.quantity %>
-                                                            </td>
-                                                            <td class="text-end">₹<%= item.totalPrice %>
-                                                            </td>
-                                                        </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <%= item.productId.productName %>
+                                                                </td>
+                                                                <td class="text-end">₹<%= item.productId.salePrice %>
+                                                                </td>
+                                                                <td class="text-center">X<%= item.quantity %>
+                                                                </td>
+                                                                <td class="text-end">₹<%= item.totalPrice %>
+                                                                </td>
+                                                            </tr>
                                                             <% } else { %>
                                                                 <tr>
-                                                                    <td colspan="4" class="text-center">No products in the cart</td>
+                                                                    <td colspan="4" class="text-center">No products in
+                                                                        the cart</td>
                                                                 </tr>
-                                                            <% } %>
-                                                    <% }); %>
-                                                    <% } %>
+                                                                <% } %>
+                                                                    <% }); %>
+                                                                        <% } %>
                                             </tbody>
                                         </table>
                                     </div>
@@ -517,10 +615,71 @@
                                         <i class="fas fa-tag me-2"></i>Have a Coupon?
                                     </h6>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" placeholder="Enter Coupon Code">
-                                        <button class="site-btn">Apply</button>
+                                        <input type="text" class="form-control" id="couponCode"
+                                            placeholder="Enter Coupon Code">
+                                        <button class="site-btn" id="applyCoupon" onclick="applyCoupons()">Apply Coupon </button>
                                     </div>
                                 </div>
+
+
+                                <div class="available-coupons mb-4">
+                                    <h6 class="mb-3 text-dark fw-bold">
+                                        <i class="fas fa-tag me-2"></i>Available Coupons
+                                    </h6>
+                                    <div class="row g-4">
+                                        <div class="col-12">
+                                            <div class="coupon-wrapper mb-3">
+                                                <div class="coupon-container" style="width: 300px; margin-left: 49px;">
+                                                    <div class="coupon-content">
+                                                        <% if (coupon && coupon.length> 0) { %>
+                                                            <% coupon.forEach(coupon=> { %>
+                                                                <div class="coupon-header">
+                                                                    <div class="coupon-code">
+                                                                        <span class="code-text" data-coupon-id="<%= coupon._id %>" id="coupon-<%= coupon._id %>">
+                                                                            <%= coupon.couponCode %>
+                                                                        </span>
+                                                                        <!-- <span class="code-description">Summer Special</span> -->
+                                                                    </div>
+                                                                    <div class="coupon-discount">
+                                                                        <span class="discount-percentage">
+                                                                            <%= coupon.couponDiscount %>%
+                                                                        </span>
+                                                                        <span class="discount-type">OFF</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="coupon-details" style="margin-bottom: 17px;">
+                                                                    <div class="detail-item">
+                                                                        <i class="fas fa-shopping-cart me-2"></i>
+                                                                        <span>Minimum Purchase: ₹<%=
+                                                                                coupon.couponMinAmount %></span>
+                                                                    </div>
+                                                                    <div class="detail-item">
+                                                                        <i class="fas fa-calendar-alt me-2"></i>
+                                                                        <span>Valid Until: <%=
+                                                                                coupon.couponValidity.getDate() %>/<%=
+                                                                                    coupon.couponValidity.getMonth() %>/
+                                                                                    <%= coupon.couponValidity.getFullYear()
+                                                                        %></span>
+                                                                    </div>
+                                                                    <button class="btn-apply-coupon" onclick="copyCoupon('<%= coupon._id %>')">
+                                                                        Copy Code
+                                                                    </button>
+                                                                </div>
+                                                                <% }) %>
+                                                                    <% }else{ %>
+                                                                        <div class="text-center py-4">
+                                                                            <h6>No Coupons Available</h6>
+                                                                        </div>
+                                                                    <% } %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+
+
 
                                 <!-- Order Summary -->
                                 <div class="order-summary p-3 bg-white rounded border mb-4">
@@ -529,7 +688,7 @@
                                     </h6>
                                     <ul class="checkout__total__all">
                                         <li class="d-flex justify-content-between mb-2">
-                                            Subtotal <span>₹<%=cart.totalPrice%></span>
+                                            Subtotal <span id="subtotal">₹<%=cart.totalPrice%></span>
                                         </li>
                                         <li class="d-flex justify-content-between mb-2">
                                             Shipping Charge <span>₹0</span>
@@ -538,12 +697,14 @@
                                             Tax (0%) <span>₹0</span>
                                         </li>
                                         <li class="d-flex justify-content-between mb-2 text-success">
-                                            Discount <span>-₹0</span>
+                                            Discount <span id="discount">-₹0</span>
                                         </li>
                                         <li class="d-flex justify-content-between total-amount" id="total-amount">
-                                            <strong>Total</strong> <strong>₹<%=cart.totalPrice%></strong>
+                                            <strong>Total</strong> <strong id="total">₹<%=cart.cartTotal%></strong>
                                         </li>
+                                        <p id="couponMessage" style="color: red;"></p>
                                     </ul>
+
                                 </div>
 
                                 <!-- Payment Methods -->
@@ -561,27 +722,27 @@
                                                 <span class="badge bg-success ms-2">No additional charges</span>
                                             </label>
                                         </div>
-                                        <div class="form-check mb-3">
+                                        <!-- <div class="form-check mb-3">
                                             <input class="form-check-input" type="radio" value="wallet"
                                                 name="payment_method" id="wallet">
                                             <label class="form-check-label" for="wallet">
                                                 <i class="fas fa-wallet me-2"></i>Wallet
                                             </label>
-                                        </div>
+                                        </div> -->
                                         <div class="form-check mb-3">
                                             <input class="form-check-input" type="radio" value="upi"
                                                 name="payment_method" id="upi">
                                             <label class="form-check-label" for="upi">
-                                                <i class="fas fa-mobile-alt me-2"></i>UPI
+                                                <i class="fas fa-mobile-alt me-2"></i>Razorpay
                                             </label>
                                         </div>
-                                        <div class="form-check mb-3">
+                                        <!-- <div class="form-check mb-3">
                                             <input class="form-check-input" type="radio" value="credit_card"
                                                 name="payment_method" id="card">
                                             <label class="form-check-label" for="card">
                                                 <i class="fas fa-credit-card me-2"></i>Credit/Debit Card
                                             </label>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
 
@@ -690,7 +851,7 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <script>
-           
+
             const sanitizeQuotes = (string) => {
                 if (typeof string !== 'string') return string;
                 return string.replace(/'/g, '"');
@@ -746,7 +907,7 @@
                     closeModal();
                 }
             };
-            
+
 
             document.addEventListener("DOMContentLoaded", function () {
                 const placeOrderBtn = document.getElementById("placeOrderBtn");
@@ -764,9 +925,14 @@
                     // Get all required order details
                     const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
                     const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
-                    const totalAmount = document.getElementById('total-amount').textContent.replace('₹', '');
+                    // const totalAmount = document.getElementById('total-amount').textContent.replace('₹', '');
                     const sanitizedOrderItems = sanitizeQuotes(<%- JSON.stringify(cart.items) %>)
                     const orderedItems = sanitizedOrderItems
+                    
+                    const subtotalText = document.getElementById("total").innerText.replace("₹", "").trim();
+                    const totalAmount = parseFloat(subtotalText);
+                    const couponCode = document.getElementById("couponCode").value.trim();
+                    console.log(totalAmount);
 
                     const confirmResult = await Swal.fire({
                         title: 'Confirm Order',
@@ -802,7 +968,8 @@
                                 shippingAddress,
                                 paymentMethod,
                                 totalAmount,
-                                orderedItems
+                                orderedItems,
+                                couponCode
                             })
                         });
 
@@ -818,7 +985,7 @@
                                 showConfirmButton: false
                             });
 
-                            // Redirect to orders page after success
+                            
                             window.location.replace(`/viewOrder/${data.orderId}`);
                         } else {
                             throw new Error(data.message || 'Order failed');
@@ -832,6 +999,98 @@
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
+                }
+            }
+
+
+            async function applyCoupons() {
+                
+                const couponCode = document.getElementById("couponCode").value.trim();
+                const subtotalText = document.getElementById("subtotal").innerText.replace("₹", "").trim();
+                const subtotal = parseFloat(subtotalText);
+
+                if (!couponCode) {
+                    document.getElementById("couponMessage").innerText = "Please enter a coupon code!";
+                    return;
+                }
+
+                try {
+                    const response = await fetch("/applyCoupon", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            couponCode,
+                            subtotal
+                        })
+                    })
+
+                    const data = await response.json();
+                    if (data.success) {
+
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Coupon applied successfully!',
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                        document.getElementById("discount").innerText = `₹${data.discount}`;
+                        document.getElementById("total").innerText = `₹${data.newTotal}`;
+                        document.getElementById("couponMessage").style.color = "green";
+                        document.getElementById("couponMessage").innerText = "Coupon applied successfully!";
+                    }else{
+                        document.getElementById("couponMessage").style.color = "red";
+                        document.getElementById("couponMessage").innerText = data.message;
+                    }
+                } catch (error) {
+                    console.error("Error applying coupon:", error);
+                }
+
+            
+            }
+
+            function copyCoupon(couponId) {
+    
+                var couponCodeElement = document.querySelector(`[data-coupon-id="${couponId}"]`);
+                
+                if (couponCodeElement) {
+                    var couponText = couponCodeElement.textContent.trim();
+                    
+                    navigator.clipboard.writeText(couponText).then(() => {
+                        var message = document.getElementById("copy-message-" + couponId);
+                        if (message) {
+                            message.style.display = "inline";
+                            setTimeout(() => { 
+                                message.style.display = "none"; 
+                            }, 2000);
+                        }
+                        
+                        // Optional: Show a sweet alert for better user feedback
+                        // Swal.fire({
+                        //     icon: 'success',
+                        //     title: 'Coupon Copied!',
+                        //     text: `Coupon code ${couponText} has been copied to clipboard`,
+                        //     toast: true,
+                        //     position: 'top-end',
+                        //     showConfirmButton: false,
+                        //     timer: 2000
+                        // });
+                    }).catch(err => {
+                        console.error('Failed to copy: ', err);
+                        // Swal.fire({
+                        //     icon: 'error',
+                        //     title: 'Oops...',
+                        //     text: 'Failed to copy coupon code',
+                        //     toast: true,
+                        //     position: 'top-end',
+                        //     showConfirmButton: false,
+                        //     timer: 2000
+                        // });
+                    });
+                } else {
+                    console.error('Coupon code element not found');
                 }
             }
 
