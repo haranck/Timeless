@@ -695,11 +695,13 @@
                                                         (<%= products[i].rating || 0 %>/5)
                                                         
                                                     </span>
-                                                    <% if (products[i].productOffer && products[i].productOffer !== "0") { %>
-                                                        <div style="color: red; font-weight: bold;">
-                                                            <%= products[i].productOffer %>%OFF
-                                                        </div>
-                                                    <% } %>
+                                                    <div>
+                                                        <% if(products[i].quantity > 0){ %>
+                                                            <span style="color: rgb(0, 134, 18);">In Stock</span>
+                                                            <% } else { %>
+                                                            <span style="color: red;">Out of stock</span>
+                                                            <% } %>
+                                                    </div>
                                         </div>
                                         <div class="product-card__cta">
                                             <button onclick="addToCart('<%= products[i]._id %>')"
@@ -891,7 +893,7 @@
                     </div>
                     <div class="product-card__details">
                         <h6 class="product-card__title">${product.productName}</h6>
-                        <div class="product-card__pricing">
+                        <div class="product-card__pricing" style="display: flex; justify-content: center;">
                             <span class="product-card__sale-price">
                                 ₹${product.salePrice.toLocaleString('en-IN')}
                             </span>
@@ -899,11 +901,19 @@
                                 ₹${product.regularPrice.toLocaleString('en-IN')}
                             </span>
                         </div>
+                        <div style="color: red; font-weight: bold; text-align: center;">${product.productOffer}%OFF</div>
                         <div class="product-card__rating">
                             ${generateRatingStars(product.rating)}
                             <span class="product-card__rating-count">
                                 (${product.rating || 0}/5)
                             </span>
+                            
+                            <div>
+                          ${product.quantity > 0 
+                            ? '<span style="color: rgb(0, 134, 18);">In Stock</span>'
+                            : '<span style="color: red;">Out of stock</span>'
+                        }
+                    </div>
                         </div>
                         <div class="product-card__cta">
                             <button onclick="addToCart('${product._id}')" 
