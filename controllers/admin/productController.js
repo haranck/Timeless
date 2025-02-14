@@ -23,6 +23,7 @@ const getProductAddPage = async (req, res) => {
 }
 
 
+
 const addProducts = async (req, res) => {
    try {
 
@@ -68,7 +69,6 @@ const addProducts = async (req, res) => {
             quantity: products.quantity,
             brand: brandId._id,
             status: "available",
-            productOffer: (((products.regularPrice - products.salePrice) / products.regularPrice) * 100).toFixed(2)
 
          })
          await newProduct.save();
@@ -608,6 +608,47 @@ const deleteProduct = async (req, res) => {
       });
    }
 };
+const addProductOffer = async (req, res) => {
+   try {
+       const { productId, offerPercentage, startDate, endDate } = req.body;
+       
+       const product = await Product.findByIdAndUpdate(productId, {
+           productOffer: offerPercentage,
+           offerStartDate: startDate,
+           offerEndDate: endDate
+       }, { new: true });
+
+       if (!product) {
+           return res.status(404).json({ success: false, message: 'Product not found' });
+       }
+
+       res.json({ success: true, product });
+   } catch (error) {
+       console.error('Error adding product offer:', error);
+       res.status(500).json({ success: false, message: 'Failed to add offer' });
+   }
+};
+
+const deleteProductOffer = async (req, res) => {
+   try {
+       const { productId } = req.body;
+       
+       const product = await Product.findByIdAndUpdate(productId, {
+           productOffer: 0,
+           offerStartDate: null,
+           offerEndDate: null
+       }, { new: true });
+
+       if (!product) {
+           return res.status(404).json({ success: false, message: 'Product not found' });
+       }
+
+       res.json({ success: true, product });
+   } catch (error) {
+       console.error('Error deleting product offer:', error);
+       res.status(500).json({ success: false, message: 'Failed to delete offer' });
+   }
+};
 
 module.exports = {
    getProductAddPage,
@@ -617,5 +658,7 @@ module.exports = {
    getEditProduct,
    editProduct,
    deleteSingleImage,
-   deleteProduct
+   deleteProduct,
+   addProductOffer,
+   deleteProductOffer
 }                                             

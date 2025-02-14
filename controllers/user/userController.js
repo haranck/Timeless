@@ -6,6 +6,23 @@ const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const mongoose = require('mongoose')
 const env = require('dotenv').config()
+const { getDiscountPrice } = require("../../helpers/offerHelper");
+
+
+// const getDiscountPrice = (product) => {
+//    let productOffer = product.productOffer || 0;
+//    let categoryOffer = product.category?.categoryOffer || 0;
+
+//    let maxOffer = Math.max(productOffer, categoryOffer);
+//    let discountedPrice = product.salePrice - (product.salePrice * maxOffer) / 100;
+
+//   return {
+//     ...product.toObject(),
+//     finalPrice: discountedPrice,
+//     appliedOffer: maxOffer,
+//     regularPrice: product.regularPrice
+//   };
+// }
 
 const loadHompage = async (req, res) => {
    try {
@@ -14,13 +31,13 @@ const loadHompage = async (req, res) => {
       const brands = await Brand.find({isBlocked:false})   
       let productData = await Product.find({
          isListed: true,
-         category: { $in: categories.map(category => category._id) }, quantity: { $gt: 0 },
-         
+         category: { $in: categories.map(category => category._id) }, 
+         quantity: { $gt: 0 }
       })
+      .populate("category")
       .sort({ createdOn: -1 }).limit(8)
 
-      // productData.sort((a,b) => new Date(b.createdOn)-new Date(a.createdOn))  //new arrivals decendint ayit latest addythe items  
-      // productData = productData.slice(0,4)   // for only displaying 4 products
+      // const processedProducts = productData.map(getDiscountPrice)
 
       if (user) {
          const userData = await User.findById(user);
@@ -29,7 +46,7 @@ const loadHompage = async (req, res) => {
       } else {
          return res.render('home', { products: productData,brands:brands})
       }
-     
+      
    } catch (error) {
       console.log('error loading home page');
       res.status(500).send('Internal server error');
@@ -262,9 +279,12 @@ const loadShoppingPage = async (req, res) => {
          // brand: { $in: brandIds }
       }
       // console.log(query)
-      const products = await Product.find(query).sort({ createdAt: 1 }).skip(skip).limit(limit)
+      const products = await Product.find(query) 
+      .populate('category')
+      .sort({ createdAt: 1 }).skip(skip).limit(limit)
+
    
-      // products.forEach(product=>console.log(product.productName))
+
       const totalProducts = await Product.countDocuments({
          isListed: true,
          category: { $in: categoryIds },
@@ -297,7 +317,7 @@ const loadShoppingPage = async (req, res) => {
       })
 
    } catch (error) {
-      // console.log("loadShoppingPage error", error);
+      console.log("load Shop Page error", error);
       throw new Error
 
    }

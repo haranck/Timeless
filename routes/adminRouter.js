@@ -68,6 +68,9 @@ router.patch('/toggleCategory/:id', adminAuth, categoryController.toggleCategory
 router.get('/editProduct', adminAuth, productController.getEditProduct)
 router.post("/editProduct/:id", adminAuth, uploads.array("croppedImage1", 4), productController.editProduct)
 router.post('/deleteImage', adminAuth, productController.deleteSingleImage)
+router.post('/addProductOffer', adminAuth, productController.addProductOffer)
+router.post('/deleteProductOffer', adminAuth, productController.deleteProductOffer)
+
 
 //brand mgt
 

@@ -636,7 +636,7 @@
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="shop__product__option__left">
-                                    <p>Showing 1–12 of  results</p>
+                                    <p>Showing 1–12 of <strong><%= totalProducts %></strong> results</p>
                                 </div>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6">
@@ -679,7 +679,7 @@
                                         </h6>
                                         <div class="product-card__pricing">
                                             <span class="product-card__sale-price">
-                                                ₹<%= products[i].salePrice.toLocaleString('en-IN') %>
+                                                ₹<%= products[i].salePrice.toLocaleString('en-IN')%>
                                             </span>
                                             <span class="product-card__regular-price">
                                                 ₹<%= products[i].regularPrice.toLocaleString('en-IN') %>
@@ -901,11 +901,13 @@
                                 ₹${product.regularPrice.toLocaleString('en-IN')}
                             </span>
                         </div>
-                        <div style="color: red; font-weight: bold; text-align: center;">${product.productOffer}%OFF</div>
+
+                        <div style="color: red; font-weight: bold;">${product.productOffer}%OFF</div>
+                       
                         <div class="product-card__rating">
                             ${generateRatingStars(product.rating)}
                             <span class="product-card__rating-count">
-                                (${product.rating || 0}/5)
+                                (${product.rating || 5}/5)
                             </span>
                             
                             <div>
