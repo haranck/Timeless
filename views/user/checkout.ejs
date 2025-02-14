@@ -362,7 +362,8 @@
         }
 
         .coupon-container:hover {
-            transform: scale(1.03); /* Simple scale instead of 3D rotation */
+            transform: scale(1.03);
+            /* Simple scale instead of 3D rotation */
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         }
 
@@ -432,7 +433,8 @@
             transform: scale(1.03);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         }
-        .site-btn{
+
+        .site-btn {
             background-color: #000000;
             color: white;
             border: none;
@@ -441,6 +443,7 @@
             margin-top: 10px;
             transition: all 0.3s ease;
         }
+
         .site-btn:hover {
             background-color: #252424;
             transform: translateY(-3px);
@@ -617,7 +620,8 @@
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="couponCode"
                                             placeholder="Enter Coupon Code">
-                                        <button class="site-btn" id="applyCoupon" onclick="applyCoupons()">Apply Coupon </button>
+                                        <button class="site-btn" id="applyCoupon" onclick="applyCoupons()">Apply Coupon
+                                        </button>
                                     </div>
                                 </div>
 
@@ -635,7 +639,9 @@
                                                             <% coupon.forEach(coupon=> { %>
                                                                 <div class="coupon-header">
                                                                     <div class="coupon-code">
-                                                                        <span class="code-text" data-coupon-id="<%= coupon._id %>" id="coupon-<%= coupon._id %>">
+                                                                        <span class="code-text"
+                                                                            data-coupon-id="<%= coupon._id %>"
+                                                                            id="coupon-<%= coupon._id %>">
                                                                             <%= coupon.couponCode %>
                                                                         </span>
                                                                         <!-- <span class="code-description">Summer Special</span> -->
@@ -647,7 +653,8 @@
                                                                         <span class="discount-type">OFF</span>
                                                                     </div>
                                                                 </div>
-                                                                <div class="coupon-details" style="margin-bottom: 17px;">
+                                                                <div class="coupon-details"
+                                                                    style="margin-bottom: 17px;">
                                                                     <div class="detail-item">
                                                                         <i class="fas fa-shopping-cart me-2"></i>
                                                                         <span>Minimum Purchase: ₹<%=
@@ -659,9 +666,10 @@
                                                                                 coupon.couponValidity.getDate() %>/<%=
                                                                                     coupon.couponValidity.getMonth() %>/
                                                                                     <%= coupon.couponValidity.getFullYear()
-                                                                        %></span>
+                                                                                        %></span>
                                                                     </div>
-                                                                    <button class="btn-apply-coupon" onclick="copyCoupon('<%= coupon._id %>')">
+                                                                    <button class="btn-apply-coupon"
+                                                                        onclick="copyCoupon('<%= coupon._id %>')">
                                                                         Copy Code
                                                                     </button>
                                                                 </div>
@@ -670,11 +678,11 @@
                                                                         <div class="text-center py-4">
                                                                             <h6>No Coupons Available</h6>
                                                                         </div>
-                                                                    <% } %>
+                                                                        <% } %>
                                                     </div>
                                                 </div>
                                             </div>
-                                            
+
                                         </div>
                                     </div>
                                 </div>
@@ -926,9 +934,9 @@
                     const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
                     const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
                     // const totalAmount = document.getElementById('total-amount').textContent.replace('₹', '');
-                    const sanitizedOrderItems = sanitizeQuotes(<%- JSON.stringify(cart.items) %>)
+                    const sanitizedOrderItems = sanitizeQuotes(<% - JSON.stringify(cart.items) %>)
                     const orderedItems = sanitizedOrderItems
-                    
+
                     const subtotalText = document.getElementById("total").innerText.replace("₹", "").trim();
                     const totalAmount = parseFloat(subtotalText);
                     const couponCode = document.getElementById("couponCode").value.trim();
@@ -985,7 +993,7 @@
                                 showConfirmButton: false
                             });
 
-                            
+
                             window.location.replace(`/viewOrder/${data.orderId}`);
                         } else {
                             throw new Error(data.message || 'Order failed');
@@ -1003,11 +1011,12 @@
             }
 
 
+            let isCouponApplied = false;
             async function applyCoupons() {
-                
                 const couponCode = document.getElementById("couponCode").value.trim();
                 const subtotalText = document.getElementById("subtotal").innerText.replace("₹", "").trim();
                 const subtotal = parseFloat(subtotalText);
+                const applyCouponBtn = document.getElementById("applyCoupon");
 
                 if (!couponCode) {
                     document.getElementById("couponMessage").innerText = "Please enter a coupon code!";
@@ -1015,7 +1024,8 @@
                 }
 
                 try {
-                    const response = await fetch("/applyCoupon", {
+                    const endpoint = isCouponApplied ? "/removeCoupon" : "/applyCoupon";
+                    const response = await fetch(endpoint, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -1024,49 +1034,71 @@
                             couponCode,
                             subtotal
                         })
-                    })
+                    });
 
                     const data = await response.json();
                     if (data.success) {
+                        if (isCouponApplied) {
+                            // Removing Coupon
+                            Swal.fire({
+                                title: 'Coupon Removed',
+                                text: 'Coupon has been successfully removed',
+                                icon: 'info',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
 
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Coupon applied successfully!',
-                            icon: 'success',
-                            showConfirmButton: false,
-                            timer: 1500
-                        })
-                        document.getElementById("discount").innerText = `₹${data.discount}`;
-                        document.getElementById("total").innerText = `₹${data.newTotal}`;
-                        document.getElementById("couponMessage").style.color = "green";
-                        document.getElementById("couponMessage").innerText = "Coupon applied successfully!";
-                    }else{
+                            document.getElementById("discount").innerText = `₹0`;
+                            document.getElementById("total").innerText = `₹${data.cartTotal}`;
+                            applyCouponBtn.textContent = "Apply Coupon";
+                            document.getElementById("couponMessage").style.color = "red";
+                            document.getElementById("couponMessage").innerText = "Coupon removed!";
+                            document.getElementById("couponCode").value = ''; // Clear coupon input
+                        } else {
+                            // Applying Coupon
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Coupon applied successfully!',
+                                icon: 'success',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+
+                            document.getElementById("discount").innerText = `₹${data.discount}`;
+                            document.getElementById("total").innerText = `₹${data.newTotal}`;
+                            applyCouponBtn.textContent = "Remove Coupon";
+                            document.getElementById("couponMessage").style.color = "green";
+                            document.getElementById("couponMessage").innerText = "Coupon applied successfully!";
+                        }
+
+                        isCouponApplied = !isCouponApplied;
+                    } else {
                         document.getElementById("couponMessage").style.color = "red";
                         document.getElementById("couponMessage").innerText = data.message;
                     }
                 } catch (error) {
-                    console.error("Error applying coupon:", error);
+                    console.error("Error applying/removing coupon:", error);
+                    document.getElementById("couponMessage").style.color = "red";
+                    document.getElementById("couponMessage").innerText = "An error occurred. Please try again.";
                 }
-
-            
             }
 
             function copyCoupon(couponId) {
-    
+
                 var couponCodeElement = document.querySelector(`[data-coupon-id="${couponId}"]`);
-                
+
                 if (couponCodeElement) {
                     var couponText = couponCodeElement.textContent.trim();
-                    
+
                     navigator.clipboard.writeText(couponText).then(() => {
                         var message = document.getElementById("copy-message-" + couponId);
                         if (message) {
                             message.style.display = "inline";
-                            setTimeout(() => { 
-                                message.style.display = "none"; 
+                            setTimeout(() => {
+                                message.style.display = "none";
                             }, 2000);
                         }
-                        
+
                         // Optional: Show a sweet alert for better user feedback
                         // Swal.fire({
                         //     icon: 'success',

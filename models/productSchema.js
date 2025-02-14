@@ -49,10 +49,10 @@ const productSchema = new Schema({
       type: Number,
       default: 0
    },
-   offerStartDate: {
-      type: Date,
-      default: null
-   },
+   // offerStartDate: {
+   //    type: Date,
+   //    default: null
+   // },
    offerEndDate: {
       type: Date,
       default: null

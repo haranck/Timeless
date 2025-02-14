@@ -610,11 +610,11 @@ const deleteProduct = async (req, res) => {
 };
 const addProductOffer = async (req, res) => {
    try {
-       const { productId, offerPercentage, startDate, endDate } = req.body;
+       const { productId, offerPercentage,endDate } = req.body;
        
        const product = await Product.findByIdAndUpdate(productId, {
            productOffer: offerPercentage,
-           offerStartDate: startDate,
+         //   offerStartDate: startDate,
            offerEndDate: endDate
        }, { new: true });
 
@@ -635,7 +635,7 @@ const deleteProductOffer = async (req, res) => {
        
        const product = await Product.findByIdAndUpdate(productId, {
            productOffer: 0,
-           offerStartDate: null,
+         //   offerStartDate: null,
            offerEndDate: null
        }, { new: true });
 

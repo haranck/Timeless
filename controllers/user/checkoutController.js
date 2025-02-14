@@ -348,6 +348,26 @@ const applyCoupon = async (req, res) => {
     } 
 }
 
+const removeCoupon = async (req, res) => {
+    try {
+        const { couponCode ,subtotal} = req.body;
+        const coupon = await Coupon.findOne({ code: couponCode });
+
+        if (!coupon) {
+            return res.json({ success: false, message: 'Invalid coupon' });
+        }
+
+        // Restore the coupon limit
+        coupon.limit += 1;
+        coupon.usageCount -= 1;
+        await coupon.save();
+
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+}
+
 module.exports = {
     loadCheckout,
     editCheckoutAddress,
@@ -355,6 +375,7 @@ module.exports = {
     placeOrder,
     viewOrder,
     cancelOrder,
-    applyCoupon
+    applyCoupon,
+    removeCoupon
     
 }
