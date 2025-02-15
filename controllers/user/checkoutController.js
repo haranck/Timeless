@@ -5,12 +5,15 @@ const Address = require('../../models/addressSchema')
 const Order = require('../../models/orderSchema')
 const Coupon = require('../../models/couponSchema')
 const Wallet = require('../../models/walletSchema')
+const { getDiscountPrice, getDiscountPriceCart } = require("../../helpers/offerHelper");
 
 
 const loadCheckout = async (req, res) => {
     try {
         const userId = req.session.user;
-        const cart = await Cart.findOne({ userId }).populate("items.productId");
+        let cart = await Cart.findOne({ userId }).populate({path:"items.productId",populate:{path:"category"}});
+        const processedData = cart.items.map(item => ({...item, productId:getDiscountPriceCart(item.productId)}))
+        cart.items = processedData;
         const user = await User.findById(userId);
         const addressDoc = await Address.findOne({ userId: userId });
         const carttotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
