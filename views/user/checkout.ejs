@@ -760,27 +760,14 @@
                                                 <span class="badge bg-success ms-2">No additional charges</span>
                                             </label>
                                         </div>
-                                        <!-- <div class="form-check mb-3">
-                                            <input class="form-check-input" type="radio" value="wallet"
-                                                name="payment_method" id="wallet">
-                                            <label class="form-check-label" for="wallet">
-                                                <i class="fas fa-wallet me-2"></i>Wallet
-                                            </label>
-                                        </div> -->
                                         <div class="form-check mb-3">
-                                            <input class="form-check-input" type="radio" value="upi"
-                                                name="payment_method" id="upi">
-                                            <label class="form-check-label" for="upi">
+                                            <input class="form-check-input" type="radio" value="razorpay"
+                                                name="payment_method" id="razorpay">
+                                            <label class="form-check-label" for="razorpay">
                                                 <i class="fas fa-mobile-alt me-2"></i>Razorpay
                                             </label>
                                         </div>
-                                        <!-- <div class="form-check mb-3">
-                                            <input class="form-check-input" type="radio" value="credit_card"
-                                                name="payment_method" id="card">
-                                            <label class="form-check-label" for="card">
-                                                <i class="fas fa-credit-card me-2"></i>Credit/Debit Card
-                                            </label>
-                                        </div> -->
+
                                     </div>
                                 </div>
 
@@ -887,6 +874,7 @@
     <%- include("../../views/partials/user/footer") %>
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
         <script>
 
@@ -960,17 +948,17 @@
 
             async function placeOrder() {
                 try {
-                    // Get all required order details
                     const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
                     const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
-                    // const totalAmount = document.getElementById('total-amount').textContent.replace('₹', '');
-                    const sanitizedOrderItems = sanitizeQuotes(<% - JSON.stringify(cart.items) %>)
-                    const orderedItems = sanitizedOrderItems
 
+                    const sanitizedOrderItems = sanitizeQuotes('<%- JSON.stringify(cart.items) %>');
+                    const orderedItems = sanitizedOrderItems;
                     const subtotalText = document.getElementById("total").innerText.replace("₹", "").trim();
                     const totalAmount = parseFloat(subtotalText);
                     const couponCode = document.getElementById("couponCode").value.trim();
-                    console.log(totalAmount);
+
+                    console.log("Total Amount:", totalAmount);
+                    console.log("Payment Method:", paymentMethod);
 
                     const confirmResult = await Swal.fire({
                         title: 'Confirm Order',
@@ -983,25 +971,22 @@
                         cancelButtonText: 'No, cancel'
                     });
 
-                    if (confirmResult.isConfirmed) {
-                        // Show loading state
-                        Swal.fire({
-                            title: 'Processing',
-                            text: 'Please wait while we process your order...',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            showConfirmButton: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
+                    if (!confirmResult.isConfirmed) return;
 
-                        // Make the API call with all order details
+                    Swal.fire({
+                        title: 'Processing',
+                        text: 'Please wait while we process your order...',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    if (paymentMethod === "cod") {
+                        // COD - Directly place the order
                         const response = await fetch("/checkout", {
                             method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
+                            headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 shippingAddress,
                                 paymentMethod,
@@ -1012,9 +997,7 @@
                         });
 
                         const data = await response.json();
-
                         if (data.success) {
-                            // Success message
                             await Swal.fire({
                                 title: 'Success!',
                                 text: 'Your order has been placed successfully!',
@@ -1022,23 +1005,81 @@
                                 timer: 1500,
                                 showConfirmButton: false
                             });
-
-
                             window.location.replace(`/viewOrder/${data.orderId}`);
                         } else {
                             throw new Error(data.message || 'Order failed');
                         }
+                    } else if (paymentMethod === "razorpay") {
+                       
+                        const orderResponse = await fetch("/createOrder", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ amount: totalAmount, currency: "INR" })
+                        });
+
+                        const orderData = await orderResponse.json();
+                        if (!orderData.success) throw new Error("Failed to create Razorpay order");
+
+                        const options = {
+                            key: orderData.key,
+                            amount: orderData.amount,
+                            currency: orderData.currency,
+                            name: "Timeless Aura",
+                            description: "Watch Purchase",
+                            order_id: orderData.order_id,
+                            handler: async function (response) {
+                                const verifyResponse = await fetch("/verifyPayment", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify(response)
+                                });
+
+                                const verifyData = await verifyResponse.json();
+                                if (verifyData.success) {
+                                    await Swal.fire({
+                                        title: 'Payment Successful!',
+                                        text: 'Your order has been placed successfully!',
+                                        icon: 'success',
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    });
+                                    window.location.replace(`/viewOrder/${verifyData.orderId}`);
+                                } else {
+                                    throw new Error("Payment verification failed");
+                                }
+                            },
+                            prefill: {
+                                name: '<%= user.name %>',
+                                email: '<%= user.email %>',
+                                contact: '<%= user.phone %>'
+                            },
+                            theme: { color: "#3399cc" },
+                            modal: {
+                                ondismiss: function () {
+                                    Swal.fire({
+                                        title: 'Payment Canceled',
+                                        text: 'You canceled the payment. Try again.',
+                                        icon: 'error',
+                                        confirmButtonText: 'OK'
+                                    });
+                                }
+                            }
+                        };
+
+                        const razorpay = new Razorpay(options);
+                        razorpay.open();
                     }
                 } catch (error) {
                     console.error('Error:', error.message);
                     await Swal.fire({
                         title: 'Error!',
-                        text: 'Something went wrong while placing your order. Please try again.',
+                        text: error.message || 'Something went wrong while placing your order.',
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
                 }
             }
+
 
 
             let currentAppliedCoupon = '';

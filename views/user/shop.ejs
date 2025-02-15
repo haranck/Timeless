@@ -679,7 +679,7 @@
                                         </h6>
                                         <div class="product-card__pricing">
                                             <span class="product-card__sale-price">
-                                                ₹<%= products[i].salePrice.toLocaleString('en-IN')%>
+                                                ₹<%= products[i].finalPrice.toLocaleString('en-IN')%>
                                             </span>
                                             <span class="product-card__regular-price">
                                                 ₹<%= products[i].regularPrice.toLocaleString('en-IN') %>
@@ -704,7 +704,7 @@
                                                     </div>
                                         </div>
                                         <div class="product-card__cta">
-                                            <button onclick="addToCart('<%= products[i]._id %>')"
+                                            <button onclick="addToCart('<%= products[i]._id %>','<%= products[i].finalPrice %>')"
                                                 class="product-card__cart-btn">
                                                 <i class="fa-solid fa-cart-plus"></i>
                                                 Add to Cart
@@ -748,8 +748,6 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        // If you're using CSRF protection, add the token here
-                        // 'CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
                         productId: productId,

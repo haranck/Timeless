@@ -3,33 +3,29 @@ const Product = require("../../models/productSchema");
 const Cart = require('../../models/cartSchema')
 const mongodb = require("mongodb");
 const Wishlist = require('../../models/wishlistSchema')
-const { getDiscountPrice } = require("../../helpers/offerHelper");
+const { getDiscountPrice, getDiscountPriceCart } = require("../../helpers/offerHelper");
 
 const loadCart = async (req, res) => {
     try {
         const userId = req.session.user;
         
-        const cart = await Cart.findOne({ userId }).populate("items.productId");
+        let cart = await Cart.findOne({ userId }).populate({path:"items.productId",populate:{path:"category"}});
 
-
+        const processedData = cart.items.map(item => ({...item, productId:getDiscountPriceCart(item.productId)}))
+        cart.items = processedData;
 
         cart.items = cart.items.filter(item => item.productId);
         
-        console.log("cart",cart)
-      
-        // If cart is empty, return a default structure
         if (!cart) {
-            return res.render("cart", {
+            return res.render("cart", { 
                 cart: {
                     items: [],
                     totalPrice: 0,
                 }
             });
         }
-
         // Calculate total price
         cart.totalPrice = cart.items.reduce((total, item) => total + item.totalPrice, 0);
-
         res.render("cart", {user:req.session.userData, cart });
 
     } catch (error) {
@@ -38,10 +34,11 @@ const loadCart = async (req, res) => {
     }
 };
 
+
 const addToCart = async (req, res) => {
     try {
         console.log('Request body:', req.body);
-        const { productId, quantity, finalPrice } = req.body;
+        const { productId, quantity } = req.body;
         const userId = req.session.user;
 
         if (!productId) {
@@ -51,8 +48,7 @@ const addToCart = async (req, res) => {
             });
         }
         
-
-        const product = await Product.findById(productId);
+        const product = await Product.findById(productId).populate("category");
         
         if (!product) {
             return res.status(404).json({ 
@@ -61,16 +57,15 @@ const addToCart = async (req, res) => {
             });
         }
 
-        let validFinalPrice = finalPrice||product.salePrice || product.regularPrice||0
+        // let validFinalPrice = product.salePrice || product.regularPrice||0
 
-        if (validFinalPrice <= 0) {
-            return res.status(400).json({ 
-                success: false,
-                message: "Invalid product price" 
-            });
-        }
+        // if (validFinalPrice <= 0) {
+        //     return res.status(400).json({ 
+        //         success: false,
+        //         message: "Invalid product price" 
+        //     });
+        // }
         
-
         const itemQuantity = parseInt(quantity) || 1;
 
         let cart = await Cart.findOne({ userId });
@@ -109,18 +104,23 @@ const addToCart = async (req, res) => {
                 });
             }
 
-            // Update alredy item in cart
+            
+            const {finalPrice,appliedOffer,regularPrice} = getDiscountPrice(product);
+
+            console.log("finalPrice",finalPrice,"appliedOffer",appliedOffer,"regularPrice",regularPrice);
 
             cart.items[existingItemIndex].quantity = newQuantity;
-            cart.items[existingItemIndex].totalPrice =  newQuantity * validFinalPrice;
-               
+            cart.items[existingItemIndex].totalPrice =  newQuantity * finalPrice;
+              
         } else {
+
+            const {finalPrice,appliedOffer,regularPrice} = getDiscountPrice(product);
 
             cart.items.push({
                 productId,
                 quantity: itemQuantity,
-                price: validFinalPrice,
-                totalPrice: validFinalPrice * itemQuantity
+                price: finalPrice,
+                totalPrice: finalPrice * itemQuantity
             });
         }
 

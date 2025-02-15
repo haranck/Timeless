@@ -9,6 +9,7 @@ const cartController = require("../controllers/user/cartController");
 const checkoutController = require("../controllers/user/checkoutController");
 const wishlistController = require("../controllers/user/wishlistController")
 const walletController = require("../controllers/user/walletController")
+const razorpayController = require("../controllers/user/razorpayController")
 
 
 router.get('/', isBlocked, userController.loadHompage);
@@ -82,6 +83,8 @@ router.post("/addCheckoutAddress", userAuth, checkoutController.addCheckoutAddre
 router.get("/viewOrder/:orderId", userAuth, checkoutController.viewOrder)
 router.patch("/cancelOrder/:orderId", userAuth, checkoutController.cancelOrder)
 
+
+
 router.post("/applyCoupon", userAuth, checkoutController.applyCoupon)
 router.post('/removeCoupon', userAuth, checkoutController.removeCoupon)
 
@@ -93,6 +96,9 @@ router.delete("/wishlist/remove/:productId", userAuth, wishlistController.remove
 //wallet management
 router.post("/addMoney", userAuth, walletController.addMoney)
 
+//razorpay
+router.post("/createOrder", userAuth, razorpayController.createOrder)
+router.post("/verifyPayment", userAuth, razorpayController.verifyPayment);
 
 
 module.exports = router;

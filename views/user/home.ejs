@@ -356,7 +356,7 @@
                                                 (<%= products[i].rating || 0 %>/5)
                                             </span>
                                 </div>
-                                <button onclick="addToCart('<%= products[i]._id %>', '<%= products[i].finalPrice %>')" class="product-card__cart-btn">
+                                <button onclick="addToCart('<%= products[i]._id %>')" class="product-card__cart-btn">
                                     <i class="fa-solid fa-cart-plus"></i> Add to Cart
                                 </button>
                                 
@@ -584,7 +584,7 @@
             }
         }
         
-        async function addToCart(productId, finalPrice) {
+        async function addToCart(productId) {
             
             try {
                 const response = await fetch('/addToCart', {
@@ -595,7 +595,6 @@
                     
                     body: JSON.stringify({
                         productId: productId,
-                        finalPrice: finalPrice,
                         quantity: 1
                     })
                 });

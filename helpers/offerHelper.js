@@ -10,8 +10,26 @@ const getDiscountPrice = (product) => {
      ...product.toObject(),
      finalPrice: Math.round(discountedPrice),
      appliedOffer: maxOffer,
-     regularPrice: product.regularPrice
+     regularPrice: product.regularPrice,
    };
  }
 
-  module.exports = { getDiscountPrice };
+
+ 
+const getDiscountPriceCart = (product) => {
+  let productOffer = product.productOffer || 0;
+  let categoryOffer = product.category?.categoryOffer || 0;
+
+  let maxOffer = Math.max(productOffer, categoryOffer);
+  let discountedPrice = product.salePrice - (product.salePrice * maxOffer) / 100;
+
+
+
+product.finalPrice = Math.round(discountedPrice);
+product.appliedOffer = maxOffer;
+product.regularPrice = product.regularPrice;
+
+  return product;
+}
+
+  module.exports = { getDiscountPrice, getDiscountPriceCart };

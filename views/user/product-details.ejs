@@ -484,7 +484,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
 
-        async function addToCart(productId, finalPrice) {
+        async function addToCart(productId) {
             try {
                 const quantity = parseInt(document.getElementById('product-quantity').value);
 
@@ -500,7 +500,6 @@
                     },
                     body: JSON.stringify({
                         productId: productId,
-                        finalPrice: finalPrice,
                         quantity: quantity
                     })
                 });
