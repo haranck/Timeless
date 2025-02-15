@@ -21,7 +21,7 @@ const orderSchema = new Schema({
    },
    payment_method: {
       type: String,
-      enum: ["credit_card","wallet","cod", "upi"],
+      enum: ["cod", "razorpay"],
       required: true
    },
    order_items: [{
@@ -61,8 +61,12 @@ const orderSchema = new Schema({
    },
    status: {
       type: String,
-      enum: ["pending", "processing", "shipped", "delivered", "cancelled", "returned", "refunded"],
+      enum: ["pending", "processing", "shipped", "delivered", "cancelled","Return requested", "returned", "refunded"],
       default: "pending"
+   },
+   returnReason:{
+      type:String,
+      default:null
    },
    invoiceDate: {
       type: Date,
@@ -72,6 +76,7 @@ const orderSchema = new Schema({
       type: String,
       default: false
    },
+   
 }, { timestamps: true });
 
 

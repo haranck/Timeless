@@ -488,11 +488,13 @@
             <% if (order.order_items && order.order_items.length > 0) { %>
                 <div class="action-row">
 
-                    <% if(order.status !== 'cancelled' && order.status !== 'delivered') { %>
+                    <% if(order.status !== 'cancelled' && order.status !== 'delivered' && order.status !== 'returned' && order.status !== 'Return requested') { %>
                     <button class="btn-cancel" onclick="openModal()">
                         <i class="fas fa-times-circle"></i> Cancel Order
                     </button>
-                    <% } %>
+                    <% }else if(order.status === 'delivered'){  %>
+                        <button class="btn-cancel" onclick="openReturnModal('<%= order._id %>')">Return Order</button>
+                    <% } %> 
 
                     <div class="">
                         <div class="continue__btn">
@@ -542,8 +544,62 @@
     </div>
 </div>
 
+<div id="returnModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Return Order</h2>
+            <button class="close-btn" onclick="closeReturnModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="returnForm">
+                <input type="hidden" id="orderId">
+                <div class="form-group">
+                    <label for="returnReason">Reason for Return:</label>
+                    <textarea id="returnReason" required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="closeReturnModal()">Cancel</button>
+                    <button type="submit" class="btn-confirm">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+
+function openReturnModal(orderId) {
+        document.getElementById("orderId").value = orderId;
+        document.getElementById("returnModal").style.display = "block";
+    }
+
+    function closeReturnModal() {
+        document.getElementById("returnModal").style.display = "none";
+    }
+
+    document.getElementById("returnForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const orderId = document.getElementById("orderId").value;
+        const reason = document.getElementById("returnReason").value;
+
+        const response = await fetch(`/returnOrder/${orderId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reason })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            Swal.fire("Success", "Return request submitted!", "success").then(() => {
+                location.reload();
+            });
+        } else {
+            Swal.fire("Error", "Something went wrong!", "error");
+        }
+    });
+
     function openModal(event) {
         if (event) {
             event.preventDefault();

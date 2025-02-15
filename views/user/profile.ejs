@@ -443,6 +443,7 @@
                                                 <th>Date</th>
                                                 <th>Status</th>
                                                 <th>Amount</th>
+                                                <th>Description</th>
                                               </tr>
                                             </thead>
                                             <tbody>
@@ -457,6 +458,7 @@
                                                 <%  } %>
                                                 
                                                 <td style="color:black;font-weight:bold;"><%= transaction.amount %></td>
+                                                <td><%= transaction.description %></td>
                                               </tr>
                                               <% }) %> 
                                                 <% } else { %>

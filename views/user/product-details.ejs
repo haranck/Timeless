@@ -261,7 +261,7 @@
 
                         </div>
                         <div class="product__details__btns__option">
-                            <a href="#" style="
+                            <a href="javascript:void(0);" onclick="addToWishlist('<%= product._id %>')" style="
                             padding-left: 284px;
                             padding-top: 15px;"><i class="fa fa-heart"></i> add to wishlist</a>
                             <!-- <a href="#"><i class="fa fa-exchange"></i> Add To Compare</a> -->
@@ -349,7 +349,7 @@
                                             accompanied with specific software to operate the unit and must feature
                                             a touchscreen and touchpad.</p>
                                         <p>As is the case with any new technology product, the cost of a Pocket PC
-                                            was substantial during it’s early release. For approximately $700.00,
+                                            was substantial during its early release. For approximately $700.00,
                                             consumers could purchase one of top-of-the-line Pocket PCs in 2003.
                                             These days, customers are finding that prices have become much more
                                             reasonable now that the newness is wearing off. For approximately
@@ -357,7 +357,7 @@
                                     </div>
                                     <div class="product__details__tab__content__item">
                                         <h5>Material used</h5>
-                                        <p>Polyester is deemed lower quality due to its none natural quality’s. Made
+                                        <p>Polyester is deemed lower quality due to its none natural qualitys. Made
                                             from synthetic materials, not natural like wool. Polyester suits become
                                             creased easily and are known for not being breathable. Polyester suits
                                             tend to have a shine to them compared to wool and cotton suits, this can
@@ -649,6 +649,67 @@
                 setupZoom($activeImage);
             });
         });
+
+        async function addToWishlist(productId){
+            try {
+                const response = await fetch("/addToWishlist",{
+                    method:"POST",
+                    headers:{"Content-Type":"application/json"},
+                    body:JSON.stringify({productId})
+                })
+                const data = await response.json();
+
+                if(data.success){
+                    Toastify({
+                        text: "Success\nProduct added to wishlist successfully",
+                        duration: 2000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        stopOnFocus: true,
+                        style: {
+                            background: "#ffffff",
+                            color: "#28a745",
+                            boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)",
+                            padding: "12px 20px",
+                            borderRadius: "10px",
+                            borderLeft: "5px solid #28a745",
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            textAlign: "left",
+                            animation: "fadeInUp 0.5s ease-in-out"
+                        },
+                        avatar: "https://cdn-icons-png.flaticon.com/512/845/845646.png",
+                    }).showToast();
+                }else {
+                    throw new Error(data.message || 'Failed to add product to Wishlist');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+               
+                Toastify({
+                    text: "Error\n" + error || 'Failed to add product to Wishlist',
+                    duration: 2000,
+                    close: true, 
+                    gravity: "top", 
+                    position: "right", 
+                    stopOnFocus: true, 
+                    style: {
+                        background: "#ffffff", 
+                        color: "#dc3545", 
+                        boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)", 
+                        padding: "12px 20px",
+                        borderRadius: "10px",
+                        borderLeft: "5px solid #dc3545", 
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        textAlign: "left",
+                        animation: "fadeInUp 0.5s ease-in-out" 
+                    },
+                    avatar: "https://cdn-icons-png.flaticon.com/512/190/190406.png", 
+                }).showToast();
+            }
+        }
 
     </script>
 

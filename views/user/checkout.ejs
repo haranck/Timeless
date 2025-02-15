@@ -947,138 +947,162 @@
             });
 
             async function placeOrder() {
-                try {
-                    const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
-                    const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+    try {
+        const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
-                    const sanitizedOrderItems = sanitizeQuotes('<%- JSON.stringify(cart.items) %>');
-                    const orderedItems = sanitizedOrderItems;
-                    const subtotalText = document.getElementById("total").innerText.replace("₹", "").trim();
-                    const totalAmount = parseFloat(subtotalText);
-                    const couponCode = document.getElementById("couponCode").value.trim();
+        // Change this line
+        const sanitizedOrderItems = sanitizeQuotes('<%- JSON.stringify(cart.items) %>');
+        const orderedItems = JSON.parse(sanitizedOrderItems); 
+        const subtotalText = document.getElementById("total").innerText.replace("₹", "").trim();
+        const totalAmount = parseFloat(subtotalText);
+        const couponCode = document.getElementById("couponCode").value.trim();
 
-                    console.log("Total Amount:", totalAmount);
-                    console.log("Payment Method:", paymentMethod);
+        console.log("orderedItems", orderedItems)
 
-                    const confirmResult = await Swal.fire({
-                        title: 'Confirm Order',
-                        text: 'Are you sure you want to place this order?',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, place order!',
-                        cancelButtonText: 'No, cancel'
-                    });
+        const confirmResult = await Swal.fire({
+            title: 'Confirm Order',
+            text: 'Are you sure you want to place this order?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, place order!',
+            cancelButtonText: 'No, cancel'
+        });
 
-                    if (!confirmResult.isConfirmed) return;
+        if (!confirmResult.isConfirmed) return;
 
-                    Swal.fire({
-                        title: 'Processing',
-                        text: 'Please wait while we process your order...',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        showConfirmButton: false,
-                        didOpen: () => Swal.showLoading()
-                    });
+        Swal.fire({
+            title: 'Processing',
+            text: 'Please wait while we process your order...',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => Swal.showLoading()
+        });
 
-                    if (paymentMethod === "cod") {
-                        // COD - Directly place the order
-                        const response = await fetch("/checkout", {
+        if (paymentMethod === "cod") {
+            const response = await fetch("/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    shippingAddress,
+                    paymentMethod,
+                    totalAmount,
+                    orderedItems,
+                    couponCode
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                await Swal.fire({
+                    title: 'Success!',
+                    text: 'Your order has been placed successfully!',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                window.location.href = `/viewOrder/${data.orderId}`;
+            } else {
+                throw new Error(data.message || 'Order failed');
+            }
+        } else if (paymentMethod === "razorpay") {
+            // Create Razorpay order
+            const orderResponse = await fetch("/createOrder", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    amount: totalAmount,
+                    currency: "INR",
+                    shippingAddress,
+                    orderedItems,
+                    couponCode
+                })
+            });
+
+            const orderData = await orderResponse.json();
+            if (!orderData.success) throw new Error("Failed to create Razorpay order");
+
+            const options = {
+                key: orderData.key,
+                amount: orderData.amount,
+                currency: orderData.currency,
+                name: "Timeless Aura",
+                description: "Watch Purchase",
+                order_id: orderData.order_id,
+                handler: async function (response) {
+                    try {
+                        // First, verify the payment
+                        const verifyResponse = await fetch("/verifyPayment", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
                                 shippingAddress,
-                                paymentMethod,
-                                totalAmount,
                                 orderedItems,
-                                couponCode
+                                totalAmount,
+                                couponCode,
+                                paymentMethod: "razorpay"
                             })
                         });
 
-                        const data = await response.json();
-                        if (data.success) {
+                        const verifyData = await verifyResponse.json();
+                        
+                        if (verifyData.success) {
                             await Swal.fire({
-                                title: 'Success!',
+                                title: 'Payment Successful!',
                                 text: 'Your order has been placed successfully!',
                                 icon: 'success',
                                 timer: 1500,
                                 showConfirmButton: false
                             });
-                            window.location.replace(`/viewOrder/${data.orderId}`);
+                            window.location.href = `/viewOrder/${verifyData.orderId}`;
                         } else {
-                            throw new Error(data.message || 'Order failed');
+                            throw new Error("Payment verification failed");
                         }
-                    } else if (paymentMethod === "razorpay") {
-                       
-                        const orderResponse = await fetch("/createOrder", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ amount: totalAmount, currency: "INR" })
+                    } catch (error) {
+                        console.error("Payment verification error:", error);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Payment verification failed. Please contact support.',
+                            icon: 'error'
                         });
-
-                        const orderData = await orderResponse.json();
-                        if (!orderData.success) throw new Error("Failed to create Razorpay order");
-
-                        const options = {
-                            key: orderData.key,
-                            amount: orderData.amount,
-                            currency: orderData.currency,
-                            name: "Timeless Aura",
-                            description: "Watch Purchase",
-                            order_id: orderData.order_id,
-                            handler: async function (response) {
-                                const verifyResponse = await fetch("/verifyPayment", {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify(response)
-                                });
-
-                                const verifyData = await verifyResponse.json();
-                                if (verifyData.success) {
-                                    await Swal.fire({
-                                        title: 'Payment Successful!',
-                                        text: 'Your order has been placed successfully!',
-                                        icon: 'success',
-                                        timer: 1500,
-                                        showConfirmButton: false
-                                    });
-                                    window.location.replace(`/viewOrder/${verifyData.orderId}`);
-                                } else {
-                                    throw new Error("Payment verification failed");
-                                }
-                            },
-                            prefill: {
-                                name: '<%= user.name %>',
-                                email: '<%= user.email %>',
-                                contact: '<%= user.phone %>'
-                            },
-                            theme: { color: "#3399cc" },
-                            modal: {
-                                ondismiss: function () {
-                                    Swal.fire({
-                                        title: 'Payment Canceled',
-                                        text: 'You canceled the payment. Try again.',
-                                        icon: 'error',
-                                        confirmButtonText: 'OK'
-                                    });
-                                }
-                            }
-                        };
-
-                        const razorpay = new Razorpay(options);
-                        razorpay.open();
                     }
-                } catch (error) {
-                    console.error('Error:', error.message);
-                    await Swal.fire({
-                        title: 'Error!',
-                        text: error.message || 'Something went wrong while placing your order.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
+                },
+                prefill: {
+                    name: '<%= user.name %>',
+                    email: '<%= user.email %>',
+                    contact: '<%= user.phone %>'
+                },
+                theme: { color: "#3399cc" },
+                modal: {
+                    ondismiss: function () {
+                        Swal.fire({
+                            title: 'Payment Canceled',
+                            text: 'You canceled the payment. Try again.',
+                            icon: 'warning'
+                        });
+                    }
                 }
-            }
+            };
+
+            const razorpay = new Razorpay(options);
+            razorpay.open();
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        await Swal.fire({
+            title: 'Error!',
+            text: error.message || 'Something went wrong while placing your order.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    }
+}
 
 
 

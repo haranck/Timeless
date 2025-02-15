@@ -95,6 +95,7 @@ router.delete("/wishlist/remove/:productId", userAuth, wishlistController.remove
 
 //wallet management
 router.post("/addMoney", userAuth, walletController.addMoney)
+router.post('/returnOrder/:orderId',userAuth, walletController.returnOrder)
 
 //razorpay
 router.post("/createOrder", userAuth, razorpayController.createOrder)

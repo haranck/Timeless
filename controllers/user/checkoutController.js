@@ -4,6 +4,7 @@ const Cart = require('../../models/cartSchema')
 const Address = require('../../models/addressSchema')
 const Order = require('../../models/orderSchema')
 const Coupon = require('../../models/couponSchema')
+const Wallet = require('../../models/walletSchema')
 
 
 const loadCheckout = async (req, res) => {
@@ -148,8 +149,8 @@ const addCheckoutAddress = async (req, res) => {
 const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user;
-        const { shippingAddress, paymentMethod, totalAmount, orderedItems, couponCode } = req.body;
-
+        const { shippingAddress, paymentMethod, totalAmount, couponCode } = req.body;
+        const orderedItems = JSON.parse(JSON.stringify(req.body.orderedItems));
         let coupon = await Coupon.findOne({couponCode,usageCount:{$lt:1}})
 
         coupon = true
@@ -282,6 +283,14 @@ const cancelOrder = async (req, res) => {
     try {
         const orderId = req.params.orderId;
         const orderReason = req.body.reason;
+        const userId = req.session.user;
+
+        if(!userId){
+            return res.status(401).json({ success: false, message: 'Unauthorised' });
+        }
+
+        
+
         const order = await Order.findById(orderId);
 
         if(!orderReason){
@@ -296,8 +305,27 @@ const cancelOrder = async (req, res) => {
                 {new: true}
             )
         }
+        
             order.status = 'cancelled';
             await order.save();
+
+            let wallet = await Wallet.findOne({userId})
+            if(!wallet){
+                wallet = new Wallet({
+                    userId,
+                    balance:0,
+                    transactions:[]
+                })
+            }
+            wallet.balance+=order.total
+            wallet.transactions.push({
+                type:'credit',
+                amount:order.total,
+                description:"refund for cancelled order",
+                status:'completed'
+            })
+            await wallet.save()
+
         return res.status(200).json({ success: true, message: 'Order cancelled successfully' });
 
     } catch (error) {
@@ -350,8 +378,8 @@ const applyCoupon = async (req, res) => {
 
 const removeCoupon = async (req, res) => {
     try {
-        const { couponCode ,subtotal} = req.body;
-        const coupon = await Coupon.findOne({ code: couponCode });
+        const { couponCode, subtotal } = req.body;
+        const coupon = await Coupon.findOne({ couponCode: couponCode });
 
         if (!coupon) {
             return res.json({ success: false, message: 'Invalid coupon' });
@@ -362,15 +390,20 @@ const removeCoupon = async (req, res) => {
         coupon.usageCount -= 1;
         await coupon.save();
 
-        let cartTotal = subtotal;
+        // Return the original subtotal as cartTotal since we're removing the coupon
+        const cartTotal = subtotal;
 
-        // if (coupon.couponType === 'percentage') {
-        //     cartTotal = subtotal / (1 - coupon.couponDiscount / 100)
-        // }
-
-        res.json({ success: true ,cartTotal});
+        res.json({ 
+            success: true,
+            cartTotal,
+            message: 'Coupon removed successfully'
+        });
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error("Error removing coupon:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error while removing coupon' 
+        });
     }
 }
 
