@@ -37,14 +37,14 @@ const loadHompage = async (req, res) => {
       .populate("category")
       .sort({ createdOn: -1 }).limit(8)
 
-      // const processedProducts = productData.map(getDiscountPrice)
+      const processedProducts = productData.map(getDiscountPrice)
 
       if (user) {
          const userData = await User.findById(user);
 
-         return res.render('home', { user: userData, products: productData ,brands:brands});
+         return res.render('home', { user: userData, products: processedProducts ,brands:brands});
       } else {
-         return res.render('home', { products: productData,brands:brands})
+         return res.render('home', { products: processedProducts,brands:brands})
       }
       
    } catch (error) {
@@ -283,7 +283,7 @@ const loadShoppingPage = async (req, res) => {
       .populate('category')
       .sort({ createdAt: 1 }).skip(skip).limit(limit)
 
-   
+      const processedProducts = products.map(getDiscountPrice);
 
       const totalProducts = await Product.countDocuments({
          isListed: true,
@@ -306,7 +306,7 @@ const loadShoppingPage = async (req, res) => {
 
       res.render('shop', {
          user: userData,
-         products: products,
+         products: processedProducts,
          categories: categoriesWithIds,
          brands: brandsWithIds,
          category: categories, 
@@ -348,7 +348,7 @@ const filterProducts = async (req, res) => {
            filter.productName = { $regex: searchQuery, $options: 'i' };
        }
        console.log(filter)
-       let query = Product.find({isListed:true}).find(filter).skip(skip).limit(limit);
+       let query = Product.find({isListed:true}).populate('category').find(filter).skip(skip).limit(limit);
 
        if (sortBy) {
            switch (sortBy) {
@@ -371,11 +371,12 @@ const filterProducts = async (req, res) => {
        }
 
        const products = await query.exec();
+       const processedProducts = products.map(getDiscountPrice);
        const totalProducts = await Product.countDocuments(filter);
 
        res.json({
            success: true,
-           products,
+           products: processedProducts,
            totalPages: Math.ceil(totalProducts / limit),
            currentPage: page
        });

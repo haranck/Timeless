@@ -2,6 +2,7 @@ const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
 const Category = require("../../models/categorySchema");
 const Brand = require("../../models/brandSchema");
+const { getDiscountPrice } = require("../../helpers/offerHelper");
 
 
 const productDetails = async (req, res) => {
@@ -10,10 +11,11 @@ const productDetails = async (req, res) => {
         const userData = await User.findById(userId);
         const productId = req.query.id;
 
-        
         const product = await Product.findById(productId)
-            .populate("category","name", { isListed: true }) 
+            .populate("category","name description categoryOffer isListed ", { isListed: true }) 
             .populate("brand", "brandName"); 
+
+            const processedProducts = getDiscountPrice(product);
 
         if (!product) {
             return res.redirect("/pageNotFound"); 
@@ -25,7 +27,7 @@ const productDetails = async (req, res) => {
         }).limit(4);
 
         res.render("product-details", {
-            product: product,
+            product: processedProducts,
             user: userData,
             quantity: product.quantity,
             category: product.category, 

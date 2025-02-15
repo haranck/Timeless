@@ -204,7 +204,7 @@
                                 <i class="fa fa-star-o"></i>
                                 <span> - 5 Reviews</span>
                             </div>
-                            <h3>₹<%= product.salePrice.toLocaleString('en-IN') %> <span>₹<%=
+                            <h3>₹<%= product.finalPrice.toLocaleString('en-IN') %> <span>₹<%=
                                             product.regularPrice.toLocaleString('en-IN') %></span></h3>
                             <p>
                                 <%= product.description %>
@@ -246,7 +246,7 @@
                                 <button class="quantity-btn" onclick="updateQuantity('increase')">+</button>
 
 
-                                <button onclick="addToCart('<%= product._id %>')" class="primary-btn"
+                                <button onclick="addToCart('<%= product._id %>', '<%= product.finalPrice %>')" class="primary-btn"
                                     style="margin-left: 20px;">
                                     Add to Cart
                                 </button>
@@ -484,11 +484,11 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
 
-        async function addToCart(productId) {
+        async function addToCart(productId, finalPrice) {
             try {
                 const quantity = parseInt(document.getElementById('product-quantity').value);
 
-                if (quantity > <%= product.quantity %> ) {
+                if (quantity > '<%= product.quantity %>' ) {
                     Swal.fire('Error!', 'you cannot order more than <%= product.quantity %> items.', 'error');
                     event.preventDefault();
                     return;
@@ -500,6 +500,7 @@
                     },
                     body: JSON.stringify({
                         productId: productId,
+                        finalPrice: finalPrice,
                         quantity: quantity
                     })
                 });

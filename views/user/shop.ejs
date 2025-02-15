@@ -895,14 +895,14 @@
                         <h6 class="product-card__title">${product.productName}</h6>
                         <div class="product-card__pricing" style="display: flex; justify-content: center;">
                             <span class="product-card__sale-price">
-                                ₹${product.salePrice.toLocaleString('en-IN')}
+                                ₹${product.finalPrice.toLocaleString('en-IN')}
                             </span>
                             <span class="product-card__regular-price">
                                 ₹${product.regularPrice.toLocaleString('en-IN')}
                             </span>
                         </div>
 
-                        <div style="color: red; font-weight: bold;">${product.productOffer}%OFF</div>
+                        <div style="color: red; font-weight: bold;">${product.appliedOffer}%OFF</div>
                        
                         <div class="product-card__rating">
                             ${generateRatingStars(product.rating)}

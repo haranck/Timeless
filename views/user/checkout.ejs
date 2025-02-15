@@ -448,6 +448,29 @@
             background-color: #252424;
             transform: translateY(-3px);
         }
+
+
+
+
+        #removeCouponSection {
+            border-top: 1px dashed #dee2e6;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        #appliedCouponText {
+            font-size: 0.9em;
+            color: #28a745;
+        }
+
+        #removeCouponBtn {
+            transition: all 0.3s ease;
+        }
+
+        #removeCouponBtn:hover {
+            background-color: #dc3545;
+            transform: translateY(-1px);
+        }
     </style>
 
 
@@ -710,6 +733,13 @@
                                         <li class="d-flex justify-content-between total-amount" id="total-amount">
                                             <strong>Total</strong> <strong id="total">₹<%=cart.cartTotal%></strong>
                                         </li>
+                                        <div id="removeCouponSection" style="display: none;" class="mt-2 text-center">
+                                            <small class="text-success mb-2 d-block" id="appliedCouponText"></small>
+                                            <button class="btn btn-danger btn-sm w-100" id="removeCouponBtn"
+                                                onclick="removeCoupon()">
+                                                <i class="fas fa-times-circle"></i> Remove Coupon
+                                            </button>
+                                        </div>
                                         <p id="couponMessage" style="color: red;"></p>
                                     </ul>
 
@@ -1011,21 +1041,22 @@
             }
 
 
-            let isCouponApplied = false;
+            let currentAppliedCoupon = '';
+
             async function applyCoupons() {
-                const couponCode = document.getElementById("couponCode").value.trim();
+                const couponInputElement = document.getElementById("couponCode");
+                const couponCode = couponInputElement.value.trim();
                 const subtotalText = document.getElementById("subtotal").innerText.replace("₹", "").trim();
                 const subtotal = parseFloat(subtotalText);
-                const applyCouponBtn = document.getElementById("applyCoupon");
 
                 if (!couponCode) {
+                    document.getElementById("couponMessage").style.color = "red";
                     document.getElementById("couponMessage").innerText = "Please enter a coupon code!";
                     return;
                 }
 
                 try {
-                    const endpoint = isCouponApplied ? "/removeCoupon" : "/applyCoupon";
-                    const response = await fetch(endpoint, {
+                    const response = await fetch("/applyCoupon", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -1037,51 +1068,94 @@
                     });
 
                     const data = await response.json();
+
                     if (data.success) {
-                        if (isCouponApplied) {
-                            // Removing Coupon
-                            Swal.fire({
-                                title: 'Coupon Removed',
-                                text: 'Coupon has been successfully removed',
-                                icon: 'info',
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
+                        // Update UI for applied coupon
+                        document.getElementById("discount").innerText = `₹${data.discount}`;
+                        document.getElementById("total").innerText = `₹${data.newTotal}`;
+                        document.getElementById("couponMessage").style.color = "green";
+                        document.getElementById("couponMessage").innerText = "Coupon applied successfully!";
 
-                            document.getElementById("discount").innerText = `₹0`;
-                            document.getElementById("total").innerText = `₹${data.cartTotal}`;
-                            applyCouponBtn.textContent = "Apply Coupon";
-                            document.getElementById("couponMessage").style.color = "red";
-                            document.getElementById("couponMessage").innerText = "Coupon removed!";
-                            document.getElementById("couponCode").value = ''; // Clear coupon input
-                        } else {
-                            // Applying Coupon
-                            Swal.fire({
-                                title: 'Success!',
-                                text: 'Coupon applied successfully!',
-                                icon: 'success',
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
+                        // Show remove coupon section
+                        document.getElementById("removeCouponSection").style.display = "block";
+                        document.getElementById("appliedCouponText").innerText = `Applied Coupon: ${couponCode}`;
+                        currentAppliedCoupon = couponCode;
 
-                            document.getElementById("discount").innerText = `₹${data.discount}`;
-                            document.getElementById("total").innerText = `₹${data.newTotal}`;
-                            applyCouponBtn.textContent = "Remove Coupon";
-                            document.getElementById("couponMessage").style.color = "green";
-                            document.getElementById("couponMessage").innerText = "Coupon applied successfully!";
-                        }
+                        // Clear input
+                        couponInputElement.value = '';
 
-                        isCouponApplied = !isCouponApplied;
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Coupon applied successfully!',
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                     } else {
                         document.getElementById("couponMessage").style.color = "red";
                         document.getElementById("couponMessage").innerText = data.message;
                     }
                 } catch (error) {
-                    console.error("Error applying/removing coupon:", error);
+                    console.error("Error applying coupon:", error);
                     document.getElementById("couponMessage").style.color = "red";
                     document.getElementById("couponMessage").innerText = "An error occurred. Please try again.";
                 }
             }
+
+            async function removeCoupon() {
+                try {
+                    const subtotalText = document.getElementById("subtotal").innerText.replace("₹", "").trim();
+                    const subtotal = parseFloat(subtotalText);
+
+                    const response = await fetch("/removeCoupon", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            couponCode: currentAppliedCoupon,
+                            subtotal
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Reset UI
+                        document.getElementById("discount").innerText = "₹0";
+                        document.getElementById("total").innerText = `₹${data.cartTotal}`;
+                        document.getElementById("couponMessage").innerText = "";
+                        document.getElementById("removeCouponSection").style.display = "none";
+                        currentAppliedCoupon = '';
+
+                        Swal.fire({
+                            title: 'Coupon Removed',
+                            text: 'Coupon has been successfully removed',
+                            icon: 'info',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error removing coupon:", error);
+                    document.getElementById("couponMessage").style.color = "red";
+                    document.getElementById("couponMessage").innerText = "Error removing coupon. Please try again.";
+                }
+            }
+
+            // Add event listeners when document loads
+            document.addEventListener('DOMContentLoaded', function () {
+                const applyCouponBtn = document.getElementById("applyCoupon");
+                const removeCouponBtn = document.getElementById("removeCouponBtn");
+
+                if (applyCouponBtn) {
+                    applyCouponBtn.addEventListener('click', applyCoupons);
+                }
+
+                if (removeCouponBtn) {
+                    removeCouponBtn.addEventListener('click', removeCoupon);
+                }
+            });
 
             function copyCoupon(couponId) {
 

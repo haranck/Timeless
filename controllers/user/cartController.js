@@ -3,12 +3,15 @@ const Product = require("../../models/productSchema");
 const Cart = require('../../models/cartSchema')
 const mongodb = require("mongodb");
 const Wishlist = require('../../models/wishlistSchema')
+const { getDiscountPrice } = require("../../helpers/offerHelper");
 
 const loadCart = async (req, res) => {
     try {
         const userId = req.session.user;
         
         const cart = await Cart.findOne({ userId }).populate("items.productId");
+
+
 
         cart.items = cart.items.filter(item => item.productId);
         
@@ -38,7 +41,7 @@ const loadCart = async (req, res) => {
 const addToCart = async (req, res) => {
     try {
         console.log('Request body:', req.body);
-        const { productId, quantity } = req.body;
+        const { productId, quantity, finalPrice } = req.body;
         const userId = req.session.user;
 
         if (!productId) {
@@ -50,7 +53,7 @@ const addToCart = async (req, res) => {
         
 
         const product = await Product.findById(productId);
-        console.log("product",product);
+        
         if (!product) {
             return res.status(404).json({ 
                 success: false,
@@ -58,12 +61,15 @@ const addToCart = async (req, res) => {
             });
         }
 
-        if (!product.salePrice) {
+        let validFinalPrice = finalPrice||product.salePrice || product.regularPrice||0
+
+        if (validFinalPrice <= 0) {
             return res.status(400).json({ 
                 success: false,
                 message: "Invalid product price" 
             });
         }
+        
 
         const itemQuantity = parseInt(quantity) || 1;
 
@@ -106,15 +112,15 @@ const addToCart = async (req, res) => {
             // Update alredy item in cart
 
             cart.items[existingItemIndex].quantity = newQuantity;
-            cart.items[existingItemIndex].totalPrice =  newQuantity * product.salePrice;
+            cart.items[existingItemIndex].totalPrice =  newQuantity * validFinalPrice;
                
         } else {
 
             cart.items.push({
                 productId,
                 quantity: itemQuantity,
-                price: product.salePrice,
-                totalPrice: product.salePrice * itemQuantity
+                price: validFinalPrice,
+                totalPrice: validFinalPrice * itemQuantity
             });
         }
 

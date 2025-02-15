@@ -362,7 +362,13 @@ const removeCoupon = async (req, res) => {
         coupon.usageCount -= 1;
         await coupon.save();
 
-        res.json({ success: true });
+        let cartTotal = subtotal;
+
+        // if (coupon.couponType === 'percentage') {
+        //     cartTotal = subtotal / (1 - coupon.couponDiscount / 100)
+        // }
+
+        res.json({ success: true ,cartTotal});
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error' });
     }
@@ -377,5 +383,6 @@ module.exports = {
     cancelOrder,
     applyCoupon,
     removeCoupon
-    
 }
+
+

@@ -6,329 +6,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
-
-    <!-- Hero Section Begin -->
-    <section class="hero">
-        <div class="hero__slider owl-carousel">
-            <div class="hero__items set-bg" data-setbg="img/hero/hero-1.jpg">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-xl-5 col-lg-7 col-md-8">
-                            <div class="hero__text">
-                                <h6>Summer Collection</h6>
-                                <h2>Hots - Summer Collections 2025</h2>
-                                <p>A specialist label creating luxury essentials. Ethically crafted with an unwavering
-                                    commitment to exceptional quality.</p>
-                                <a href="/shop" class="primary-btn" style="background-color: white;color: black;">Shop
-                                    now
-                                </a>
-                                <div class="hero__social">
-                                    <a href="#"><i class="fa-brands fa-facebook" style="color: #ffffff;"></i></a>
-                                    <a href="#"><i class="fa-brands fa-twitter" style="color: #ffffff;"></i></a>
-                                    <a href="#"><i class="fa-brands fa-pinterest" style="color: #ffffff;"></i></a>
-                                    <a href="#"><i class="fa-brands fa-instagram" style="color: #ffffff;"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- <div class="hero__items set-bg" data-setbg="img/hero/hero-2.jpg">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-xl-5 col-lg-7 col-md-8">
-                            <div class="hero__text">
-                                <h6>Summer Collection</h6>
-                                <h2>Fall - Winter Collections 2030</h2>
-                                <p>A specialist label creating luxury essentials. Ethically crafted with an unwavering
-                                    commitment to exceptional quality.</p>
-                                <a href="#" class="primary-btn">Shop now <span class="arrow_right"></span></a>
-                                <div class="hero__social">
-                                    <a href="#"><i class="fa fa-facebook"></i></a>
-                                    <a href="#"><i class="fa fa-twitter"></i></a>
-                                    <a href="#"><i class="fa fa-pinterest"></i></a>
-                                    <a href="#"><i class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-        </div>
-    </section>
-    <!-- Hero Section End -->
-
-    <!-- Banner Section Begin -->
-    <section class="banner spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-7 offset-lg-4">
-                    <div class="banner__item">
-                        <div class="banner__item__pic">
-                            <img src="img/banner/banner-1.jpg" alt="" style="
-                            display: block;
-                            height: auto;
-                            object-fit: cover;
-                            width: 464px;
-                            margin-bottom: 50px;
-                            border-radius: 25px;
-                        ">
-                        </div>
-                        <div id="myElement" class="banner__item__text">
-                            <h2 style="margin-right: 30px;">Watch Collections 2025</h2>
-                            <a href="/shop">Shop now</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-5">
-                    <div class="banner__item banner__item--middle">
-                        <div class="banner__item__pic">
-                            <img src="img/banner/banner-2.jpg" alt="" style="border-radius: 25px;">
-                        </div>
-                        <div class="banner__item__text">
-                            <h2>Accessories</h2>
-                            <a href="/shop">Shop now</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-7">
-                    <div class="banner__item banner__item--last">
-                        <div class="banner__item__pic">
-                            <img src="img/banner/banner-3.jpg" alt="" style="    height: auto;
-                            object-fit: cover;
-                            width: 464px;
-                            margin-top: 304px;
-                            margin-right: 96px;
-                            border-radius: 25px;">
-                        </div>
-                        <div class="banner__item__text">
-                            <h2 style="margin-left: 93px;">Legend Watches </h2>
-                            <a href="/shop" style="    margin-left: 97px;">Shop now</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- Banner Section End -->
-
-    <!-- Product Section Begin -->
-    <section class="product spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <ul class="filter__controls">
-                        <li data-filter=".new-arrivals">New Arrivals</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="row product__filter">
-                <% for (let i=0; i < products.length; i++) { %>
-                    <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                        <div class="product-card">
-                            <div class="product-card__image">
-                                <a href="/productDetails?id=<%= products[i]._id %>">
-                                    <img src="/uploads/product-images/<%= products[i].productImages[0] %>"
-                                        alt="<%= products[i].productName %>" class="img-fluid">
-                                </a>
-                                <div class="product-card__actions">
-                                    <a href="javascript:void(0);" onclick="addToWishlist('<%= products[i]._id %>')"
-                                        class="product-card__wishlist-btn" title="Add to Wishlist">
-                                        <i class="fa-regular fa-heart"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="product-card__details">
-
-                                <h6 class="product-card__title">
-                                    <%= products[i].productName %>
-                                </h6>
-                                <div class="product-card__pricing">
-                                    <span class="product-card__sale-price">
-                                        ₹<%= products[i].salePrice.toLocaleString('en-IN') %>
-                                    </span>
-                                    <span class="product-card__regular-price">
-                                        ₹<%= products[i].regularPrice.toLocaleString('en-IN') %>
-                                    </span>
-                                   
-                                </div>
-                                <div style="color: red; font-weight: bold;"><%=products[i].productOffer %>%OFF</div>
-                                <div>
-                                    <% if(products[i].quantity > 0){ %>
-                                        <span style="color: rgb(0, 134, 18);">In Stock</span>
-                                        <% } else { %>
-                                        <span style="color: red;">Out of stock</span>
-                                        <% } %>
-                                </div>
-                                <div class="product-card__rating">
-                                    <% for(let j=0; j < 5; j++) { %>
-                                        <i
-                                            class="fa-solid fa-star <%= j < Math.round(products[i].rating || 0) ? 'active' : '' %>"></i>
-                                        <% } %>
-                                            <span class="product-card__rating-count">
-                                                (<%= products[i].rating || 0 %>/5)
-                                            </span>
-                                </div>
-                                <button onclick="addToCart('<%= products[i]._id %>')" class="product-card__cart-btn">
-                                    <i class="fa-solid fa-cart-plus"></i>Add to Cart
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <% } %>
-            </div>
-        </div>
-    </section>
-
-    <!-- Product Section End -->
-
-    <!-- Categories Section Begin -->
-    <section class="categories spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3">
-                    <div class="categories__text">
-                        <h2>Watching Hot <br /> <span>Joys Collection</span> <br /> Accessories</h2>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="categories__hot__deal">
-                        <img src="img/product-sale.png" alt="">
-                        <div class="hot__deal__sticker">
-                            <span>Sale Of</span>
-                            <h5>₹22,9999</h5>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 offset-lg-1">
-                    <div class="categories__deal__countdown">
-                        <span>Deal Of The Week</span>
-                        <h2>TimeForge Chrono Black </h2>
-                        <div class="categories__deal__countdown__timer" id="countdown">
-                            <div class="cd-item">
-                                <span>3</span>
-                                <p>Days</p>
-                            </div>
-                            <div class="cd-item">
-                                <span>1</span>
-                                <p>Hours</p>
-                            </div>
-                            <div class="cd-item">
-                                <span>50</span>
-                                <p>Minutes</p>
-                            </div>
-                            <div class="cd-item">
-                                <span>18</span>
-                                <p>Seconds</p>
-                            </div>
-                        </div>
-                        <a href="/shop" class="primary-btn">Shop now</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- Categories Section End -->
-
-    <!-- Brands Section Begin -->
-
-    <div class="image-container"
-    style="    display: flex;
-        justify-content: center;
-        gap: 80px;
-        flex-wrap: wrap;
-        margin-top: 48px;">
-
-    <div class="col-lg-12">
-        <ul class="filter__controls">
-            <li data-filter=".new-arrivals">BRANDS</li>
-        </ul>
-    </div>
-    <% brands.forEach(brand => { %> 
-        <img src="/uploads/brands/<%= brand.brandImage %>" alt="<%= brand.brandName %>" style="    width: 210px;
-    height: 183px;">
-    <% }); %>
-</div>
-    <!-- Brands Section End -->
-
-
-    <!-- Instagram Section Begin -->
-    <section class="instagram spad" style="margin-bottom: 70px;">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="instagram__pic">
-                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-1.jpg"></div>
-                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-2.jpg"></div>
-                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-3.jpg"></div>
-                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-4.jpg"></div>
-                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-5.jpg"></div>
-                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-6.jpg"></div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="instagram__text">
-                        <h2>Explore It....</h2>
-                        <p>A watch is a timeless accessory that not only tells time but also reflects style and
-                            personality.
-                            Whether analog or digital, it combines function with fashion, serving as a symbol of
-                            elegance,
-                            precision, and craftsmanship.</p>
-                        <h3>#Style_Fashion</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- Instagram Section End -->
-
-    <!-- Latest Blog Section Begin -->
-    <!-- <section class="latest spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="section-title">
-                        <span>Latest News</span>
-                        <h2>Fashion New Trends</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-4 col-md-6 col-sm-6">
-                    <div class="blog__item">
-                        <div class="blog__item__pic set-bg" data-setbg="img/blog/blog-1.jpg"></div>
-                        <div class="blog__item__text">
-                            <span><img src="img/icon/calendar.png" alt=""> 16 February 2020</span>
-                            <h5>What Curling Irons Are The Best Ones</h5>
-                            <a href="#">Read More</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-6">
-                    <div class="blog__item">
-                        <div class="blog__item__pic set-bg" data-setbg="img/blog/blog-2.jpg"></div>
-                        <div class="blog__item__text">
-                            <span><img src="img/icon/calendar.png" alt=""> 21 February 2020</span>
-                            <h5>Eternity Bands Do Last Forever</h5>
-                            <a href="#">Read More</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-6">
-                    <div class="blog__item">
-                        <div class="blog__item__pic set-bg" data-setbg="img/blog/blog-3.jpg"></div>
-                        <div class="blog__item__text">
-                            <span><img src="img/icon/calendar.png" alt=""> 28 February 2020</span>
-                            <h5>The Health Benefits Of Sunglasses</h5>
-                            <a href="#">Read More</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section> -->
-    <!-- Latest Blog Section End -->
-
     <style>
         /* Product Card Styles */
         .product-card {
@@ -516,6 +193,332 @@
         }
     </style>
 
+
+    <!-- Hero Section Begin -->
+    <section class="hero">
+        <div class="hero__slider owl-carousel">
+            <div class="hero__items set-bg" data-setbg="img/hero/hero-1.jpg">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-5 col-lg-7 col-md-8">
+                            <div class="hero__text">
+                                <h6>Summer Collection</h6>
+                                <h2>Hots - Summer Collections 2025</h2>
+                                <p>A specialist label creating luxury essentials. Ethically crafted with an unwavering
+                                    commitment to exceptional quality.</p>
+                                <a href="/shop" class="primary-btn" style="background-color: white;color: black;">Shop
+                                    now
+                                </a>
+                                <div class="hero__social">
+                                    <a href="#"><i class="fa-brands fa-facebook" style="color: #ffffff;"></i></a>
+                                    <a href="#"><i class="fa-brands fa-twitter" style="color: #ffffff;"></i></a>
+                                    <a href="#"><i class="fa-brands fa-pinterest" style="color: #ffffff;"></i></a>
+                                    <a href="#"><i class="fa-brands fa-instagram" style="color: #ffffff;"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="hero__items set-bg" data-setbg="img/hero/hero-2.jpg">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-5 col-lg-7 col-md-8">
+                            <div class="hero__text">
+                                <h6>Summer Collection</h6>
+                                <h2>Fall - Winter Collections 2030</h2>
+                                <p>A specialist label creating luxury essentials. Ethically crafted with an unwavering
+                                    commitment to exceptional quality.</p>
+                                <a href="#" class="primary-btn">Shop now <span class="arrow_right"></span></a>
+                                <div class="hero__social">
+                                    <a href="#"><i class="fa fa-facebook"></i></a>
+                                    <a href="#"><i class="fa fa-twitter"></i></a>
+                                    <a href="#"><i class="fa fa-pinterest"></i></a>
+                                    <a href="#"><i class="fa fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+    </section>
+    <!-- Hero Section End -->
+
+    <!-- Banner Section Begin -->
+    <section class="banner spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-7 offset-lg-4">
+                    <div class="banner__item">
+                        <div class="banner__item__pic">
+                            <img src="img/banner/banner-1.jpg" alt="" style="
+                            display: block;
+                            height: auto;
+                            object-fit: cover;
+                            width: 464px;
+                            margin-bottom: 50px;
+                            border-radius: 25px;
+                        ">
+                        </div>
+                        <div id="myElement" class="banner__item__text">
+                            <h2 style="margin-right: 30px;">Watch Collections 2025</h2>
+                            <a href="/shop">Shop now</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="banner__item banner__item--middle">
+                        <div class="banner__item__pic">
+                            <img src="img/banner/banner-2.jpg" alt="" style="border-radius: 25px;">
+                        </div>
+                        <div class="banner__item__text">
+                            <h2>Accessories</h2>
+                            <a href="/shop">Shop now</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="banner__item banner__item--last">
+                        <div class="banner__item__pic">
+                            <img src="img/banner/banner-3.jpg" alt="" style="    height: auto;
+                            object-fit: cover;
+                            width: 464px;
+                            margin-top: 304px;
+                            margin-right: 96px;
+                            border-radius: 25px;">
+                        </div>
+                        <div class="banner__item__text">
+                            <h2 style="margin-left: 93px;">Legend Watches </h2>
+                            <a href="/shop" style="    margin-left: 97px;">Shop now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Banner Section End -->
+
+    <!-- Product Section Begin -->
+    <section class="product spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul class="filter__controls">
+                        <li data-filter=".new-arrivals">New Arrivals</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row product__filter">
+                <% for (let i=0; i < products.length; i++) { %>
+                    <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                        <div class="product-card">
+                            <div class="product-card__image">
+                                <a href="/productDetails?id=<%= products[i]._id %>">
+                                    <img src="/uploads/product-images/<%= products[i].productImages[0] %>"
+                                        alt="<%= products[i].productName %>" class="img-fluid">
+                                </a>
+                                <div class="product-card__actions">
+                                    <a href="javascript:void(0);" onclick="addToWishlist('<%= products[i]._id %>')"
+                                        class="product-card__wishlist-btn" title="Add to Wishlist">
+                                        <i class="fa-regular fa-heart"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="product-card__details">
+
+                                <h6 class="product-card__title">
+                                    <%= products[i].productName %>
+                                </h6>
+                                <div class="product-card__pricing">
+                                    <span class="product-card__sale-price">
+                                        ₹<%= products[i].finalPrice.toLocaleString('en-IN') %>
+                                    </span>
+                                    <span class="product-card__regular-price">
+                                        ₹<%= products[i].regularPrice.toLocaleString('en-IN') %>
+                                    </span>
+                                   
+                                </div>
+                                <div style="color: red; font-weight: bold;"><%=products[i].appliedOffer %>%OFF</div>
+                                <div>
+                                    <% if(products[i].quantity > 0){ %>
+                                        <span style="color: rgb(0, 134, 18);">In Stock</span>
+                                        <% } else { %>
+                                        <span style="color: red;">Out of stock</span>
+                                        <% } %>
+                                </div>
+                                <div class="product-card__rating">
+                                    <% for(let j=0; j < 5; j++) { %>
+                                        <i
+                                            class="fa-solid fa-star <%= j < Math.round(products[i].rating || 0) ? 'active' : '' %>"></i>
+                                        <% } %>
+                                            <span class="product-card__rating-count">
+                                                (<%= products[i].rating || 0 %>/5)
+                                            </span>
+                                </div>
+                                <button onclick="addToCart('<%= products[i]._id %>', '<%= products[i].finalPrice %>')" class="product-card__cart-btn">
+                                    <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                                </button>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <% } %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Section End -->
+
+    <!-- Categories Section Begin -->
+    <section class="categories spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="categories__text">
+                        <h2>Watching Hot <br /> <span>Joys Collection</span> <br /> Accessories</h2>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="categories__hot__deal">
+                        <img src="img/product-sale.png" alt="">
+                        <div class="hot__deal__sticker">
+                            <span>Sale Of</span>
+                            <h5>₹22,9999</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 offset-lg-1">
+                    <div class="categories__deal__countdown">
+                        <span>Deal Of The Week</span>
+                        <h2>TimeForge Chrono Black </h2>
+                        <div class="categories__deal__countdown__timer" id="countdown">
+                            <div class="cd-item">
+                                <span>3</span>
+                                <p>Days</p>
+                            </div>
+                            <div class="cd-item">
+                                <span>1</span>
+                                <p>Hours</p>
+                            </div>
+                            <div class="cd-item">
+                                <span>50</span>
+                                <p>Minutes</p>
+                            </div>
+                            <div class="cd-item">
+                                <span>18</span>
+                                <p>Seconds</p>
+                            </div>
+                        </div>
+                        <a href="/shop" class="primary-btn">Shop now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Categories Section End -->
+
+    <!-- Brands Section Begin -->
+
+    <div class="image-container"
+    style="    display: flex;
+        justify-content: center;
+        gap: 80px;
+        flex-wrap: wrap;
+        margin-top: 48px;">
+
+    <div class="col-lg-12">
+        <ul class="filter__controls">
+            <li data-filter=".new-arrivals">BRANDS</li>
+        </ul>
+    </div>
+    <% brands.forEach(brand => { %> 
+        <img src="/uploads/brands/<%= brand.brandImage %>" alt="<%= brand.brandName %>" style="    width: 210px;
+    height: 183px;">
+    <% }); %>
+</div>
+    <!-- Brands Section End -->
+
+
+    <!-- Instagram Section Begin -->
+    <section class="instagram spad" style="margin-bottom: 70px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="instagram__pic">
+                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-1.jpg"></div>
+                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-2.jpg"></div>
+                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-3.jpg"></div>
+                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-4.jpg"></div>
+                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-5.jpg"></div>
+                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-6.jpg"></div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="instagram__text">
+                        <h2>Explore It....</h2>
+                        <p>A watch is a timeless accessory that not only tells time but also reflects style and
+                            personality.
+                            Whether analog or digital, it combines function with fashion, serving as a symbol of
+                            elegance,
+                            precision, and craftsmanship.</p>
+                        <h3>#Style_Fashion</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Instagram Section End -->
+
+    <!-- Latest Blog Section Begin -->
+    <!-- <section class="latest spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title">
+                        <span>Latest News</span>
+                        <h2>Fashion New Trends</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="blog__item">
+                        <div class="blog__item__pic set-bg" data-setbg="img/blog/blog-1.jpg"></div>
+                        <div class="blog__item__text">
+                            <span><img src="img/icon/calendar.png" alt=""> 16 February 2020</span>
+                            <h5>What Curling Irons Are The Best Ones</h5>
+                            <a href="#">Read More</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="blog__item">
+                        <div class="blog__item__pic set-bg" data-setbg="img/blog/blog-2.jpg"></div>
+                        <div class="blog__item__text">
+                            <span><img src="img/icon/calendar.png" alt=""> 21 February 2020</span>
+                            <h5>Eternity Bands Do Last Forever</h5>
+                            <a href="#">Read More</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="blog__item">
+                        <div class="blog__item__pic set-bg" data-setbg="img/blog/blog-3.jpg"></div>
+                        <div class="blog__item__text">
+                            <span><img src="img/icon/calendar.png" alt=""> 28 February 2020</span>
+                            <h5>The Health Benefits Of Sunglasses</h5>
+                            <a href="#">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+    <!-- Latest Blog Section End -->
+
+   
+
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -581,7 +584,7 @@
             }
         }
         
-        async function addToCart(productId) {
+        async function addToCart(productId, finalPrice) {
             
             try {
                 const response = await fetch('/addToCart', {
@@ -592,6 +595,7 @@
                     
                     body: JSON.stringify({
                         productId: productId,
+                        finalPrice: finalPrice,
                         quantity: 1
                     })
                 });
