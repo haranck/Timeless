@@ -85,6 +85,8 @@ router.get('/deleteBrand', adminAuth, brandController.deleteBrand)
 router.get('/orders', adminAuth, orderController.getOrdersPage)
 router.post('/updateOrder', adminAuth, orderController.updateOrder)
 router.post('/cancelOrder', adminAuth, orderController.cancelOrder)
+router.post('/approveReturn', adminAuth, orderController.approveReturn)
+router.post('/rejectReturn/:orderId', adminAuth, orderController.rejectReturn)
 
 //coupon management
 
@@ -92,5 +94,8 @@ router.get('/coupons', adminAuth, couponController.getCouponPage)
 router.post('/addCoupon', adminAuth, couponController.addCoupon)
 router.patch('/toggle-coupon/:id', adminAuth, couponController.toggleCoupon)
 
+//sales report
+
+router.get('/salesReport', adminAuth, orderController.getSalesReport)
 
 module.exports = router

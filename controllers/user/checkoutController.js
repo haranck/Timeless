@@ -153,6 +153,7 @@ const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user;
         const { shippingAddress, paymentMethod, totalAmount, couponCode } = req.body;
+        
         const orderedItems = JSON.parse(JSON.stringify(req.body.orderedItems));
         let coupon = await Coupon.findOne({couponCode,usageCount:{$lt:1}})
 

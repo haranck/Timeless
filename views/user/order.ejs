@@ -383,9 +383,9 @@
                     <div class="info-label">Payment Status</div>
                     <div class="info-value">
 
-                        <% if(order.orderStatus === 'cancelled') {%> 
+                        <% if(order.orderStatus === 'cancelled' ) {%> 
                         <span class="status status-cancelled">Cancelled</span>
-                        <% } else if (order.orderStatus ==="delivered"){ %>
+                        <% } else if (order.orderStatus ==="delivered" || order.orderStatus ==="Return rejected" || order.orderStatus ==="Return approved" || order.orderStatus ==="Return requested"){ %>
                             <span class="status status-delivered">Paid</span>
                         <% }else{%>
                             <span class="status status-pending">Pending</span>
@@ -396,6 +396,17 @@
                     <div class="info-label">Total Amount</div>
                     <div class="info-value">₹<%= order.totalAmount || 0 %></div>
                 </div>
+                <div class="info-item">
+                    <div class="info-label">Coupon Applied</div>
+                    <div class="info-value"><%= order.couponApplied  %></div>
+                </div>
+
+                <% if(order.orderStatus === "Return rejected"){  %> 
+                <div class="info-item">
+                    <div class="info-label">Reason for rejecting order</div>
+                    <div class="info-value"><%=order.adminReturnStatus %></div>
+                </div>
+                <% } %>
             </div>
         </div>
 
@@ -488,7 +499,7 @@
             <% if (order.order_items && order.order_items.length > 0) { %>
                 <div class="action-row">
 
-                    <% if(order.status !== 'cancelled' && order.status !== 'delivered' && order.status !== 'returned' && order.status !== 'Return requested') { %>
+                    <% if(order.status !== 'cancelled' && order.status !== 'delivered' && order.status !== 'returned' && order.status !== 'Return requested' && order.status !== 'Return approved' && order.status !== 'Return rejected' && order.status !== 'Return requested') { %>
                     <button class="btn-cancel" onclick="openModal()">
                         <i class="fas fa-times-circle"></i> Cancel Order
                     </button>

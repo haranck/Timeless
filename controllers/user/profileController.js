@@ -174,24 +174,48 @@ const postNewPassword = async (req, res) => {
 
 const userProfile = async (req, res) => {
     try {
-        const userId = req.session.user
-        if(!userId){
-            res.redirect("/login")
+        const userId = req.session.user;
+        if (!userId) {
+            return res.redirect("/login");
         }
-        const userData = await User.findById(userId)
-        if(!userData) {
-            return res.redirect("/login")
+
+        const userData = await User.findById(userId);
+        if (!userData) {
+            return res.redirect("/login");
         }
-        const addressData = await Address.findOne({ userId: userId })
-        const walletData = await Wallet.findOne({ userId: userId })
-        const orders = await Order.find({user_id: userId}).populate("order_items.productId")
-        
-        res.render("profile", { user: userData, userAddress: addressData, orders,wallet:walletData||{transactions:[]} })
+
+        const addressData = await Address.findOne({ userId: userId });
+        const walletData = await Wallet.findOne({ userId: userId }) || { transactions: [] };
+
+        walletData.transactions = walletData.transactions.sort((a, b) => b.createdAt - a.createdAt);
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+        const skip = (page - 1) * limit;
+
+        const totalOrders = await Order.countDocuments({ user_id: userId });
+        const orders = await Order.find({ user_id: userId })
+            .populate("order_items.productId")
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const totalPages = Math.ceil(totalOrders / limit);
+
+        res.render("profile", { 
+            user: userData, 
+            userAddress: addressData, 
+            orders, 
+            wallet: walletData, // Transactions now sorted in descending order
+            currentPage: page, 
+            totalPages 
+        });
     } catch (error) {
-        console.error("Error in userProfile:", error)
-        res.redirect('/pageNotFound')
+        console.error("Error in userProfile:", error);
+        res.redirect('/pageNotFound');
     }
-}
+};
+
 
 const changeEmail = async (req, res) => {
 

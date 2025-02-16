@@ -62,6 +62,7 @@
             background: linear-gradient(45deg, #ffa500, #ffd700);
             color: white;
             margin-right: 0.5rem;
+            margin-left: -50px;
         }
 
         .btn-cancel {
@@ -288,6 +289,102 @@
             padding: 10px 18px;
             font-weight: bold;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /* Light Theme Styles */
+
+
+
+
+
+
+.status-badge {
+    display: inline-block;
+    background-color: #ffcc00;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: #fff;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f1f1f1;
+}
+
+.view-reason {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.view-reason:hover {
+    text-decoration: underline;
+}
+
+.status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.status.pending {
+    background-color: #ffcc00;
+    color: white;
+}
+
+button {
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.approve-btn {
+    background-color: #28a745;
+    color: white;
+    margin-right: 5px;
+}
+
+.reject-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
     </style>
 
     <main class="main-content">
@@ -322,6 +419,9 @@
                                     : order.status === 'shipped' ? 'blue' 
                                     : order.status === 'delivered' ? 'green' 
                                     : order.status === 'cancelled' ? 'red' 
+                                    : order.status === 'Return requested' ? 'purple' 
+                                    : order.status === 'Return approved' ? 'green'
+                                    : order.status === 'Return rejected' ? 'red'
                                     : 'black' %>" <%=order.status==='cancelled' ? 'disabled' : '' %>>
                                     <option value="pending" <%=order.status==='pending' ? 'selected' : '' %>>Pending
                                     </option>
@@ -331,14 +431,24 @@
                                         >Delivered</option>
                                     <option value="cancelled" <%=order.status==='cancelled' ? 'selected' : '' %>
                                         >Cancelled</option>
+                                        <% if(order.status === 'Return requested') {  %> 
+                                    <option value="Return requested" <%=order.status==='Return requested' ? 'selected' : '' %>
+                                        >Return requested</option>
+                                        <% }else if(order.status === 'Return approved') { %> 
+                                    <option value="Return approved" <%=order.status==='Return approved' ? 'selected' : '' %>
+                                        >Return approved</option>
+                                        <% }else if(order.status === 'Return rejected') { %> 
+                                    <option value="Return rejected" <%=order.status==='Return rejected' ? 'selected' : '' %>
+                                        >Return rejected</option>
+                                        <% } %> 
                                 </select>
                             </td>
                             <td>
                                 <%= order.payment_method %>
                             </td>
                             <td>
-                                <button class="btn btn-view" onclick="openModal(<%= index %>)">View</button>
-                                <% if (order.status !=='cancelled' ) { %>
+                                <button class="btn btn-view" onclick="openModal(<%= index %>)" >View</button>
+                                <% if ( order.status !=='delivered'&&order.status !=='cancelled' && order.status !=='Return requested' && order.status !=='Return approved' && order.status !=='Return rejected') { %>
                                     <button class="btn btn-cancel" onclick="cancelOrder('<%= order._id %>')">Cancel
                                         Order</button>
                                     <% } %>
@@ -347,7 +457,43 @@
                         <% }); %>
                 </tbody>
             </table>
+
         </div>
+
+        <% if(returnRequests.length > 0){ %>
+            <div class="container" style="margin-top: 23px;">
+                <h2>Return Requests</h2>
+                <!-- <div class="status-badge">1 Pending</div> -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Return Date</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% returnRequests.forEach((order, index)=> { %>
+                        <tr>
+                            <td>#<%= order._id %></td>
+                            <td> <%= order.user_id.name %></td>
+                            <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                            <td><a href="#" class="view-reason"><%= order.returnReason %></a></td>
+                            <td><span class="status pending"><%= order.status %> </span></td>
+                            <td>
+                                <button class="approve-btn" onclick="approveReturn('<%= order._id %>')">Approve</button>
+                                <button class="reject-btn" onclick="openRejectModal('<%= order._id %>')">Reject</button>
+
+                            </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+            <% } %>
 
         <!-- Order Details Modal -->
         <div id="orderModal" class="modal">
@@ -460,6 +606,31 @@
             </div>
         </div>
     </main>
+
+    <!-- Reject Modal -->
+
+    <div id="rejectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Reject Order</h2>
+                <button class="close-btn" onclick="closeRejectModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="rejectForm">
+                    <input type="hidden" id="rejectOrderId">
+                    <div class="form-group">
+                        <label for="rejectReason">Reason for Rejection:</label>
+                        <textarea id="rejectReason" required></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-cancel" onclick="closeRejectModal()">Cancel</button>
+                        <button type="submit" class="btn-confirm">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -639,6 +810,119 @@
                 closeModal();
             }
         }
+
+        async function approveReturn(orderId) {
+            try {
+                const result = await Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning!',
+                    text: 'Are you sure you want to approve return for this order?',
+                    showConfirmButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    reverseButtons: true
+                });
+
+                if (!result.isConfirmed) {
+                    return;
+                }
+                const response = await fetch('/admin/approveReturn', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderId })
+                })
+                const data = await response.json();
+                if(data.success){
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        toast: true,
+                        position: 'top-end',
+                        html: 'Return approved successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 1500)
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        toast: true,
+                        position: 'top-end',
+                        html: data.message || 'Failed to approve return',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })      
+                }
+                
+                
+            } catch (error) {
+                console.log("error while approving return",error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Something went wrong',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
+        }
+
+        function openRejectModal(orderId) {
+            document.getElementById("rejectOrderId").value = orderId;
+            document.getElementById("rejectModal").style.display = "block";
+        }
+
+        function closeRejectModal() {
+            document.getElementById("rejectModal").style.display = "none";
+        }
+
+        document.getElementById("rejectForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const orderId = document.getElementById("rejectOrderId").value;
+            const reason = document.getElementById("rejectReason").value;
+
+            const response = await fetch(`/admin/rejectReturn/${orderId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ reason })
+            });
+
+            console.log("Response status:", response.status); 
+
+            const data = await response.json()
+
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Order Rejected Successfully!',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    location.reload();
+                })
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Something went wrong',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
+        });
+
+
     </script>
 
     <%- include("../../views/partials/admin/footer") %>

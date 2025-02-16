@@ -346,38 +346,65 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <% if (!orders || orders.length===0) { %>
+                                                        <% if (!orders || orders.length === 0) { %>
                                                             <tr>
-                                                                <td colspan="4">No orders found.</td>
+                                                                <td colspan="5">No orders found.</td>
                                                             </tr>
-                                                            <% } else { %>
-                                                                <% orders.forEach(order=> { %>
-                                                                    <tr>
-                                                                        <td> <img class="cart-img"
-                                                                                src="/uploads/product-images/<%= order.order_items[0].productId.productImages[0] %>"
-                                                                                alt=""></td>
-                                                                        <td>
-                                                                            <%= order.order_items[0].productId.productName
-                                                                                %>
-                                                                        </td>
-                                                                        <td>
-                                                                            <%= order.status %>
-                                                                        </td>
-                                                                        <td>₹<%= order.total %>
-                                                                        </td>
-                                                                        <td>
-                                                                            <a href="/viewOrder/<%= order._id %>"
-                                                                                class="btn btn-sm btn-success ml-2">View</a>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <% }) %>
-                                                                        <% } %>
+                                                        <% } else { %>
+                                                            <% orders.forEach(order => { %>
+                                                                <tr>
+                                                                    <td>
+                                                                        <img class="cart-img"
+                                                                            src="/uploads/product-images/<%= order.order_items[0].productId.productImages[0] %>"
+                                                                            alt="">
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= order.order_items[0].productId.productName %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= order.status %>
+                                                                    </td>
+                                                                    <td>₹<%= order.total %></td>
+                                                                    <td>
+                                                                        <a href="/viewOrder/<%= order._id %>"
+                                                                            class="btn btn-sm btn-success ml-2">View</a>
+                                                                    </td>
+                                                                </tr>
+                                                            <% }) %>
+                                                        <% } %>
                                                     </tbody>
                                                 </table>
                                             </div>
+                                
+                                            <!-- Pagination Controls -->
+                                            <% if (totalPages > 1) { %>
+                                                <nav>
+                                                    <ul class="pagination justify-content-center mt-3">
+                                                        <% if (currentPage > 1) { %>
+                                                            <li class="page-item">
+                                                                <a class="page-link" href="?page=<%= currentPage - 1 %>#orders">Previous</a>
+                                                            </li>
+                                                        <% } %>
+                                
+                                                        <% for (let i = 1; i <= totalPages; i++) { %>
+                                                            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                                                <a class="page-link" href="?page=<%= i %>#orders"><%= i %></a>
+                                                            </li>
+                                                        <% } %>
+                                
+                                                        <% if (currentPage < totalPages) { %>
+                                                            <li class="page-item">
+                                                                <a class="page-link" href="?page=<%= currentPage + 1 %>#orders">Next</a>
+                                                            </li>
+                                                        <% } %>
+                                                    </ul>
+                                                </nav>
+                                            <% } %>
+                                
                                         </div>
                                     </div>
                                 </div>
+                                
 
                                 <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
                                     <div class="card">
@@ -390,27 +417,7 @@
                                                     <h2>My Wallet</h2>
                                                     <p><strong>Wallet Balance:</strong> ₹<%= wallet ? wallet.balance : 0 %></p>
 
-                                                    <!-- <h3>Transaction History</h3>
-                                                    <table border="1">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Type</th>
-                                                                <th>Amount</th>
-                                                                <th>Description</th>
-                                                                <th>Status</th>
-                                                                <th>Date</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>Credit</td>
-                                                                <td>₹5000</td>
-                                                                <td>Wallet Recharge</td>
-                                                                <td>Completed</td>
-                                                                <td>2024-10-20</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table> -->
+                                                    
 
                                                     <h3>Add Money to Wallet</h3>
                                                     <form onsubmit="addMoney()">
@@ -430,7 +437,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                    <div class="tab-pane fade" id="walletHistory" role="tabpanel" aria-labelledby="walletHistory-tab">
+
+                                <!-- Wallet History -->
+                                <div class="tab-pane fade" id="walletHistory" role="tabpanel" aria-labelledby="walletHistory-tab">
                                     <div class="card">
                                       <div class="card-header">
                                         <h5 class="mb-0">Wallet History</h5>
@@ -447,31 +456,33 @@
                                               </tr>
                                             </thead>
                                             <tbody>
-                                                <% if (wallet && wallet.transactions && wallet.transactions.length > 0) { %>
+                                              <% if (wallet && wallet.transactions.length > 0) { %>
                                                 <% wallet.transactions.forEach(transaction => { %> 
-                                              <tr>
-                                                <td><%= transaction.createdAt.getDate() %>/<%= transaction.createdAt.getMonth() %>/<%= transaction.createdAt.getFullYear() %></td>
-                                               <% if(transaction.type==="credit"){ %>
-                                                    <td style="color:green">credit</td>
-                                                <%  }else{ %>
-                                                <td style="color:red">debit</td>
-                                                <%  } %>
-                                                
-                                                <td style="color:black;font-weight:bold;"><%= transaction.amount %></td>
-                                                <td><%= transaction.description %></td>
-                                              </tr>
-                                              <% }) %> 
-                                                <% } else { %>
+                                                  <tr>
+                                                    <td><%= transaction.createdAt.getDate() %>/<%= transaction.createdAt.getMonth() + 1 %>/<%= transaction.createdAt.getFullYear() %></td>
+                                                    <% if(transaction.type === "credit"){ %>
+                                                      <td style="color:green">Credit</td>
+                                                    <% } else { %>
+                                                      <td style="color:red">Debit</td>
+                                                    <% } %>
+                                                    <td style="color:black; font-weight:bold;"><%= transaction.amount %></td>
+                                                    <td><%= transaction.description %></td>
+                                                  </tr>
+                                                <% }) %> 
+                                              <% } else { %>
                                                 <tr>
-                                                  <td colspan="3">No transactions found.</td>
+                                                  <td colspan="4">No transactions found.</td>
                                                 </tr>
-                                                <% } %>
+                                              <% } %>
                                             </tbody>
                                           </table>
                                         </div>
+                                   
+                                  
                                       </div>
                                     </div>
                                   </div>
+                                  
 
                             </div>
                         </div>
@@ -532,23 +543,21 @@
 
 
         $(document).ready(function () {
-            // Initialize Bootstrap tabs
             $('a[data-toggle="tab"]').on('click', function (e) {
                 e.preventDefault();
                 $(this).tab('show');
             });
 
-            // Set initial active tab
             $('#dashboard-tab').tab('show');
 
-            // Handle tab switching and active states
             $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-                // Remove active class from all nav links
                 $('.nav-link').removeClass('active');
-                // Add active class to current tab
                 $(this).addClass('active');
             });
         });
+
+
+
     </script>
 
     <%- include("../../views/partials/user/footer") %>
