@@ -36,8 +36,19 @@
     }
 
     .pdf-btn {
-        background-color: blue;
+        background: linear-gradient(to right, #FFD700, #FF8C00); /* Yellow to Orange */
         color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+        
+    }
+    .pdf-btn:hover{
+        background: linear-gradient(to right, #FF8C00, #FFD700); 
     }
 
     .excel-btn {
@@ -61,8 +72,18 @@
     }
 
     .generate-btn {
-        background-color: #28a745;
+        background: linear-gradient(to right, #77ff00, #00ff11); /* Yellow to Orange */
         color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .generate-btn:hover{
+        background: linear-gradient(to right, #00ff11, #77ff00);
     }
 
     .summary {
@@ -164,7 +185,7 @@
 <div class="container">
     <h2>Sales Report</h2>
     <div class="top-buttons">
-        <button class="pdf-btn">Download PDF</button>
+        <a href="/admin/salesReportPDF/pdf"><button class="pdf-btn">Download PDF</button></a>
         <!-- <button class="excel-btn">Download Excel</button> -->
     </div>
 

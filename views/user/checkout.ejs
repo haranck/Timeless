@@ -947,8 +947,8 @@
                 }
             });
 
-            async function placeOrder() {
-    try {
+    async function placeOrder() {
+      try {
         const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
         const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
@@ -958,8 +958,11 @@
         const subtotalText = document.getElementById("total").innerText.replace("₹", "").trim();
         const totalAmount = parseFloat(subtotalText);
         const couponCode = document.getElementById("couponCode").value.trim();
+        const discountText = document.getElementById("discount").innerText.replace("₹", "").replace("-", "").trim();
+        const discountAmount = parseFloat(discountText) || 0;
+        const appliedCouponCode = currentCouponCode;
 
-        console.log("orderedItems", orderedItems)
+        // console.log("orderedItems", orderedItems)
 
         const confirmResult = await Swal.fire({
             title: 'Confirm Order',
@@ -992,7 +995,8 @@
                     paymentMethod,
                     totalAmount,
                     orderedItems,
-                    couponCode
+                    couponCode:appliedCouponCode,
+                    discountAmount
                 })
             });
 
@@ -1019,7 +1023,8 @@
                     currency: "INR",
                     shippingAddress,
                     orderedItems,
-                    couponCode
+                    couponCode:appliedCouponCode,
+                    // discountAmount
                 })
             });
 
@@ -1046,7 +1051,8 @@
                                 shippingAddress,
                                 orderedItems,
                                 totalAmount,
-                                couponCode,
+                                couponCode:appliedCouponCode,
+                                discountAmount,
                                 paymentMethod: "razorpay"
                             })
                         });
@@ -1107,7 +1113,8 @@
 
 
 
-            let currentAppliedCoupon = '';
+            // let currentAppliedCoupon = '';
+            let currentCouponCode = '';
 
             async function applyCoupons() {
                 const couponInputElement = document.getElementById("couponCode");
@@ -1145,7 +1152,7 @@
                         // Show remove coupon section
                         document.getElementById("removeCouponSection").style.display = "block";
                         document.getElementById("appliedCouponText").innerText = `Applied Coupon: ${couponCode}`;
-                        currentAppliedCoupon = couponCode;
+                        currentCouponCode = couponCode;
 
                         // Clear input
                         couponInputElement.value = '';
@@ -1192,7 +1199,7 @@
                         document.getElementById("total").innerText = `₹${data.cartTotal}`;
                         document.getElementById("couponMessage").innerText = "";
                         document.getElementById("removeCouponSection").style.display = "none";
-                        currentAppliedCoupon = '';
+                        currentCouponCode  = '';
 
                         Swal.fire({
                             title: 'Coupon Removed',

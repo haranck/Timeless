@@ -539,6 +539,7 @@ const deleteAddress = async (req, res) => {
                 }
             }
         )
+        
         res.redirect("/address")
 
     } catch (error) {

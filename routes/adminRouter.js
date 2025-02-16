@@ -97,5 +97,7 @@ router.patch('/toggle-coupon/:id', adminAuth, couponController.toggleCoupon)
 //sales report
 
 router.get('/salesReport', adminAuth, orderController.getSalesReport)
+router.get('/salesReportPDF/pdf', adminAuth, orderController.getSalesReportPDF)
+
 
 module.exports = router

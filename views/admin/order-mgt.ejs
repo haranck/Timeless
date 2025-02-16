@@ -653,6 +653,7 @@ button:hover {
 
             document.getElementById('modalSubtotal').textContent = `₹${order.total}`;
             document.getElementById('modalFinalAmount').textContent = `₹${order.finalAmount}`;
+            document.getElementById('modalDiscount').textContent = `₹${order.discount}`;
 
             // Update products list
             const productsList = document.getElementById('modalProductsList');

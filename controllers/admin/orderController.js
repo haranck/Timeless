@@ -6,6 +6,9 @@ const Brand = require('../../models/brandSchema')
 const Order = require('../../models/orderSchema')
 const { default: mongoose } = require('mongoose')
 const Wallet = require('../../models/walletSchema')
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const path = require('path');
 
 const getOrdersPage = async (req, res) => {
     try {
@@ -158,6 +161,7 @@ const getSalesReport = async (req, res) => {
         const skip = (page - 1) * limit; 
 
         const totalOrders = await Order.countDocuments(); 
+        const totalSales =  await Order.find({}).select('total').then(orders => orders.reduce((sum, order) => sum + order.total, 0))
         const totalPages = Math.ceil(totalOrders / limit); 
 
         const orders = await Order.find({})
@@ -167,7 +171,7 @@ const getSalesReport = async (req, res) => {
             .skip(skip)
             .limit(limit);
 
-        const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
+        // const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
 
         res.render('sales', { 
             orders, 
@@ -183,6 +187,160 @@ const getSalesReport = async (req, res) => {
     }
 };
 
+const getSalesReportPDF = async (req, res) => {
+    try {
+        const orders = await Order.find({})
+            .populate('user_id', 'name email mobile')
+            .populate('order_items.productId', 'productName price')
+            .sort({ createdAt: -1 });
+
+        const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
+        const totalOrders = orders.length;
+
+        // Create a new PDF document
+        const doc = new PDFDocument({
+            margin: 50,
+            size: 'A4'
+        });
+        const filePath = path.join(__dirname, '../publics/sales_report.pdf');
+        const stream = fs.createWriteStream(filePath);
+        doc.pipe(stream);
+
+        // Add company logo/name
+        doc.fontSize(24)
+           .font('Helvetica-Bold')
+           .text('TIMELESS AURA', { align: 'center' })
+           .moveDown(0.5);
+
+        // Add report title
+        doc.fontSize(16)
+           .font('Helvetica')
+           .text('Sales Report', { align: 'center' })
+           .moveDown(0.5);
+
+        // Add date
+        doc.fontSize(10)
+           .text(`Generated on: ${new Date().toLocaleDateString('en-US', {
+               year: 'numeric',
+               month: 'long',
+               day: 'numeric'
+           })}`, { align: 'center' })
+           .moveDown(1);
+
+        // Summary Section with box
+        doc.rect(50, doc.y, 500, 60).stroke();
+        doc.fontSize(12)
+           .text('Summary', 60, doc.y + 10)
+           .fontSize(10)
+           .text(`Total Orders: ${totalOrders}`, 60, doc.y + 5)
+           .text(`Total Sales: ₹${totalSales.toLocaleString()}.00`, 60, doc.y + 5)
+           .moveDown(2);
+
+        // Table Header with background
+        const tableTop = doc.y;
+        const tableHeaders = ['Order ID', 'Date', 'Customer Name', 'Status', 'Amount'];
+        const columnWidths = [120, 80, 140, 80, 80];
+        let xPosition = 50;
+
+        // Draw header background
+        doc.rect(50, tableTop, 500, 20).fill('#f0f0f0');
+
+        // Draw header text
+        doc.font('Helvetica-Bold').fontSize(10);
+        tableHeaders.forEach((header, i) => {
+            doc.fillColor('black')
+               .text(header, xPosition, tableTop + 5, {
+                   width: columnWidths[i],
+                   align: header === 'Amount' ? 'right' : 'left'
+               });
+            xPosition += columnWidths[i];
+        });
+
+        // Table Data
+        doc.font('Helvetica').fontSize(9);
+        let yPosition = tableTop + 25;
+
+        orders.forEach((order, index) => {
+            // Add page if needed
+            if (yPosition > 750) {
+                doc.addPage();
+                yPosition = 50;
+                
+                // Redraw headers on new page
+                xPosition = 50;
+                doc.rect(50, yPosition, 500, 20).fill('#f0f0f0');
+                doc.font('Helvetica-Bold').fontSize(10);
+                tableHeaders.forEach((header, i) => {
+                    doc.fillColor('black')
+                       .text(header, xPosition, yPosition + 5, {
+                           width: columnWidths[i],
+                           align: header === 'Amount' ? 'right' : 'left'
+                       });
+                    xPosition += columnWidths[i];
+                });
+                doc.font('Helvetica').fontSize(9);
+                yPosition += 25;
+            }
+
+            // Draw alternating row background
+            if (index % 2 === 0) {
+                doc.rect(50, yPosition - 5, 500, 20).fill('#f9f9f9');
+            }
+
+            // Draw row data
+            xPosition = 50;
+            doc.fillColor('black')
+               .text(order._id.toString().slice(-8), xPosition, yPosition, {
+                   width: columnWidths[0]
+               });
+            
+            xPosition += columnWidths[0];
+            doc.text(new Date(order.createdAt).toLocaleDateString(), xPosition, yPosition, {
+                width: columnWidths[1]
+            });
+            
+            xPosition += columnWidths[1];
+            doc.text(order.user_id.name, xPosition, yPosition, {
+                width: columnWidths[2]
+            });
+            
+            xPosition += columnWidths[2];
+            doc.text(order.status, xPosition, yPosition, {
+                width: columnWidths[3]
+            });
+            
+            xPosition += columnWidths[3];
+            doc.text(`₹${order.total.toLocaleString()}.00`, xPosition, yPosition, {
+                width: columnWidths[4],
+                align: 'right'
+            });
+
+            yPosition += 20;
+        });
+
+        // Add footer
+        doc.fontSize(8)
+           .text('© 2024 TIMELESS AURA. All rights reserved.', 50, 780, { align: 'center' });
+
+        // Finalize PDF and send response
+        doc.end();
+
+        stream.on('finish', () => {
+            res.download(filePath, 'TIMELESS_AURA_sales_report.pdf', (err) => {
+                if (err) {
+                    console.error("Error downloading PDF:", err);
+                    res.status(500).send("Error downloading PDF");
+                }
+                // Clean up: Delete the file after download
+                fs.unlinkSync(filePath);
+            });
+        });
+
+    } catch (error) {
+        console.log("Error generating sales report PDF", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
 
 
 module.exports = {
@@ -193,6 +351,7 @@ module.exports = {
     cancelOrder,
     approveReturn,
     rejectReturn,
-    getSalesReport
+    getSalesReport,
+    getSalesReportPDF
 }
 

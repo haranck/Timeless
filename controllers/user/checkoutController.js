@@ -152,14 +152,21 @@ const addCheckoutAddress = async (req, res) => {
 const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user;
-        const { shippingAddress, paymentMethod, totalAmount, couponCode } = req.body;
+        const { shippingAddress, paymentMethod, totalAmount, couponCode,discountAmount } = req.body;
         
         const orderedItems = JSON.parse(JSON.stringify(req.body.orderedItems));
-        let coupon = await Coupon.findOne({couponCode,usageCount:{$lt:1}})
-
-        coupon = true
+        
+        let coupon ="";
+        if (couponCode) {
+            coupon = await Coupon.findOne({ couponCode: couponCode });
+            if (!coupon) {
+                return res.status(400).json({ success: false, error: "Invalid coupon code" });
+            }
+        }
 
         const cleanedTotal = parseFloat(totalAmount);
+        const cleanedDiscount = parseFloat(discountAmount);
+        console.log("cleanedDiscount",cleanedDiscount)
 
         if (isNaN(cleanedTotal)) {
             return res.status(400).json({ success: false, error: "Invalid total amount" });
@@ -200,10 +207,19 @@ const placeOrder = async (req, res) => {
             order_items:formattedItems,
             status:"pending",
             total:cleanedTotal,
-            CoupenApplied:coupon
+            // couponCode: couponCode || null, 
+            couponApplied: !!coupon, 
+            discount:cleanedDiscount
             
 
         });
+
+        if (coupon) {
+            await Coupon.findOneAndUpdate(
+                { couponCode },
+                { $inc: { usageCount: 1 } }
+            );
+        }
                                                                
         await newOrder.save();
 
