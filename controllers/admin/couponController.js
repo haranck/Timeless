@@ -3,7 +3,7 @@ const Coupon = require("../../models/couponSchema");
 const getCouponPage = async (req, res) => {
     try {
         let page = parseInt(req.query.page) || 1; 
-        let limit = 5; 
+        let limit = 8; 
         let skip = (page - 1) * limit; 
         
         const coupons = await Coupon.find().sort({couponValidity: -1}).skip(skip).limit(limit)

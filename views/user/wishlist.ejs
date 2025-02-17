@@ -139,18 +139,18 @@
                                                         onclick="addToCart('<%= item.productId._id %>')">Add to
                                                         Cart</button>
                                                     <button class="btn remove"
-                                                        onclick="removeFromWishlist('<%= item.productId._id %>',event)">✕</button>
+                                                        onclick="removeFromWishlist('<%= item.productId._id %>',event)"><i class="fa fa-trash"></i></button>
                                                 </td>
                                                 <% } else { %>
                                                     <td><span class="stock out-of-stock">Out of Stock</span>
-                                                    <p style="display: inline;font-size: 13px; color: #721c24;"> /<%= item.productId.quantity %>left</p></td>
+                                                    <p style="display: inline;font-size: 13px; color: #721c24;"> / <%= item.productId.quantity %>left</p></td>
                                                     <td class="actions">
                                                         <button class="btn add-to-cart disabled" disabled>Add to
                                                             Cart</button>
                                                         <button class="btn remove"
-                                                            onclick="removeFromWishlist('<%= item.productId._id %>',event)">✕</button>
+                                                            onclick="removeFromWishlist('<%= item.productId._id %>',event)"><i class="fa fa-trash"></i></button>
                                                     </td>
-                                                    <% } %>
+                                                <% } %>
                                         </tr>
                                         <% }) %>
                                             <% } else { %>
@@ -210,7 +210,6 @@
                     `;
                 }
 
-                // Show success message
                 Toastify({
                     text: "Success\nProduct added to cart ",
                     duration: 2000,
@@ -234,7 +233,29 @@
                 }).showToast();
             }
         } else {
-            throw new Error(data.message || 'Failed to add product to cart');
+            Toastify({
+                text: "Error\n" + (data.message || 'Failed to add product to cart'),
+                duration: 2000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                stopOnFocus: true,
+                style: {
+                    background: "#ffffff",
+                    color: "#dc3545",
+                    boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)",
+                    padding: "12px 20px",
+                    borderRadius: "10px",
+                    borderLeft: "5px solid #dc3545",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    textAlign: "left",
+                    animation: "fadeInUp 0.5s ease-in-out"
+                },
+                avatar: "https://cdn-icons-png.flaticon.com/512/190/190406.png",
+            }).showToast();
+            
+            // throw new Error(data.message || 'Failed to add product to cart');
         }
     } catch (error) {
         console.error('Error:', error);

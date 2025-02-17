@@ -685,11 +685,7 @@
                                                                     </div>
                                                                     <div class="detail-item">
                                                                         <i class="fas fa-calendar-alt me-2"></i>
-                                                                        <span>Valid Until: <%=
-                                                                                coupon.couponValidity.getDate() %>/<%=
-                                                                                    coupon.couponValidity.getMonth() %>/
-                                                                                    <%= coupon.couponValidity.getFullYear()
-                                                                                        %></span>
+                                                                        <span>Valid Until: <%= new Date(coupon.couponValidity).toLocaleDateString() %></span>
                                                                     </div>
                                                                     <button class="btn-apply-coupon"
                                                                         onclick="copyCoupon('<%= coupon._id %>')">
@@ -721,9 +717,9 @@
                                         <li class="d-flex justify-content-between mb-2">
                                             Subtotal <span id="subtotal">₹<%=cart.totalPrice%></span>
                                         </li>
-                                        <li class="d-flex justify-content-between mb-2">
+                                        <!-- <li class="d-flex justify-content-between mb-2">
                                             Shipping Charge <span>₹0</span>
-                                        </li>
+                                        </li> -->
                                         <li class="d-flex justify-content-between mb-2">
                                             Tax (0%) <span>₹0</span>
                                         </li>
@@ -1014,16 +1010,16 @@
                 throw new Error(data.message || 'Order failed');
             }
         } else if (paymentMethod === "razorpay") {
-            // Create Razorpay order
+
             const orderResponse = await fetch("/createOrder", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     amount: totalAmount,
                     currency: "INR",
-                    shippingAddress,
-                    orderedItems,
-                    couponCode:appliedCouponCode,
+                    // shippingAddress,
+                    // orderedItems,
+                    // couponCode:appliedCouponCode,
                     // discountAmount
                 })
             });
@@ -1049,7 +1045,7 @@
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_signature: response.razorpay_signature,
                                 shippingAddress,
-                                orderedItems,
+                                orderedItems, 
                                 totalAmount,
                                 couponCode:appliedCouponCode,
                                 discountAmount,
@@ -1186,7 +1182,7 @@
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
-                            couponCode: currentAppliedCoupon,
+                            couponCode: currentCouponCode,
                             subtotal
                         })
                     });

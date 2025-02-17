@@ -17,13 +17,13 @@ const loadCheckout = async (req, res) => {
         const user = await User.findById(userId);
         const addressDoc = await Address.findOne({ userId: userId });
         const carttotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+        
         const date= new Date();
         const coupon = await Coupon.find({ 
             couponMinAmount: { $lte: carttotal },
             isActive: true ,
             limit: { $gt: 0 },
-            couponValidity: { $gte: date},
-            
+            couponValidity: { $gte: date }
         });
 
         let userAddress = [];
@@ -166,7 +166,7 @@ const placeOrder = async (req, res) => {
 
         const cleanedTotal = parseFloat(totalAmount);
         const cleanedDiscount = parseFloat(discountAmount);
-        console.log("cleanedDiscount",cleanedDiscount)
+        // console.log("cleanedDiscount",cleanedDiscount)
 
         if (isNaN(cleanedTotal)) {
             return res.status(400).json({ success: false, error: "Invalid total amount" });
@@ -207,7 +207,7 @@ const placeOrder = async (req, res) => {
             order_items:formattedItems,
             status:"pending",
             total:cleanedTotal,
-            // couponCode: couponCode || null, 
+            couponCode: couponCode || null, 
             couponApplied: !!coupon, 
             discount:cleanedDiscount
             

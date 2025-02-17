@@ -160,11 +160,11 @@ const getSalesReport = async (req, res) => {
         const limit = 10; 
         const skip = (page - 1) * limit; 
 
-        const totalOrders = await Order.countDocuments(); 
-        const totalSales =  await Order.find({}).select('total').then(orders => orders.reduce((sum, order) => sum + order.total, 0))
+        const totalOrders = await Order.countDocuments({status: { $in: ["delivered", "Return rejected"] }})
+        const totalSales =  await Order.find({ status: { $in: ["delivered", "Return rejected"] } }).select('total').then(orders => orders.reduce((sum, order) => sum + order.total, 0))
         const totalPages = Math.ceil(totalOrders / limit); 
 
-        const orders = await Order.find({})
+        const orders = await Order.find({status: { $in: ["delivered", "Return rejected"] } })
             .populate('user_id', 'name email mobile')
             .populate('order_items.productId', 'productName price')
             .sort({ createdAt: -1 })
@@ -189,7 +189,7 @@ const getSalesReport = async (req, res) => {
 
 const getSalesReportPDF = async (req, res) => {
     try {
-        const orders = await Order.find({})
+        const orders = await Order.find({status: { $in: ["delivered", "Return rejected"] } })
             .populate('user_id', 'name email mobile')
             .populate('order_items.productId', 'productName price')
             .sort({ createdAt: -1 });
@@ -290,7 +290,7 @@ const getSalesReportPDF = async (req, res) => {
             // Draw row data
             xPosition = 50;
             doc.fillColor('black')
-               .text(order._id.toString().slice(-8), xPosition, yPosition, {
+               .text("#"+order._id.toString().slice(-20), xPosition, yPosition, {
                    width: columnWidths[0]
                });
             

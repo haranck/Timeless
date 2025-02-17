@@ -14,16 +14,6 @@ const addMoney = async (req, res) => {
 
         let wallet = await Wallet.findOne({ userId: userId })
 
-
-        // if(!wallet || wallet.balance<amount){
-        //     return res.status(400).json({ success:false,message: 'Insufficient balance' });
-        // }
-        // wallet.balance -= amount;
-        // wallet.transactions.push({ type: 'debit', amount, description: 'Order Payment' });
-
-        // await wallet.save();
-        // return res.status(200).json({ success:true,message: 'Money added successfully' });
-
         if(!wallet){
             wallet = new Wallet({
                 userId: userId,

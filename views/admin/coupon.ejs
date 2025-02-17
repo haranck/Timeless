@@ -241,8 +241,7 @@
                                         <%= coupon.couponMaxAmount %>
                                     </td>
                                     <td>
-                                        <%= coupon.couponValidity.getDate() %>/<%= coupon.couponValidity.getMonth() %>/
-                                                <%= coupon.couponValidity.getFullYear() %>
+                                        <%= new Date(coupon.couponValidity).toLocaleDateString() %>
                                     </td>
                                     <!-- <td>
                                             <span class="badge bg-success">Active</span>

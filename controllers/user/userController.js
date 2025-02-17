@@ -333,7 +333,7 @@ const filterProducts = async (req, res) => {
 
        const listedCategories = await Category.find({ isListed:true}).lean()
        const filteredCategories = listedCategories.filter((cat)=>categories.includes(cat._id.toString()))
-       console.log(listedCategories)
+      //  console.log(listedCategories)
        if (filteredCategories && filteredCategories.length > 0) {
            filter.category = { $in: filteredCategories , $ne: null};
        }else{
@@ -347,7 +347,7 @@ const filterProducts = async (req, res) => {
        if(searchQuery){
            filter.productName = { $regex: searchQuery, $options: 'i' };
        }
-       console.log(filter)
+      //  console.log(filter)
        let query = Product.find({isListed:true}).populate('category').find(filter).skip(skip).limit(limit);
 
        if (sortBy) {

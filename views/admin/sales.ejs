@@ -132,8 +132,8 @@
 
 /* Existing statuses */
 .delivered {
-    background-color: #28a745; /* Green */
-    color: white;
+    background-color: #7cdd93; /* Green */
+    color: rgb(26, 70, 16);
 }
 
 .cancelled {
@@ -148,8 +148,8 @@
 
 /* New return statuses */
 .return-rejected {
-    background-color: #dc3545; /* Red */
-    color: white;
+    background-color: #e6828c; /* Red */
+    color: rgb(150, 20, 20);
 }
 
 .return-approved {
@@ -237,7 +237,7 @@
                     <td class="status <%= order.status.replace(/\s+/g, '-').toLowerCase() %>">
                         <%= order.status %>
                     </td>
-                    <td><%= order.finalAmount %></td>
+                    <td>₹ <%= order.finalAmount.toFixed(2) %></td>
                 </tr>
             <% }) %>
         </tbody>

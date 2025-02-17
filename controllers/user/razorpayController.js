@@ -1,9 +1,9 @@
-
 const Razorpay = require("razorpay");
 require("dotenv").config();
 const crypto = require("crypto");
 const Order = require("../../models/orderSchema");
 const Cart = require("../../models/cartSchema");
+const Product = require("../../models/productSchema");
 
 const razorpayInstance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -29,6 +29,7 @@ const createOrder = async (req, res) => {
             currency: order.currency,
             key: process.env.RAZORPAY_KEY_ID
         });
+
     } catch (error) {
         console.error("Error creating order:", error);
         res.status(500).json({ success: false, error: "Failed to create order" });
@@ -44,17 +45,16 @@ const verifyPayment = async(req, res) => {
             shippingAddress,
             orderedItems,
             totalAmount,
-            couponCode 
+            couponCode ,
+            discountAmount
         } = req.body;
 
         if (!req.session.user) {
             return res.status(401).json({ success: false, message: "Not authenticated" });
         }
 
-        // Parse orderedItems if it's a string
         const parsedOrderItems = typeof orderedItems === 'string' ? JSON.parse(orderedItems) : orderedItems;
 
-        // Transform the order items to match schema
         const transformedOrderItems = parsedOrderItems.map(item => ({
             productId: item.productId._id,
             productName: item.productId.productName,
@@ -77,25 +77,41 @@ const verifyPayment = async(req, res) => {
                 finalAmount: totalAmount,
                 status: "pending",
                 couponApplied: couponCode ? true : false,
+                discount: discountAmount || 0,
                 razorpay_order_id,
                 razorpay_payment_id
             });
 
             const savedOrder = await newOrder.save();
-            const cart = await Cart.findOne({ userId: req.session.user });
+
+            let cart = await Cart.findOne({ userId: req.session.user });
+
             if (!cart) {
                 cart = new Cart({
                     userId: req.session.user,
                     items: [],
                     cartTotal: 0
-                });
+                }); 
+
+            }else {
+                cart.items = [];
+                cart.cartTotal = 0;
             }
-            
+
+            await cart.save();
+
+            orderedItems.forEach(async (item) =>{
+                 await Product.updateOne(
+                    {_id:item.productId._id},
+                    {$inc:{quantity:-item.quantity}}
+                )
+            })
             
             res.json({ 
                 success: true, 
                 orderId: savedOrder._id
             });
+
         } else {
             res.status(400).json({ success: false, message: "Payment verification failed" });
         }

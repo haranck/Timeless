@@ -107,7 +107,7 @@ const addToCart = async (req, res) => {
             
             const {finalPrice,appliedOffer,regularPrice} = getDiscountPrice(product);
 
-            console.log("finalPrice",finalPrice,"appliedOffer",appliedOffer,"regularPrice",regularPrice);
+            // console.log("finalPrice",finalPrice,"appliedOffer",appliedOffer,"regularPrice",regularPrice);
 
             cart.items[existingItemIndex].quantity = newQuantity;
             cart.items[existingItemIndex].totalPrice =  newQuantity * finalPrice;

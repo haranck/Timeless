@@ -1,6 +1,7 @@
 const Wishlist = require("../../models/wishlistSchema")
 const Product = require("../../models/productSchema")
 const User = require("../../models/userSchema")
+const Cart = require("../../models/cartSchema")
 
 
 const loadWishlist = async (req,res)=>{
@@ -22,17 +23,31 @@ const addToWishlist = async (req,res)=>{
     try {
         const userId = req.session.user
         const {productId} = req.body
+        
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "User not logged in" });
+        }
+
         let wishlist = await Wishlist.findOne({userId})
 
         if (!wishlist) {
             wishlist = new Wishlist({ userId: userId, items: [] });
         }
 
-        const existingItemIndex = wishlist.items.findIndex(item => item.productId.toString() === productId);
-        if(existingItemIndex === -1){
-            wishlist.items.push({productId})
-            await wishlist.save()
+        const cart = await Cart.findOne({ userId, "items.productId": productId });
+
+        if (cart) {
+            return res.status(400).json({ success: false, message: "Item is already in the cart" });
         }
+
+        const existingItemIndex = wishlist.items.findIndex(item => item.productId.toString() === productId);
+         if (existingItemIndex !== -1) {
+            return res.status(200).json({ success: false, message: "Item already in wishlist" });
+        }
+
+        wishlist.items.push({productId})
+
+        await wishlist.save()
 
         res.status(200).json({success:true, message:"Added to wishlist"})
     } catch (error) {
