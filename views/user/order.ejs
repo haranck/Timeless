@@ -420,7 +420,7 @@
             <div class="info-grid">
                 <% if (order.address && Object.keys(order.address).length > 0) { %>
                     <div class="info-item">
-                        <div class="info-label">Customer Name</div>
+                        <div class="info-label">Delevery place</div>
                         <div class="info-value"><%= order.address.name || 'N/A' %></div>
                     </div>
                     <div class="info-item">
@@ -439,8 +439,9 @@
                     <div class="info-item">
                         <div class="info-label">Address</div>
                         <div class="info-value">
+                            <%= order.address.name %> <br>
                             <% if (order.address.landMark) { %>
-                                <%= order.address.landMark %><br>
+                                LandMark:<%= order.address.landMark %><br>
                             <% } %>
                             <%= order.address.city || '' %>
                             <% if (order.address.state) { %>

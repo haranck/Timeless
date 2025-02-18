@@ -58,7 +58,7 @@ const updateOrder = async (req, res) => {
 
         await updatedOrder.save()
 
-        res.status(200).json({ success: true, message: "order updated successfully" })
+        res.status(200).json({ success: true, message: "order updated successfully",status:updatedOrder.status })
 
     } catch (error) {
         console.log("error updating order", error)

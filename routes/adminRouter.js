@@ -48,8 +48,10 @@ router.get('/', adminAuth, adminController.loadDashboard)            /////
 router.get('/logout', adminController.logout)
 router.get('/customers', adminAuth, customerController.customerInfo)
 
-router.get('/blockedCustomer', adminAuth, customerController.customerBlocked)
-router.get('/unblockedCustomer', adminAuth, customerController.customerunBlocked)
+// router.get('/blockedCustomer', adminAuth, customerController.customerBlocked)
+// router.get('/unblockedCustomer', adminAuth, customerController.customerunBlocked)
+
+router.post('/toggleBlock', adminAuth, customerController.toggleBlock);
 
 router.get('/category', adminAuth, categoryController.categoryInfo)
 router.post('/addCategory', adminAuth, categoryController.addCategory)

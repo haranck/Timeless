@@ -717,9 +717,9 @@
                                         <li class="d-flex justify-content-between mb-2">
                                             Subtotal <span id="subtotal">₹<%=cart.totalPrice%></span>
                                         </li>
-                                        <!-- <li class="d-flex justify-content-between mb-2">
-                                            Shipping Charge <span>₹0</span>
-                                        </li> -->
+                                        <li class="d-flex justify-content-between mb-2">
+                                            Shipping Charge <span id="shipping-charge">₹40</span>
+                                        </li>
                                         <li class="d-flex justify-content-between mb-2">
                                             Tax (0%) <span>₹0</span>
                                         </li>
@@ -727,7 +727,7 @@
                                             Discount <span id="discount">-₹0</span>
                                         </li>
                                         <li class="d-flex justify-content-between total-amount" id="total-amount">
-                                            <strong>Total</strong> <strong id="total">₹<%=cart.cartTotal%></strong>
+                                            <strong>Total</strong> <strong id="total">₹<%=cart.cartTotal + 40 %></strong>
                                         </li>
                                         <div id="removeCouponSection" style="display: none;" class="mt-2 text-center">
                                             <small class="text-success mb-2 d-block" id="appliedCouponText"></small>
@@ -736,8 +736,7 @@
                                                 <i class="fas fa-times-circle"></i> Remove Coupon
                                             </button>
                                         </div>
-                                        <p id="couponMessage" style="color: red;    margin-left: 76px;
-    margin-top: 12px;"></p>
+                                        <p id="couponMessage" style="color: red;margin-left: 76px;margin-top: 12px;"></p>
                                     </ul>
 
                                 </div>
@@ -945,14 +944,14 @@
 
     async function placeOrder() {
       try {
+        // const shippingCharge = 40;
         const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
         const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
-        // Change this line
         const sanitizedOrderItems = sanitizeQuotes('<%- JSON.stringify(cart.items) %>');
         const orderedItems = JSON.parse(sanitizedOrderItems); 
-        const subtotalText = document.getElementById("total").innerText.replace("₹", "").trim();
-        const totalAmount = parseFloat(subtotalText);
+        let subtotalText = document.getElementById("total").innerText.replace("₹", "").trim();
+        let  totalAmount = parseFloat(subtotalText);
         const couponCode = document.getElementById("couponCode").value.trim();
         const discountText = document.getElementById("discount").innerText.replace("₹", "").replace("-", "").trim();
         const discountAmount = parseFloat(discountText) || 0;
@@ -1007,7 +1006,12 @@
                 });
                 window.location.href = `/viewOrder/${data.orderId}`;
             } else {
-                throw new Error(data.message || 'Order failed');
+                Swal.fire({
+                    title: 'Error!',
+                    text: data.message||'Minimum order amount for COD is ₹1000', 
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+            });
             }
         } else if (paymentMethod === "razorpay") {
 

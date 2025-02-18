@@ -217,85 +217,6 @@ const userProfile = async (req, res) => {
 };
 
 
-const changeEmail = async (req, res) => {
-
-    try {
-
-        const { email } = req.body
-        const userExists = await User.findOne({ email: email })
-        if (userExists) {
-            res.render("change-email", { message: "User with this email already exists" })
-        }
-        res.render("change-email")
-    } catch (error) {
-        res.redirect('/pageNotFound')
-    }
-
-}
-
-const changeEmailValid = async (req, res) => {
-    try {
-        const { email } = req.body
-        const userExists = await User.findOne({ email: email })
-        if (userExists) {
-            const otp = generateOtp()
-            const emailSent = await sendVerificationEmail(email, otp);
-            if (emailSent) {
-                req.session.userOtp = otp
-                req.session.userData = req.body
-                req.session.email = email
-                res.render("change-email-otp")
-                console.log("email sent", email)
-                console.log("otp sent", otp);
-            } else {
-                res.json({ success: false, message: "Failed to send OTP. Please try again." })
-            }
-
-
-        } else {
-            res.render("change-email", { message: "User with this email not found" })
-        }
-
-
-    } catch (error) {
-
-        res.redirect('/pageNotFound')
-
-    }
-}
-
-const verifyEmailOtp = async (req, res) => {
-    try {
-
-        const enteredOtp = req.body.otp
-        if (enteredOtp === req.session.userOtp) {
-            req.session.userData = req.body.userData
-            res.render("new-email", {
-                userData: req.session.userData
-            })
-        } else {
-            res.render("change-email-otp", { message: "Invalid OTP", userData: req.session.userData })
-        }
-
-    } catch (error) {
-        res.redirect('/pageNotFound')
-    }
-}
-const updateEmail = async (req, res) => {
-
-    try {
-
-        const newEmail = req.body.newEmail
-        const userId = req.session.user
-        await User.findByIdAndUpdate(userId, { email: newEmail },{new:true})
-        res.redirect("/userProfile")
-
-
-    } catch (error) {
-        res.redirect('/pageNotFound')
-    }
-}
-
 const changePassword = async (req, res) => {
     try {
 
@@ -307,58 +228,88 @@ const changePassword = async (req, res) => {
     }
 }
 
-const changePasswordValid = async (req, res) => {
-
+const verifyCurrentPassword = async (req, res) => {
     try {
+        const userId = req.session.user;
+        const { currentPassword } = req.body;
 
-        const { email } = req.body
-        const userExists = await User.findOne({ email: email })
-        if (userExists) {
-            const otp = generateOtp()
-            const emailSent = await sendVerificationEmail(email, otp);
-            if (emailSent) {
-                req.session.userOtp = otp
-                req.session.userData = req.body
-                req.session.email = email
-                res.render("change-password-otp")
-
-                console.log("otp sent", otp);
-            } else {
-                res.json({ success: false, message: "Failed to send OTP. Please try again." })
-            }
-
-        } else {
-            res.render("change-password", { message: "User with this email not found" })
+        if (!currentPassword) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Current password is required' 
+            });
         }
 
-    } catch (error) {
-        console.log("Error changing password", error)
-        res.redirect('/pageNotFound')
-    }
-
-}
-
-const verifyChangePassOtp = async (req, res) => {
-    try {
-        const enteredOtp = req.body.otp
-        
-        if (enteredOtp === req.session.userOtp) {
-            res.json({
-                success: true,
-                message: "OTP verified successfully",
-                redirectUrl: "/reset-password"
-            })
-        } else {
-            res.json({
-                success: false,
-                message: "Invalid OTP"
-            })
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'User not found' 
+            });
         }
+
+        // Verify current password
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Current password is incorrect' 
+            });
+        }
+
+        res.json({ success: true });
+
     } catch (error) {
-        console.log("Error verifying OTP", error)
-        res.redirect('/pageNotFound')
+        console.error('Error verifying password:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error' 
+        });
     }
-}
+};
+
+const updatePassword = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const { newPassword } = req.body;
+
+        if (!newPassword) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'New password is required' 
+            });
+        }
+
+        // Validate password
+        if (newPassword.length < 6) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Password must be at least 6 characters long' 
+            });
+        }
+
+        // Hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update password in database
+        await User.findByIdAndUpdate(userId, { 
+            password: hashedPassword 
+        });
+
+        res.json({ 
+            success: true, 
+            message: 'Password updated successfully' 
+        });
+
+    } catch (error) {
+        console.error('Error updating password:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error' 
+        });
+    }
+};
+
 
 const getAllAddresses = async (req, res) => {
     try {
@@ -556,17 +507,13 @@ module.exports = {
     resendtOTP,
     postNewPassword,
     userProfile,
-    changeEmail,
-    changeEmailValid,
-    verifyEmailOtp,
-    updateEmail,
     changePassword,
-    changePasswordValid,
-    verifyChangePassOtp,
     addAddress,
     postAddAddress,
     getAllAddresses,
     editAddress,
     postEditAddress,
-    deleteAddress
+    deleteAddress,
+    verifyCurrentPassword,
+    updatePassword
 }

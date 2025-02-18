@@ -55,28 +55,42 @@ const customerInfo = async (req, res) => {
    }
 }
 
-const customerBlocked = async (req, res) => {
-   try {
-      let id = req.query.id
-      await User.updateOne({ _id: id }, { $set: { isblocked: true } })
-      res.redirect('/admin/customers')
-   } catch (error) {
-      res.redirect('/pageerror')
-   }
-}
+// const customerBlocked = async (req, res) => {
+//    try {
+//       let id = req.query.id
+//       await User.updateOne({ _id: id }, { $set: { isblocked: true } })
+//       res.redirect('/admin/customers')
+//    } catch (error) {
+//       res.redirect('/pageerror')
+//    }
+// }
 
-const customerunBlocked = async (req, res) => {
+// const customerunBlocked = async (req, res) => {
+//    try {
+//       let id = req.query.id
+//       await User.updateOne({ _id: id }, { $set: { isblocked: false } })
+//       res.redirect("/admin/customers")
+//    } catch (error) {
+//       res.redirect("/pageerror")
+//    }
+// }
+
+
+const toggleBlock = async (req, res) => {
    try {
-      let id = req.query.id
-      await User.updateOne({ _id: id }, { $set: { isblocked: false } })
-      res.redirect("/admin/customers")
+       const { id, isBlocked } = req.body;
+       await User.updateOne({ _id: id }, { $set: { isblocked: isBlocked } });
+
+       return res.json({ success: true });
    } catch (error) {
-      res.redirect("/pageerror")
+       console.error("Error:", error);
+       return res.status(500).json({ success: false, message: "Internal Server Error" });
    }
-}
+};
 
 module.exports = {
    customerInfo,
-   customerBlocked,
-   customerunBlocked
+   toggleBlock,
+   // customerBlocked,
+   // customerunBlocked
 }

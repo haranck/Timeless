@@ -153,6 +153,10 @@ const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user;
         const { shippingAddress, paymentMethod, totalAmount, couponCode,discountAmount } = req.body;
+
+        if(paymentMethod === "cod" && totalAmount>1000){
+            return res.status(400).json({ success: false, error: "Minimum order amount for COD is ₹1000" });
+        }
         
         const orderedItems = JSON.parse(JSON.stringify(req.body.orderedItems));
         

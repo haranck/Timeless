@@ -205,11 +205,11 @@
 
     <div class="summary">
         <div class="box">
-            <h4>Overall orders Count</h4>
+            <h4>Overall Sales Count</h4>
             <p><%- totalOrders %></p>
         </div>
         <div class="box">
-            <h4>Overall Order Amount</h4>
+            <h4>Overall Sales Amount</h4>
             <p>₹<%- totalSales %>.00</p>
         </div>
         <!-- <div class="box">
@@ -224,6 +224,7 @@
                 <th>Order ID</th>
                 <th>Date</th>
                 <th>Customer Name</th>
+                <th>Product</th>
                 <th>Order Status</th>
                 <th>Amount</th>
             </tr>
@@ -231,9 +232,10 @@
         <tbody>
             <% orders.forEach(order => { %>
                 <tr>
-                    <td><%- order._id %></td>
+                    <td>#<%- order._id %></td>
                     <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
                     <td><%= order.user_id.name %></td>
+                    <td><%- order.order_items[0].productId.productName %></td>
                     <td class="status <%= order.status.replace(/\s+/g, '-').toLowerCase() %>">
                         <%= order.status %>
                     </td>

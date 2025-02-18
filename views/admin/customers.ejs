@@ -1,73 +1,6 @@
 <%- include("../../views/partials/admin/header") %>
 
-<div class="main-content">
-    <div class="container-fluid">
-        <div class="content-wrapper">
-            <h2 class="mb-4">Customers</h2>
-            
-            <!-- Search Bar -->
-            <div class="search-container">
-                <form method="GET" action="/admin/customers">
-                    <div class="input-group">
-                        <input type="text" name="search" value="<%= search %>" id="searchInput" class="form-control" placeholder="Search customers..." />
-                        <button type="submit" class="btn btn-primary">Search</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Customers Table -->
-            <div class="table-container">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone No.</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% for (let i = 0; i < data.length; i++) { %>
-                            <tr>
-                                <td><%= data[i].name %></td>
-                                <td><%= data[i].email %></td>
-                                <td><%= data[i].phone %></td>
-                                <td>
-                                    <% if (data[i].isblocked === false) { %>
-                                        <a href="/admin/blockedCustomer?id=<%= data[i]._id %>" class="btn btn-danger">Block</a>
-                                    <% } else { %>
-                                        <a href="/admin/unblockedCustomer?id=<%= data[i]._id %>" class="btn btn-success">Unblock</a>
-                                    <% } %>
-                                </td>
-                            </tr>
-                        <% } %>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            <nav aria-label="Page navigation">
-                <ul class="pagination">
-                    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
-                        <a class="page-link" href="/admin/customers?page=<%= currentPage - 1 %>&search=<%= search %>" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    <% for (let i = 1; i <= totalPages; i++) { %>
-                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                            <a class="page-link" href="/admin/customers?page=<%= i %>&search=<%= search %>"><%= i %></a>
-                        </li>
-                    <% } %>
-                    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
-                        <a class="page-link" href="/admin/customers?page=<%= currentPage + 1 %>&search=<%= search %>" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-</div>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
     .main-content {
@@ -140,5 +73,124 @@
         padding: 12px 18px;
     }
 </style>
+
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="content-wrapper">
+            <h2 class="mb-4">Customers</h2>
+            
+            <!-- Search Bar -->
+            <div class="search-container">
+                <form method="GET" action="/admin/customers">
+                    <div class="input-group">
+                        <input type="text" name="search" value="<%= search %>" id="searchInput" class="form-control" placeholder="Search customers..." 
+                        style="height: 40px;width: 272px;padding: 10px;">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                    
+                </form>
+            </div>
+
+            <!-- Customers Table -->
+            <div class="table-container">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone No.</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for (let i = 0; i < data.length; i++) { %>
+                            <tr>
+                                <td><%= data[i].name %></td>
+                                <td><%= data[i].email %></td>
+                                <td><%= data[i].phone %></td>
+                                <!-- <td>
+                                    <if (data[i].isblocked === false) { %>
+                                        <a href="/admin/blockedCustomer?id=<= data[i]._id %>" class="btn btn-danger">Block</a>
+                                    < } else { %>
+                                        <a href="/admin/unblockedCustomer?id=<= data[i]._id %>" class="btn btn-success">Unblock</a>
+                                    <} %>
+                                </td> -->
+                                <td>
+                                    <button onclick="toggleBlock('<%= data[i]._id %>', <%= data[i].isblocked %>)" 
+                                        class="btn <%= data[i].isblocked ? 'btn-success' : 'btn-danger' %>">
+                                        <%= data[i].isblocked ? 'Unblock' : 'Block' %>
+                                    </button>
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                        <a class="page-link" href="/admin/customers?page=<%= currentPage - 1 %>&search=<%= search %>" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="/admin/customers?page=<%= i %>&search=<%= search %>"><%= i %></a>
+                        </li>
+                    <% } %>
+                    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="/admin/customers?page=<%= currentPage + 1 %>&search=<%= search %>" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<script>
+    async function toggleBlock(userId, isBlocked) {
+        try {
+            const response = await fetch('/admin/toggleBlock', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: userId, isBlocked: !isBlocked })
+            });
+            
+                const data = await response.json();
+                if (data.success) {
+                   Swal.fire({
+    title: 'Success!',
+    text: isBlocked ? 'Customer unblocked successfully' : 'Customer blocked successfully',
+    toast: true,
+    position: 'top-end',
+    icon: 'success',
+    showConfirmButton: false,
+    timer: 1500,
+    background: 'linear-gradient(to right, #4CAF50, #A5D6A7)', // Darker to lighter green
+});
+                    const button = document.querySelector(`button[onclick="toggleBlock('${userId}', ${isBlocked})"]`);
+                    button.innerText = isBlocked ? "Block" : "Unblock";
+                    button.classList.toggle('btn-danger');
+                    button.classList.toggle('btn-success');
+
+                    button.setAttribute('onclick', `toggleBlock('${userId}', ${!isBlocked})`);
+                }
+            
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+    </script>
+    
 
 <%- include("../../views/partials/admin/footer") %>

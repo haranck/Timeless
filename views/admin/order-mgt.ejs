@@ -709,7 +709,14 @@ button:hover {
                     if (status.toLowerCase() === 'cancelled') {
                         selectElement.disabled = true;
                     }
-                    window.location.reload();
+                    const orderRow = document.querySelector(`tr[data-order-id="${orderId}"]`);
+                    if (orderRow) {
+                        const statusSelect = orderRow.querySelector('.status-select');
+                        if (statusSelect) {
+                            statusSelect.value = status;
+                            statusSelect.style.color = { pending: 'orange', shipped: 'blue', delivered: 'green', cancelled: 'red' }[status] || 'black';
+                        }
+                    }
 
                 } else {
                     Swal.fire({
@@ -760,7 +767,6 @@ button:hover {
                 });
 
                 const data = await response.json();
-                console.log(data);
 
                 if (data.success) {
                     Swal.fire({
@@ -783,7 +789,6 @@ button:hover {
                             cancelButton.remove();
                         }
                     }
-                    window.location.reload();
                 } else {
                     Swal.fire({
                         icon: 'error',

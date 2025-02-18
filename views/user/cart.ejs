@@ -183,13 +183,13 @@
                             
                             cartRow.remove();
                             
-                        
+
                             calculateTotalPrice();
                             
                             // Check if cart is empty
                             const remainingItems = document.querySelectorAll('tr').length;
                             if (remainingItems <= 1) {
-                                location.reload(); // Reload to show empty cart message
+                                location.reload();
                             }
 
                             Swal.fire('Removed!', 'Your item has been removed.', 'success');
@@ -219,7 +219,6 @@
                 }
             });
 
-            // Add IDs to the price elements in the HTML for easier selection
             document.querySelectorAll('ul li').forEach(li => {
                 const text = li.childNodes[0].textContent.trim();
                 if (text === 'Subtotal') {
@@ -233,7 +232,6 @@
             return subtotal;
         }
 
-        // Call the function when page loads
         document.addEventListener('DOMContentLoaded', calculateTotalPrice);
 
         async function updateItemQuantity(productId, action, value = null) {
@@ -276,24 +274,23 @@
                 Swal.fire('Error!', data.message, 'error');
                 return;
             }
- 
-            // await Swal.fire('Success!', '', 'success');
-            await Swal.fire({
-                title: 'Success!',
-                icon: 'success',
-                showConfirmButton: false,
-                timer: 1000
-            })
 
-            if (newQuantity !== currentQuantity) {  // If quantity changed
+            // await Swal.fire({
+            //     title: 'Success!',
+            //     icon: 'success',
+            //     toast: true,
+            //     position: 'top-end',
+            //     showConfirmButton: false,
+            //     timer: 1000
+            // })
+
+            if (newQuantity !== currentQuantity) {  
                 quantityInput.value = newQuantity;
                 
-                // Update the price for this item
                 const pricePerUnit = parseFloat(quantityInput.closest('tr').querySelector('.product__cart__item__text h5').textContent.replace('₹', ''));
                 const totalPriceElement = quantityInput.closest('tr').querySelector('.cart__price');
                 totalPriceElement.textContent = `₹${(pricePerUnit * newQuantity).toFixed(2)}`;
 
-                // Recalculate total cart price
                 calculateTotalPrice()            
             }
         }
