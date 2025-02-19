@@ -26,13 +26,15 @@ const productDetails = async (req, res) => {
             _id: { $ne: productId }
         }).limit(4);
 
+        const processedRelatedProducts = relatedProducts.map(getDiscountPrice);
+
         res.render("product-details", {
             product: processedProducts,
             user: userData,
             quantity: product.quantity,
             category: product.category, 
             brand: product.brand, 
-            relatedProducts: relatedProducts
+            relatedProducts: processedRelatedProducts
         });
 
     } catch (error) {

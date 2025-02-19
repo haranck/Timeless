@@ -232,9 +232,7 @@ const editProduct = async (req, res) => {
       }
 
     
-      const productOffer = salePrice < regularPrice ? (((regularPrice - salePrice) / regularPrice) * 100).toFixed(2) 
-         : "0%";
-
+      
       
       const categoryId = await Category.findOne({ name: data.category });
       if (!categoryId) {
@@ -300,7 +298,7 @@ const editProduct = async (req, res) => {
       existingProduct.productImages = updatedImages;
       
       // Explicitly set product offer
-      existingProduct.productOffer = productOffer;
+      
 
       // Save the updated product
       await existingProduct.save();
@@ -318,7 +316,7 @@ const editProduct = async (req, res) => {
       return res.status(200).json({
          success: true, 
          message: "Product updated successfully",
-         productOffer: productOffer
+         
       });
 
    } catch (error) {

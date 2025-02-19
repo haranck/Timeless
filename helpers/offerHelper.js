@@ -14,8 +14,6 @@ const getDiscountPrice = (product) => {
    };
  }
 
-
- 
 const getDiscountPriceCart = (product) => {
   let productOffer = product.productOffer || 0;
   let categoryOffer = product.category?.categoryOffer || 0;

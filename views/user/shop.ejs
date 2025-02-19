@@ -65,11 +65,13 @@
         }
 
         .product-card__title {
-            font-weight: 600;
+            font-weight: bold;
             margin-bottom: 10px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            display: flex;
+            justify-content: center;
         }
 
         .product-card__pricing {
@@ -94,6 +96,7 @@
             display: flex;
             align-items: center;
             margin-bottom: 15px;
+            justify-content: center;
         }
 
         .product-card__rating .fa-star {
@@ -761,7 +764,7 @@
                 if (data.success) {
                     Toastify({
                         text: "Success\nProduct added to cart successfully",
-                        duration: 2000,
+                        duration: 1500,
                         close: true,
                         gravity: "top",
                         position: "right",
@@ -781,13 +784,41 @@
                         avatar: "https://cdn-icons-png.flaticon.com/512/845/845646.png",
                     }).showToast();
                 } else {
-                    throw new Error(data.message || 'Failed to add product to cart');
+                    // throw new Error(data.message || 'Login to add product to cart').then(() => {
+                    //     window.location.href = '/login';
+                    // });
+                    Toastify({
+                        text: "Error\n" + 'Login to add product to cart',
+                        duration: 1500,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        stopOnFocus: true,
+                        style: {
+                            background: "#ffffff", // 
+                            color: "#dc3545",
+                            boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)",
+                            padding: "12px 20px",
+                            borderRadius: "10px",
+                            borderLeft: "5px solid #dc3545",
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            textAlign: "left",
+                            animation: "fadeInUp 0.5s ease-in-out"
+                        },
+                        avatar: "https://cdn-icons-png.flaticon.com/512/190/190406.png",
+                    }).showToast()
+                    setTimeout(()=>{
+                        window.location.href = '/login';
+                    },1500)
+                        
+                    
                 }
             } catch (error) {
                 console.error('Error:', error);
                 Toastify({
-                    text: "Error\n" + error.message || 'Failed to add product to cart',
-                    duration: 2000,
+                    text: "Error\n" + error.message || 'Login to add product to cart',
+                    duration: 1500,
                     close: true,
                     gravity: "top",
                     position: "right",
@@ -900,7 +931,7 @@
                             </span>
                         </div>
 
-                        <div style="color: red; font-weight: bold;">${product.appliedOffer}%OFF</div>
+                        <div style="color: red; font-weight: bold;display: flex;justify-content: center;font-weight:bold;">${product.appliedOffer}%OFF</div>
                        
                         <div class="product-card__rating">
                             ${generateRatingStars(product.rating)}

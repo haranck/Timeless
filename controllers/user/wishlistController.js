@@ -2,12 +2,16 @@ const Wishlist = require("../../models/wishlistSchema")
 const Product = require("../../models/productSchema")
 const User = require("../../models/userSchema")
 const Cart = require("../../models/cartSchema")
+const { getDiscountPrice, getDiscountPriceCart } = require("../../helpers/offerHelper");
 
 
 const loadWishlist = async (req,res)=>{
     try {
         const userId = req.session.user
-        const wishlist = await Wishlist.findOne({userId}).populate("items.productId")
+        const wishlist = await Wishlist.findOne({userId}).populate({path:"items.productId",populate:{path:"category"}});
+
+        const processedData = wishlist.items.map(item => ({...item, productId:getDiscountPriceCart(item.productId)}))
+        wishlist.items = processedData;
 
         if(!wishlist){
             return res.render("wishlist", {user:req.session.userData,wishlist:[]})

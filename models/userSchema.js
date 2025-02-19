@@ -52,31 +52,7 @@ const userSchema = new Schema({
             default: Date.now
         }
     }]
-   // cart: [{
-   //     type: Schema.Types.ObjectId,
-   //     ref: "Cart"
-   // }],
-   // wallet: {
-   //     type: Number,
-   //     default: 0
-   // },
-   // orderHistory: [{
-   //     type: Schema.Types.ObjectId,
-   //     ref: "Order"
-   // }],
-   // referalCode: {
-   //     type: String,
-   //     default: null
-   // },
-   // redeemed: {
-   //     type: Boolean,
-   //     default: false
-   // },
-   // redeemedUsers: [{
-   //     type: Schema.Types.ObjectId,
-   //     ref: "User"
-   // }],
-   // 
+   
 });
 
 const User = mongoose.model('User', userSchema);

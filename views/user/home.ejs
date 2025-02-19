@@ -23,13 +23,14 @@
         }
 
         .product-card__image {
+            margin-top: 10px;
             position: relative;
             overflow: hidden;
         }
 
         .product-card__image img {
             width: 100%;
-            height: 250px;
+            height: 269px;
             object-fit: cover;
             transition: transform 0.3s ease;
         }
@@ -37,6 +38,20 @@
         .product-card:hover .product-card__image img {
             transform: scale(1.05);
         }
+        .product-card__image .label {
+            color: #111111;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: inline-block;
+            padding: 4px 15px 2px;
+            background: #ffffff;
+            position: absolute;
+            left: 0;
+            top: 20px;
+        }
+
 
         .product-card__actions {
             position: absolute;
@@ -67,17 +82,20 @@
         }
 
         .product-card__title {
-            font-weight: 600;
+            font-weight: bold;
             margin-bottom: 10px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            display: flex;
+            justify-content: center;
         }
 
         .product-card__pricing {
             display: flex;
             align-items: center;
             margin-bottom: 10px;
+            justify-content: center;
         }
 
         .product-card__sale-price {
@@ -96,6 +114,7 @@
             display: flex;
             align-items: center;
             margin-bottom: 15px;
+            justify-content: center;
         }
 
         .product-card__rating .fa-star {
@@ -317,6 +336,7 @@
                                 <a href="/productDetails?id=<%= products[i]._id %>">
                                     <img src="/uploads/product-images/<%= products[i].productImages[0] %>"
                                         alt="<%= products[i].productName %>" class="img-fluid">
+                                        <span class="label">New</span>
                                 </a>
                                 <div class="product-card__actions">
                                     <a href="javascript:void(0);" onclick="addToWishlist('<%= products[i]._id %>')"
@@ -339,10 +359,10 @@
                                     </span>
                                    
                                 </div>
-                                <div style="color: red; font-weight: bold;"><%=products[i].appliedOffer %>%OFF</div>
+                                <div style="color: red; font-weight: bold;font-weight: bold;display: flex;justify-content: center;"><%=products[i].appliedOffer %>%OFF</div>
                                 <div>
                                     <% if(products[i].quantity > 0){ %>
-                                        <span style="color: rgb(0, 134, 18);">In Stock</span>
+                                        <span style="color: rgb(0, 134, 18);display: flex;justify-content: center;font-weight: bold;">In Stock</span>
                                         <% } else { %>
                                         <span style="color: red;">Out of stock</span>
                                         <% } %>
