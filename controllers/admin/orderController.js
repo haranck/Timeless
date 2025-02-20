@@ -9,6 +9,7 @@ const Wallet = require('../../models/walletSchema')
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
+const { getDiscountPrice } = require("../../helpers/offerHelper");
 
 const getOrdersPage = async (req, res) => {
     try {
@@ -343,6 +344,7 @@ const getSalesReportPDF = async (req, res) => {
 };
 
 
+
 module.exports = {
     getOrdersPage,
     updateOrder,
@@ -352,6 +354,7 @@ module.exports = {
     approveReturn,
     rejectReturn,
     getSalesReport,
-    getSalesReportPDF
+    getSalesReportPDF,
+    
 }
 

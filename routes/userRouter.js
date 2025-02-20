@@ -84,6 +84,7 @@ router.post("/editCheckoutAddress", userAuth, checkoutController.editCheckoutAdd
 router.post("/addCheckoutAddress", userAuth, checkoutController.addCheckoutAddress)
 router.get("/viewOrder/:orderId", userAuth, checkoutController.viewOrder)
 router.patch("/cancelOrder/:orderId", userAuth, checkoutController.cancelOrder)
+router.get('/invoice/:id', userAuth, checkoutController.generateInvoice);
 
 
 

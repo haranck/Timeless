@@ -727,7 +727,7 @@
                                             Discount <span id="discount">-₹0</span>
                                         </li>
                                         <li class="d-flex justify-content-between total-amount" id="total-amount">
-                                            <strong>Total</strong> <strong id="total">₹<%=cart.cartTotal + 40 %></strong>
+                                            <strong>Total</strong> <strong id="total">₹<%=cart.cartTotal+40 %></strong>
                                         </li>
                                         <div id="removeCouponSection" style="display: none;" class="mt-2 text-center">
                                             <small class="text-success mb-2 d-block" id="appliedCouponText"></small>
@@ -1145,7 +1145,7 @@
                     if (data.success) {
                         // Update UI for applied coupon
                         document.getElementById("discount").innerText = `₹${data.discount}`;
-                        document.getElementById("total").innerText = `₹${data.newTotal}`;
+                        document.getElementById("total").innerText = `₹${data.newTotal+40}`;
                         document.getElementById("couponMessage").style.color = "green";
                         document.getElementById("couponMessage").innerText = "Coupon applied successfully!";
 

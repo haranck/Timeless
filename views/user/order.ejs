@@ -351,13 +351,39 @@
             overflow-x: auto;
         }
     }
+
+    .invoice-btn {
+        background-color: black;
+        color: white;
+        border: none;
+        padding: 6px 15px;
+        font-size: 16px;
+        font-weight: bold;
+        text-transform: uppercase;
+        border-radius: 5px;
+        transition: all 0.3sease;
+        height: 38px;
+}
+
+.invoice-btn:hover {
+    background-color: #333;
+    color: #f1c40f; /* Optional golden effect */
+    transform: scale(1.05);
+}
+
 </style>
 
 <div class="container">
     <% if (order) { %>
         <!-- Order Information Section -->
         <div class="card">
+            <div style="display: flex; justify-content: space-between;">   
             <h2 class="section-title">Order Information</h2>
+            <% if(order.orderStatus === 'delivered'){  %> 
+                <a href="/invoice/<%= order._id %>" class="btn btn-dark invoice-btn">Invoice</a>
+            <% } %>
+            </div>
+            
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-label">Order ID</div>

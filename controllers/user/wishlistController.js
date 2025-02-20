@@ -5,24 +5,52 @@ const Cart = require("../../models/cartSchema")
 const { getDiscountPrice, getDiscountPriceCart } = require("../../helpers/offerHelper");
 
 
-const loadWishlist = async (req,res)=>{
+const loadWishlist = async (req, res) => {
     try {
-        const userId = req.session.user
-        const wishlist = await Wishlist.findOne({userId}).populate({path:"items.productId",populate:{path:"category"}});
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = 5;
+        const userId = req.session.user;
 
-        const processedData = wishlist.items.map(item => ({...item, productId:getDiscountPriceCart(item.productId)}))
-        wishlist.items = processedData;
+        const wishlist = await Wishlist.findOne({ userId })
+            .populate({
+                path: "items.productId",
+                populate: { path: "category" }
+            });
 
-        if(!wishlist){
-            return res.render("wishlist", {user:req.session.userData,wishlist:[]})
+        if (!wishlist || wishlist.items.length === 0) {
+            return res.render("wishlist", {
+                user: req.session.userData,
+                wishlist: [],
+                currentPage: 1,
+                totalPages: 0
+            });
         }
 
-        res.render("wishlist", {user:req.session.userData,wishlist})
+  
+        const processedItems = wishlist.items.map(item => ({
+            ...item.toObject(),
+            productId: getDiscountPriceCart(item.productId)
+        }));
+
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+        const paginatedItems = processedItems.slice(startIndex, endIndex);
+
+        const totalItems = processedItems.length;
+        const totalPages = Math.ceil(totalItems / limit);
+
+        res.render("wishlist", {
+            user: req.session.userData,
+            wishlist: { ...wishlist.toObject(), items: paginatedItems },
+            currentPage: page,
+            totalPages: totalPages,
+            totalItems: totalItems
+        });
     } catch (error) {
-        console.log("error in load wishlist", error)
-        res.redirect("/userProfile")
+        console.error("Error in load wishlist:", error);
+        res.status(500).redirect("/userProfile");
     }
-}
+};
 const addToWishlist = async (req,res)=>{
     try {
         const userId = req.session.user

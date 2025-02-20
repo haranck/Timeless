@@ -416,13 +416,9 @@ body {
 
 /* Breadcrumbs */
 .breadcrumbs {
-   padding: 1rem 2rem;
-   color: #6b7280;
-   font-size: 0.9rem;
-   background: white;
-   border-radius: 8px;
-   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-   margin-bottom: 1.5rem;
+   margin-bottom: 20px;
+   font-size: 14px;
+   color: #6c757d;
 }
 
 .breadcrumbs span {
@@ -431,9 +427,8 @@ body {
 
 /* Main Content */
 .main-content {
-   margin-left: var(--sidebar-width);
-   padding: calc(var(--header-height) + 1rem) 2rem 2rem;
-   background-color: var(--light-color);
+   padding: 20px;
+   background-color: #f4f6f9;
 }
 
 .dashboard-grid {

@@ -101,241 +101,120 @@
 
 // Dashboard charts initialization
 document.addEventListener('DOMContentLoaded', function() {
-    // Get dashboard data from the window object
-    const dashboardData = window.dashboardData || {
-        monthly: {
-            labels: [],
-            revenue: [],
-            orders: [],
-            customers: []
-        },
-        category: {
-            labels: [],
-            data: [],
-            count: []
-        }
-    };
+    const dashboardData = window.dashboardData;
 
-    // Chart colors
-    const chartColors = {
-        revenue: {
-            bg: 'rgba(0, 123, 255, 0.2)',
-            border: 'rgba(0, 123, 255, 1)'
-        },
-        orders: {
-            bg: 'rgba(40, 167, 69, 0.2)', 
-            border: 'rgba(40, 167, 69, 1)'
-        },
-        customers: {
-            bg: 'rgba(255, 193, 7, 0.2)',
-            border: 'rgba(255, 193, 7, 1)'
-        },
-        category: [
-            'rgba(255, 99, 132, 0.8)',  // Luxury
-            'rgba(54, 162, 235, 0.8)',  // Mid-range
-            'rgba(255, 206, 86, 0.8)',  // Budget-friendly
-            'rgba(75, 192, 192, 0.8)',  // Cheapest
-            'rgba(153, 102, 255, 0.8)', // Extra category if needed
-            'rgba(255, 159, 64, 0.8)'   // Extra category if needed
-        ]
-    };
-
-    // Format currency
-    const formatCurrency = (value) => {
-        return '₹' + value.toLocaleString('en-IN');
-    };
-
-    // --- Sales Revenue Chart ---
+    // Sales Chart
     const salesCtx = document.getElementById('salesChart').getContext('2d');
-    const salesChart = new Chart(salesCtx, {
+    new Chart(salesCtx, {
         type: 'line',
         data: {
-            labels: dashboardData.monthly.labels,
+            labels: dashboardData.sales.labels,
             datasets: [{
-                label: 'Revenue',
-                data: dashboardData.monthly.revenue,
-                backgroundColor: chartColors.revenue.bg,
-                borderColor: chartColors.revenue.border,
-                borderWidth: 2,
-                tension: 0.4,
-                fill: true
+                label: 'Monthly Sales (₹)',
+                data: dashboardData.sales.data,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
-                            return formatCurrency(value);
+                            return '₹' + value.toLocaleString();
                         }
                     }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'Revenue: ' + formatCurrency(context.raw);
-                        }
-                    }
-                },
-                legend: {
-                    display: true,
-                    position: 'top'
                 }
             }
         }
     });
 
-    // --- Customers Chart ---
+    // Customers Chart
     const customersCtx = document.getElementById('customersChart').getContext('2d');
-    const customersChart = new Chart(customersCtx, {
+    new Chart(customersCtx, {
         type: 'bar',
         data: {
-            labels: dashboardData.monthly.labels,
+            labels: dashboardData.customers.labels,
             datasets: [{
                 label: 'New Customers',
-                data: dashboardData.monthly.customers,
-                backgroundColor: chartColors.customers.bg,
-                borderColor: chartColors.customers.border,
-                borderWidth: 1
+                data: dashboardData.customers.data,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)'
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'New Customers: ' + context.raw;
-                        }
-                    }
-                },
-                legend: {
-                    display: true,
-                    position: 'top'
                 }
             }
         }
     });
 
-    // --- Orders Chart ---
+    // Orders Chart
     const ordersCtx = document.getElementById('ordersChart').getContext('2d');
-    const ordersChart = new Chart(ordersCtx, {
-        type: 'line',
+    new Chart(ordersCtx, {
+        type: 'bar',
         data: {
-            labels: dashboardData.monthly.labels,
+            labels: dashboardData.orders.labels,
             datasets: [{
-                label: 'Orders',
-                data: dashboardData.monthly.orders,
-                backgroundColor: chartColors.orders.bg,
-                borderColor: chartColors.orders.border,
-                borderWidth: 2,
-                tension: 0.4,
-                fill: true
+                label: 'Monthly Orders',
+                data: dashboardData.orders.data,
+                backgroundColor: 'rgba(255, 99, 132, 0.5)'
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true
                 }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'Orders: ' + context.raw;
-                        }
-                    }
-                },
-                legend: {
-                    display: true,
-                    position: 'top'
-                }
             }
         }
     });
 
-    // --- Category Chart ---
+    // Category Performance Chart
     const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-    const categoryChart = new Chart(categoryCtx, {
-        type: 'doughnut',
+    new Chart(categoryCtx, {
+        type: 'pie',
         data: {
-            labels: dashboardData.category.labels,
+            labels: dashboardData.categories.labels,
             datasets: [{
-                label: 'Sales by Category',
-                data: dashboardData.category.data,
-                backgroundColor: chartColors.category.slice(0, dashboardData.category.labels.length),
-                borderWidth: 1
+                label: 'Category Sales (₹)',
+                data: dashboardData.categories.data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(54, 162, 235, 0.5)',
+                    'rgba(255, 206, 86, 0.5)',
+                    'rgba(75, 192, 192, 0.5)'
+                ]
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'right',
-                    align: 'center'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const value = context.raw;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((value / total) * 100).toFixed(1);
-                            return `${context.label}: ${formatCurrency(value)} (${percentage}%)`;
-                        }
-                    }
-                }
-            }
+            responsive: true
         }
     });
 
-    // Handle filter changes
-    const handleFilterChange = (chart, filter) => {
-        // This would normally fetch new data based on the filter
-        // For now, we'll simulate it by showing a loading state
-        chart.data.datasets[0].data = chart.data.datasets[0].data.map(() => Math.random() * 1000);
-        chart.update();
-        
-        // In production, you would do an AJAX call to get new data:
-        /*
-        fetch(`/admin/api/chart-data?chart=${chart.canvas.id}&filter=${filter}`)
-            .then(response => response.json())
-            .then(data => {
-                chart.data.labels = data.labels;
-                chart.data.datasets[0].data = data.values;
-                chart.update();
-            });
-        */
-    };
-
-    // Add filter event listeners
+    // Chart filter event listeners
     document.getElementById('salesChartFilter').addEventListener('change', function() {
-        handleFilterChange(salesChart, this.value);
+        console.log('Sales chart filter changed to:', this.value);
+        // In a real app, you would fetch and update chart data based on the filter
     });
 
     document.getElementById('customersChartFilter').addEventListener('change', function() {
-        handleFilterChange(customersChart, this.value);
+        console.log('Customers chart filter changed to:', this.value);
+        // In a real app, you would fetch and update chart data based on the filter
     });
 
     document.getElementById('ordersChartFilter').addEventListener('change', function() {
-        handleFilterChange(ordersChart, this.value);
+        console.log('Orders chart filter changed to:', this.value);
+        // In a real app, you would fetch and update chart data based on the filter
     });
 
     document.getElementById('categoryChartFilter').addEventListener('change', function() {
-        handleFilterChange(categoryChart, this.value);
+        console.log('Category chart filter changed to:', this.value);
+        // In a real app, you would fetch and update chart data based on the filter
     });
 });

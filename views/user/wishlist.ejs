@@ -163,6 +163,73 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Pagination -->
+<div class="d-flex justify-content-center mt-3">
+    <nav aria-label="Wishlist navigation">
+        <ul class="pagination">
+            <% 
+            // Pagination logic with smart display
+            const maxPagesToShow = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+            let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+            // Adjust start and end pages if near the edges
+            if (endPage - startPage + 1 < maxPagesToShow) {
+                startPage = Math.max(1, endPage - maxPagesToShow + 1);
+            }
+            %>
+
+            <% if (currentPage > 1) { %>
+                <li class="page-item">
+                    <a class="page-link bg-dark text-white" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo; Previous</span>
+                    </a>
+                </li>
+            <% } %>
+
+            <% if (startPage > 1) { %>
+                <li class="page-item">
+                    <a class="page-link bg-dark text-white" href="?page=1">1</a>
+                </li>
+                <% if (startPage > 2) { %>
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                <% } %>
+            <% } %>
+
+            <% for (let i = startPage; i <= endPage; i++) { %>
+                <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                    <a class="page-link bg-dark text-white <%= i === currentPage ? 'border-light' : '' %>" href="?page=<%= i %>">
+                        <%= i %>
+                    </a>
+                </li>
+            <% } %>
+
+            <% if (endPage < totalPages) { %>
+                <% if (endPage < totalPages - 1) { %>
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                <% } %>
+                <li class="page-item">
+                    <a class="page-link bg-dark text-white" href="?page=<%= totalPages %>"><%= totalPages %></a>
+                </li>
+            <% } %>
+
+            <% if (currentPage < totalPages) { %>
+                <li class="page-item">
+                    <a class="page-link bg-dark text-white" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                        <span aria-hidden="true">Next &raquo;</span>
+                    </a>
+                </li>
+            <% } %>
+        </ul>
+    </nav>
+</div>
+
+
         </div>
     </section>
     <!-- Wishlist Section End -->
