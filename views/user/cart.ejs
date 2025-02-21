@@ -43,6 +43,40 @@
         -webkit-appearance: none;
         margin: 0;
     }
+    .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.pagination a, .pagination span {
+    color: white;
+    background-color: #000000;
+    padding: 8px 12px;
+    margin: 2px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.pagination a:hover {
+    background-color: #333;
+    transform: scale(1.05);
+}
+
+.pagination .active {
+    background-color: #333030;
+    color: white;
+    cursor: default;
+}
+
+.pagination .disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
 </style>
     <!-- Breadcrumb Section Begin -->
     <section class="breadcrumb-option" >
@@ -152,6 +186,27 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="pagination">
+            <% if (currentPage > 1) { %>
+                <a href="?page=<%= currentPage - 1 %>" class="prev">&laquo; Previous</a>
+            <% } else { %>
+                <span class="disabled">&laquo; Previous</span>
+            <% } %>
+        
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <% if (i === currentPage) { %>
+                    <span class="active"><%= i %></span>
+                <% } else { %>
+                    <a href="?page=<%= i %>"><%= i %></a>
+                <% } %>
+            <% } %>
+        
+            <% if (currentPage < totalPages) { %>
+                <a href="?page=<%= currentPage + 1 %>" class="next">Next &raquo;</a>
+            <% } else { %>
+                <span class="disabled">Next &raquo;</span>
+            <% } %>
         </div>
     </section>
 

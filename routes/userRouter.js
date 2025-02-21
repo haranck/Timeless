@@ -103,6 +103,9 @@ router.post('/returnOrder/:orderId',userAuth, walletController.returnOrder)
 //razorpay
 router.post("/createOrder", userAuth, razorpayController.createOrder)
 router.post("/verifyPayment", userAuth, razorpayController.verifyPayment);
+router.post("/retryPayment/:orderId", userAuth, razorpayController.retryPayment);
+router.get("/paymentFailed/:orderId", userAuth, razorpayController.paymentFailed);
+router.post("/verifyRetryPayment", userAuth, razorpayController.verifyRetryPayment);
 
 
 module.exports = router;

@@ -685,7 +685,9 @@
                                                                     </div>
                                                                     <div class="detail-item">
                                                                         <i class="fas fa-calendar-alt me-2"></i>
-                                                                        <span>Valid Until: <%= new Date(coupon.couponValidity).toLocaleDateString() %></span>
+                                                                        <span>Valid Until: <%= new
+                                                                                Date(coupon.couponValidity).toLocaleDateString()
+                                                                                %></span>
                                                                     </div>
                                                                     <button class="btn-apply-coupon"
                                                                         onclick="copyCoupon('<%= coupon._id %>')">
@@ -736,7 +738,8 @@
                                                 <i class="fas fa-times-circle"></i> Remove Coupon
                                             </button>
                                         </div>
-                                        <p id="couponMessage" style="color: red;margin-left: 76px;margin-top: 12px;"></p>
+                                        <p id="couponMessage" style="color: red;margin-left: 76px;margin-top: 12px;">
+                                        </p>
                                     </ul>
 
                                 </div>
@@ -942,174 +945,237 @@
                 }
             });
 
-    async function placeOrder() {
-      try {
-        // const shippingCharge = 40;
-        const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
-        const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            async function placeOrder() {
+                try {
+                    const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
+                    const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
-        const sanitizedOrderItems = sanitizeQuotes('<%- JSON.stringify(cart.items) %>');
-        const orderedItems = JSON.parse(sanitizedOrderItems); 
-        let subtotalText = document.getElementById("total").innerText.replace("₹", "").trim();
-        let  totalAmount = parseFloat(subtotalText);
-        const couponCode = document.getElementById("couponCode").value.trim();
-        const discountText = document.getElementById("discount").innerText.replace("₹", "").replace("-", "").trim();
-        const discountAmount = parseFloat(discountText) || 0;
-        const appliedCouponCode = currentCouponCode;
+                    const sanitizedOrderItems = sanitizeQuotes('<%- JSON.stringify(cart.items) %>');
+                    const orderedItems = JSON.parse(sanitizedOrderItems);
+                    let subtotalText = document.getElementById("total").innerText.replace("₹", "").trim();
+                    let totalAmount = parseFloat(subtotalText);
+                    const couponCode = document.getElementById("couponCode").value.trim();
+                    const discountText = document.getElementById("discount").innerText.replace("₹", "").replace("-", "").trim();
+                    const discountAmount = parseFloat(discountText) || 0;
+                    const appliedCouponCode = currentCouponCode;
 
-        // console.log("orderedItems", orderedItems)
+                    const confirmResult = await Swal.fire({
+                        title: 'Confirm Order',
+                        text: 'Are you sure you want to place this order?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, place order!',
+                        cancelButtonText: 'No, cancel'
+                    });
 
-        const confirmResult = await Swal.fire({
-            title: 'Confirm Order',
-            text: 'Are you sure you want to place this order?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, place order!',
-            cancelButtonText: 'No, cancel'
-        });
+                    if (!confirmResult.isConfirmed) return;
 
-        if (!confirmResult.isConfirmed) return;
+                    Swal.fire({
+                        title: 'Processing',
+                        text: 'Please wait while we process your order...',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        didOpen: () => Swal.showLoading()
+                    });
 
-        Swal.fire({
-            title: 'Processing',
-            text: 'Please wait while we process your order...',
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            showConfirmButton: false,
-            didOpen: () => Swal.showLoading()
-        });
-
-        if (paymentMethod === "cod") {
-            const response = await fetch("/checkout", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    shippingAddress,
-                    paymentMethod,
-                    totalAmount,
-                    orderedItems,
-                    couponCode:appliedCouponCode,
-                    discountAmount
-                })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                await Swal.fire({
-                    title: 'Success!',
-                    text: 'Your order has been placed successfully!',
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-                window.location.href = `/viewOrder/${data.orderId}`;
-            } else {
-                Swal.fire({
-                    title: 'Error!',
-                    text: data.message||'Minimum order amount for COD is ₹1000', 
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-            });
-            }
-        } else if (paymentMethod === "razorpay") {
-
-            const orderResponse = await fetch("/createOrder", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    amount: totalAmount,
-                    currency: "INR",
-                    // shippingAddress,
-                    // orderedItems,
-                    // couponCode:appliedCouponCode,
-                    // discountAmount
-                })
-            });
-
-            const orderData = await orderResponse.json();
-            if (!orderData.success) throw new Error("Failed to create Razorpay order");
-
-            const options = {
-                key: orderData.key,
-                amount: orderData.amount,
-                currency: orderData.currency,
-                name: "Timeless Aura",
-                description: "Watch Purchase",
-                order_id: orderData.order_id,
-                handler: async function (response) {
-                    try {
-                        // First, verify the payment
-                        const verifyResponse = await fetch("/verifyPayment", {
+                    if (paymentMethod === "cod") {
+                        // COD payment handling remains the same
+                        const response = await fetch("/checkout", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_signature: response.razorpay_signature,
                                 shippingAddress,
-                                orderedItems, 
+                                paymentMethod,
                                 totalAmount,
-                                couponCode:appliedCouponCode,
-                                discountAmount,
-                                paymentMethod: "razorpay"
+                                orderedItems,
+                                couponCode: appliedCouponCode,
+                                discountAmount
                             })
                         });
 
-                        const verifyData = await verifyResponse.json();
-                        
-                        if (verifyData.success) {
+                        const data = await response.json();
+                        if (data.success) {
                             await Swal.fire({
-                                title: 'Payment Successful!',
+                                title: 'Success!',
                                 text: 'Your order has been placed successfully!',
                                 icon: 'success',
                                 timer: 1500,
                                 showConfirmButton: false
                             });
-                            window.location.href = `/viewOrder/${verifyData.orderId}`;
+                            window.location.href = `/viewOrder/${data.orderId}`;
                         } else {
-                            throw new Error("Payment verification failed");
+                            Swal.fire({
+                                title: 'Error!',
+                                text: data.message || 'Minimum order amount for COD is ₹1000',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
                         }
-                    } catch (error) {
-                        console.error("Payment verification error:", error);
-                        Swal.fire({
-                            title: 'Error!',
-                            text: 'Payment verification failed. Please contact support.',
-                            icon: 'error'
+                    } else if (paymentMethod === "razorpay") {
+                        // Razorpay payment flow
+                        const orderResponse = await fetch("/createOrder", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                amount: totalAmount,
+                                currency: "INR"
+                            })
                         });
-                    }
-                },
-                prefill: {
-                    name: '<%= user.name %>',
-                    email: '<%= user.email %>',
-                    contact: '<%= user.phone %>'
-                },
-                theme: { color: "#3399cc" },
-                modal: {
-                    ondismiss: function () {
-                        Swal.fire({
-                            title: 'Payment Canceled',
-                            text: 'You canceled the payment. Try again.',
-                            icon: 'warning'
-                        });
-                    }
-                }
-            };
 
-            const razorpay = new Razorpay(options);
-            razorpay.open();
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        await Swal.fire({
-            title: 'Error!',
-            text: error.message || 'Something went wrong while placing your order.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    }
-}
+                        const orderData = await orderResponse.json();
+                        if (!orderData.success) {
+                            throw new Error("Failed to create Razorpay order");
+                        }
+
+                        // let failedOrderId = null;
+
+                        const options = {
+                            key: orderData.key,
+                            amount: orderData.amount,
+                            currency: orderData.currency,
+                            name: "Timeless Aura",
+                            description: "Watch Purchase",
+                            order_id: orderData.order_id,
+                            handler: async function (response) {
+                                try {
+                                    const verifyResponse = await fetch("/verifyPayment", {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({
+                                            razorpay_payment_id: response.razorpay_payment_id,
+                                            razorpay_order_id: response.razorpay_order_id,
+                                            razorpay_signature: response.razorpay_signature,
+                                            shippingAddress,
+                                            orderedItems,
+                                            totalAmount,
+                                            couponCode: appliedCouponCode,
+                                            discountAmount,
+                                            paymentMethod: "razorpay",
+                                            // paymentStatus: "failed"
+                                        })
+                                    });
+
+                                    const verifyData = await verifyResponse.json();
+
+                                    if (verifyData.success) {
+                                        await Swal.fire({
+                                            title: 'Payment Successful!',
+                                            text: 'Your order has been placed successfully!',
+                                            icon: 'success',
+                                            timer: 1500,
+                                            showConfirmButton: false
+                                        });
+
+                                        window.location.href = `/viewOrder/${verifyData.orderId}`;
+
+                                    } else {
+                                        
+                                        throw new Error(verifyData.message || 'Payment verification failed');
+
+                                    }
+                                } catch (error) {
+                                    console.error("Payment verification error:", error);
+                                    Swal.fire({
+                                        title: 'Payment Failed!',
+                                        text: error.message || 'Payment verification failed. Please contact support.',
+                                        icon: 'error'
+                                    });
+                                    const failedResponse = await fetch("/verifyPayment", {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({
+                                            razorpay_order_id: orderData.order_id,
+                                            shippingAddress,
+                                            orderedItems,
+                                            totalAmount,
+                                            couponCode: appliedCouponCode,
+                                            discountAmount,
+                                            paymentMethod: "razorpay",
+                                            
+                                        })
+                                    });
+                                    const failedData = await failedResponse.json();
+                                    if (failedData.orderId) {
+                                        window.location.href = `/paymentFailed/${failedData.orderId}`;
+                                    }
+
+                                }
+                            },
+                            modal: {
+                                ondismiss: async function () {
+                                    try {
+                                        // Create failed order when modal is dismissed
+                                        const response = await fetch("/verifyPayment", {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({
+                                                razorpay_order_id: orderData.order_id,
+                                                shippingAddress,
+                                                orderedItems,
+                                                totalAmount,
+                                                couponCode: appliedCouponCode,
+                                                discountAmount,
+                                                paymentMethod: "razorpay",
+                                                // paymentStatus: "failed"
+                                            })
+                                        });
+                                        const failedResponse = await response.json();
+                                        if (failedResponse.orderId) {
+                                            await Swal.fire({
+                                                title: 'Payment Cancelled',
+                                                text: 'Your payment was cancelled',
+                                                icon: 'warning',
+                                                timer: 1500,
+                                                showConfirmButton: false
+                                            });
+                                            window.location.href = `/paymentFailed/${failedResponse.orderId}`;
+                                        }
+                                    } catch (error) {
+                                        if (failedResponse.orderId) {
+                                            await Swal.fire({
+                                                title: 'Payment Cancelled',
+                                                text: 'Your payment was cancelled',
+                                                icon: 'warning',
+                                                timer: 1500,
+                                                showConfirmButton: false
+                                            });
+                                            window.location.href = `/paymentFailed/${failedResponse.orderId}`;
+                                        }
+                                        console.error("Failed to handle payment cancellation:", error);
+                                        Swal.fire({
+                                            title: 'Error',
+                                            text: 'Something went wrong while cancelling the payment',
+                                            icon: 'error',
+                                            confirmButtonText: 'OK'
+                                        });
+                                    }
+                                }
+                            },
+                            prefill: {
+                                name: '<%= user.name %>',
+                                email: '<%= user.email %>',
+                                contact: '<%= user.phone %>'
+                            },
+                            theme: { color: "#3399cc" }
+                        };
+
+                        const razorpay = new Razorpay(options);
+                        razorpay.open();
+
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    await Swal.fire({
+                        title: 'Error!',
+                        text: error.message || 'Something went wrong while placing your order.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            }
 
 
 
@@ -1145,7 +1211,7 @@
                     if (data.success) {
                         // Update UI for applied coupon
                         document.getElementById("discount").innerText = `₹${data.discount}`;
-                        document.getElementById("total").innerText = `₹${data.newTotal+40}`;
+                        document.getElementById("total").innerText = `₹${data.newTotal + 40}`;
                         document.getElementById("couponMessage").style.color = "green";
                         document.getElementById("couponMessage").innerText = "Coupon applied successfully!";
 
@@ -1199,7 +1265,7 @@
                         document.getElementById("total").innerText = `₹${data.cartTotal}`;
                         document.getElementById("couponMessage").innerText = "";
                         document.getElementById("removeCouponSection").style.display = "none";
-                        currentCouponCode  = '';
+                        currentCouponCode = '';
 
                         Swal.fire({
                             title: 'Coupon Removed',

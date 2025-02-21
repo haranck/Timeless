@@ -788,7 +788,7 @@
                     //     window.location.href = '/login';
                     // });
                     Toastify({
-                        text: "Error\n" + 'Login to add product to cart',
+                        text: "Error\n" + data.message || 'Login to add product to cart',
                         duration: 1500,
                         close: true,
                         gravity: "top",
@@ -808,11 +808,6 @@
                         },
                         avatar: "https://cdn-icons-png.flaticon.com/512/190/190406.png",
                     }).showToast()
-                    setTimeout(()=>{
-                        window.location.href = '/login';
-                    },1500)
-                        
-                    
                 }
             } catch (error) {
                 console.error('Error:', error);

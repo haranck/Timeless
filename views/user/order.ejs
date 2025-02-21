@@ -379,7 +379,7 @@
         <div class="card">
             <div style="display: flex; justify-content: space-between;">   
             <h2 class="section-title">Order Information</h2>
-            <% if(order.orderStatus === 'delivered'){  %> 
+            <% if(order.orderStatus === 'delivered' || order.orderStatus === 'Return rejected' || order.orderStatus === 'Return approved' || order.orderStatus === 'Return requested'){  %> 
                 <a href="/invoice/<%= order._id %>" class="btn btn-dark invoice-btn">Invoice</a>
             <% } %>
             </div>
@@ -413,6 +413,8 @@
                         <span class="status status-cancelled">Cancelled</span>
                         <% } else if (order.orderStatus ==="delivered" || order.orderStatus ==="Return rejected" || order.orderStatus ==="Return approved" || order.orderStatus ==="Return requested"){ %>
                             <span class="status status-delivered">Paid</span>
+                        <% }else if(order.orderStatus ==="failed"){%>
+                            <span class="status status-failed">Failed</span>
                         <% }else{%>
                             <span class="status status-pending">Pending</span>
                         <% } %> 

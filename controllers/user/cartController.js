@@ -8,32 +8,49 @@ const { getDiscountPrice, getDiscountPriceCart } = require("../../helpers/offerH
 const loadCart = async (req, res) => {
     try {
         const userId = req.session.user;
-        
-        let cart = await Cart.findOne({ userId }).populate({path:"items.productId",populate:{path:"category"}});
 
-        const processedData = cart.items.map(item => ({...item, productId:getDiscountPriceCart(item.productId)}))
-        cart.items = processedData;
-
-        cart.items = cart.items.filter(item => item.productId);
+        const page = parseInt(req.query.page) || 1;
+        const limit = 3;
+        const skip = (page - 1) * limit;
         
+        let cart = await Cart.findOne({ userId }).populate({
+            path: "items.productId", 
+            populate: { path: "category" }
+        });
+
         if (!cart) {
             return res.render("cart", { 
+                user: req.session.userData,
                 cart: {
                     items: [],
                     totalPrice: 0,
-                }
+                },
+                currentPage: 1,
+                totalPages: 1
             });
         }
-        // Calculate total price
+        const processedData = cart.items
+            .map(item => ({...item, productId: getDiscountPriceCart(item.productId)}))
+            .filter(item => item.productId);
+
+        cart.items = processedData;
         cart.totalPrice = cart.items.reduce((total, item) => total + item.totalPrice, 0);
-        res.render("cart", {user:req.session.userData, cart });
+        const paginatedItems = cart.items.slice(skip, skip + limit);
+        const totalPages = Math.ceil(cart.items.length / limit);
+        cart.items = paginatedItems;
+
+        res.render("cart", {
+            user: req.session.userData, 
+            cart,
+            currentPage: page,
+            totalPages
+        });
 
     } catch (error) {
         console.error("Error loading cart:", error);
         res.status(500).send("Failed to load cart");
     }
 };
-
 
 const addToCart = async (req, res) => {
     try {
@@ -143,7 +160,7 @@ const addToCart = async (req, res) => {
         console.error("Error in add to cart:", error);
         res.status(500).json({
             success: false,
-            message: "Failed to add product to cart"
+            message: "Failed to add product to cart \n LOGIN FIRST"
         });
         
     }
