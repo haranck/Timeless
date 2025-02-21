@@ -370,6 +370,50 @@
     color: #f1c40f; /* Optional golden effect */
     transform: scale(1.05);
 }
+/* .retry-btn{
+    background-color: #e53e3e;
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 5px;
+    transition: all 0.3sease;
+    height: 38px;
+}
+.retry-btn:hover {
+    background-color: #cc1313;
+    color: #f1c40f; optionla golden
+    transform: scale(1.05);
+} */
+.retry-btn {
+    background-color: lightgreen;
+    color: rgb(5, 75, 0);
+    border: none;
+    padding: 6px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    height: 38px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.retry-btn:hover {
+    background-color: rgb(119, 238, 119);
+    color: rgb(5, 75, 0);
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.retry-btn:active {
+    background-color: rgb(100, 220, 100);
+    transform: scale(0.98);
+    transition: all 0.1s ease;
+}
 
 </style>
 
@@ -396,9 +440,15 @@
                 <div class="info-item">
                     <div class="info-label">Order Status</div>
                     <div class="info-value">
+                        <% if(order.orderStatus==="failed"){ %> 
+                        <span class="status status-<%= order.orderStatus ? order.orderStatus.toLowerCase() : 'pending' %>">
+                            ----
+                        </span>
+                        <% } else { %>
                         <span class="status status-<%= order.orderStatus ? order.orderStatus.toLowerCase() : 'pending' %>">
                             <%= order.orderStatus || 'Pending' %>
                         </span>
+                        <% } %>
                     </div>
                 </div>
                 <div class="info-item">
@@ -408,13 +458,15 @@
                 <div class="info-item">
                     <div class="info-label">Payment Status</div>
                     <div class="info-value">
-
-                        <% if(order.orderStatus === 'cancelled' ) {%> 
+                        <% if(order.paymentStatus ==='success'){  %>
+                            <span class="status status-delivered">Paid</span>
+                        <% }else if(order.orderStatus === 'cancelled' ) {%> 
                         <span class="status status-cancelled">Cancelled</span>
                         <% } else if (order.orderStatus ==="delivered" || order.orderStatus ==="Return rejected" || order.orderStatus ==="Return approved" || order.orderStatus ==="Return requested"){ %>
                             <span class="status status-delivered">Paid</span>
                         <% }else if(order.orderStatus ==="failed"){%>
-                            <span class="status status-failed">Failed</span>
+                            <span class="status status-cancelled">Failed</span>
+                           <button class="retry-btn" onclick="retryPayment('<%= order._id %>')">Retry</button>
                         <% }else{%>
                             <span class="status status-pending">Pending</span>
                         <% } %> 
@@ -611,6 +663,7 @@
 </div>
 
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 
@@ -718,6 +771,105 @@ function openReturnModal(orderId) {
         closeModal();
         // location.reload();
         
+    }
+
+    async function retryPayment(orderId) {
+        try {
+
+        const response = await fetch(`/retryPayment/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({orderId})
+        })
+        const data = await response.json();
+
+        
+        if (data.success) {
+                const options = {
+                    key: data.key,
+                    amount: data.amount,
+                    currency: data.currency,
+                    name: "Timeless Aura",
+                    description: "Watch Purchase Retry",
+                    order_id: data.order_id,
+                    handler: function (response) {
+                        Swal.fire({
+                            title: 'Processing',
+                            text: 'Verifying your payment...',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+                        
+                        fetch("/verifyRetryPayment", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
+                                orderId: '<%= order._id %>',
+                                paymentStatus: 'success'
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Payment Successful!',
+                                    text: 'Your order has been processed successfully!',
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.href = `/viewOrder/${data.orderId}`;
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'Payment verification failed. Please try again.',
+                                    icon: 'error'
+                                });
+                            }
+                        });
+                    },
+                    prefill: {
+                        name: '<%= user.name %>',
+                        email: '<%= user.email %>',
+                        contact: '<%= user.phone %>'
+                    },
+                    theme: { color: "#3399cc" },
+                    modal: {
+                        ondismiss: function () {
+                            Swal.fire({
+                                title: 'Payment Canceled',
+                                text: 'You canceled the payment. Try again later.',
+                                icon: 'warning'
+                            });
+                        }
+                    }
+                };
+
+                const razorpay = new Razorpay(options);
+                razorpay.open();
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: data.message || 'Failed to initiate payment. Please try again later.',
+                    icon: 'error'
+                });
+            }
+        }catch(error){
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'Something went wrong. Please try again later.',
+                icon: 'error'
+            });   
+        }
     }
 </script>
 

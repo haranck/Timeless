@@ -69,10 +69,18 @@
     .filters input,
     .filters select {
         padding: 5px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
+    
+    .filters input:focus,
+    .filters select:focus {
+        outline: none;
+        border-color: #FFD700;
     }
 
     .generate-btn {
-        background: linear-gradient(to right, #77ff00, #00ff11); /* Yellow to Orange */
+        background: linear-gradient(to right, #77ff00, #00ff11); /* Green gradient */
         color: white;
         border: none;
         padding: 10px 20px;
@@ -98,12 +106,26 @@
         border-radius: 5px;
         text-align: center;
         width: 30%;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .box h4 {
+        margin-top: 0;
+        color: #333;
+    }
+    
+    .box p {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 0;
+        color: #444;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
     table,
@@ -122,86 +144,132 @@
         background: #333;
         color: white;
     }
+    
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    
+    tr:hover {
+        background-color: #f0f0f0;
+    }
 
     .status {
-    padding: 5px;
-    border-radius: 5px;
-    text-align: center;
-    font-weight: bold;
-}
+        padding: 5px;
+        border-radius: 5px;
+        text-align: center;
+        font-weight: bold;
+    }
 
-/* Existing statuses */
-.delivered {
-    background-color: #7cdd93; /* Green */
-    color: rgb(26, 70, 16);
-}
+    /* Existing statuses */
+    .delivered {
+        background-color: #7cdd93; /* Green */
+        color: rgb(26, 70, 16);
+    }
 
-.cancelled {
-    background-color: #dc3545; /* Red */
-    color: white;
-}
+    .cancelled {
+        background-color: #dc3545; /* Red */
+        color: white;
+    }
 
-.pending {
-    background-color: #c4b178; /* Yellow */
-    color: rgb(171, 126, 0);
-}
+    .pending {
+        background-color: #c4b178; /* Yellow */
+        color: rgb(171, 126, 0);
+    }
 
-/* New return statuses */
-.return-rejected {
-    background-color: #e6828c; /* Red */
-    color: rgb(150, 20, 20);
-}
+    /* New return statuses */
+    .return-rejected {
+        background-color: #e6828c; /* Red */
+        color: rgb(150, 20, 20);
+    }
 
-.return-approved {
-    background-color: #88c16e; /* Blue */
-    color: rgb(19, 129, 0);
-}
-.pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
+    .return-approved {
+        background-color: #88c16e; /* Blue */
+        color: rgb(19, 129, 0);
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
 
-.pagination a {
-    color: white;
-    background-color: black;
-    padding: 8px 12px;
-    margin: 2px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-}
+    .pagination a {
+        color: white;
+        background-color: black;
+        padding: 8px 12px;
+        margin: 2px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    }
 
-.pagination a.active {
-    background-color: #444;
-}
+    .pagination a.active {
+        background-color: #444;
+    }
 
-.pagination a:hover {
-    background-color: #666;
-}
-
-
+    .pagination a:hover {
+        background-color: #666;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 20px;
+        font-style: italic;
+        color: #777;
+    }
+    
+    .filter-active {
+        background-color: #f0f8ff;
+        border: 2px solid #FFD700;
+        padding: 8px;
+        margin-bottom: 10px;
+        text-align: center;
+        border-radius: 5px;
+    }
 </style>
+
 <div class="container">
     <h2>Sales Report</h2>
+    
     <div class="top-buttons">
-        <a href="/admin/salesReportPDF/pdf"><button class="pdf-btn">Download PDF</button></a>
-        <!-- <button class="excel-btn">Download Excel</button> -->
+        <a href="/admin/salesReportPDF/pdf<%= filterType ? `?filterType=${filterType}` : '' %><%= fromDate ? `&fromDate=${fromDate}` : '' %><%= toDate ? `&toDate=${toDate}` : '' %>">
+            <button class="pdf-btn">Download PDF</button>
+        </a>
     </div>
 
-    <div class="filters">
-        <label>Filter By:</label>
-        <select>
-            <option>Monthly</option>
-            <option>Weekly</option>
-            <option>Daily</option>
-        </select>
-        <label>From:</label>
-        <input type="date">
-        <label>To:</label>
-        <input type="date">
-        <button class="generate-btn">Generate Report</button>
-    </div>
+    <form id="filterForm" action="/admin/salesReport" method="GET">
+        <div class="filters">
+            <label>Filter By:</label>
+            <select name="filterType" id="filterType">
+                <option value="All" <%= filterType === 'All' ? 'selected' : '' %>>All Time</option>
+                <option value="Daily" <%= filterType === 'Daily' ? 'selected' : '' %>>Daily</option>
+                <option value="Weekly" <%= filterType === 'Weekly' ? 'selected' : '' %>>Weekly</option>
+                <option value="Monthly" <%= filterType === 'Monthly' ? 'selected' : '' %>>Monthly</option>
+                <option value="Yearly" <%= filterType === 'Yearly' ? 'selected' : '' %>>Yearly</option>
+            </select>
+            
+            <label>From:</label>
+            <input type="date" name="fromDate" id="fromDate" value="<%= fromDate || '' %>">
+            
+            <label>To:</label>
+            <input type="date" name="toDate" id="toDate" value="<%= toDate || '' %>">
+            
+            <button type="submit" class="generate-btn">Filter</button>
+        </div>
+    </form>
+    
+    <% if (filterType !== 'All' || fromDate || toDate) { %>
+        <div class="filter-active">
+            <% if (filterType !== 'All') { %>
+                <strong>Active Filter:</strong> <%= filterType %>
+            <% } %>
+            <% if (fromDate && toDate) { %>
+                <strong><%= filterType !== 'All' ? ' - ' : 'Date Range: ' %></strong>
+                <%= new Date(fromDate).toLocaleDateString() %> to <%= new Date(toDate).toLocaleDateString() %>
+            <% } %>
+        </div>
+    <% } %>
 
     <div class="summary">
         <div class="box">
@@ -210,55 +278,86 @@
         </div>
         <div class="box">
             <h4>Overall Sales Amount</h4>
-            <p>₹<%- totalSales %>.00</p>
+            <p>₹<%- totalSales.toLocaleString() %>.00</p>
         </div>
-        <!-- <div class="box">
-            <h4>Overall Discount</h4>
-            <p>₹124.00</p>
-        </div> -->
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>Date</th>
-                <th>Customer Name</th>
-                <th>Product</th>
-                <th>Order Status</th>
-                <th>Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% orders.forEach(order => { %>
+    <!-- Sales data table -->
+    <% if (orders.length > 0) { %>
+        <table>
+            <thead>
                 <tr>
-                    <td>#<%- order._id %></td>
-                    <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
-                    <td><%= order.user_id.name %></td>
-                    <td><%- order.order_items[0].productId.productName %></td>
-                    <td class="status <%= order.status.replace(/\s+/g, '-').toLowerCase() %>">
-                        <%= order.status %>
-                    </td>
-                    <td>₹ <%= order.finalAmount.toFixed(2) %></td>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Customer Name</th>
+                    <th>Product</th>
+                    <th>Order Status</th>
+                    <th>Amount</th>
                 </tr>
-            <% }) %>
-        </tbody>
+            </thead>
+            <tbody>
+                <% orders.forEach(order => { %>
+                    <tr>
+                        <td>#<%- order._id %></td>
+                        <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                        <td><%= order.user_id.name %></td>
+                        <td><%- order.order_items[0].productId.productName %></td>
+                        <td class="status <%= order.status.replace(/\s+/g, '-').toLowerCase() %>">
+                            <%= order.status %>
+                        </td>
+                        <td>₹ <%= order.finalAmount ? order.finalAmount.toFixed(2) : order.total.toFixed(2) %></td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
         
-    </table>
-    <div class="pagination">
-        <% if (currentPage > 1) { %>
-            <a href="?page=<%= currentPage - 1 %>">&laquo; Prev</a>
-        <% } %>
-    
-        <% for (let i = 1; i <= totalPages; i++) { %>
-            <a href="?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a>
-        <% } %>
-    
-        <% if (currentPage < totalPages) { %>
-            <a href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
-        <% } %>
-    </div>
-    
+        <!-- Pagination -->
+        <div class="pagination">
+            <% if (currentPage > 1) { %>
+                <a href="?page=<%= currentPage - 1 %><%= filterType ? `&filterType=${filterType}` : '' %><%= fromDate ? `&fromDate=${fromDate}` : '' %><%= toDate ? `&toDate=${toDate}` : '' %>">&laquo; Prev</a>
+            <% } %>
+        
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <a href="?page=<%= i %><%= filterType ? `&filterType=${filterType}` : '' %><%= fromDate ? `&fromDate=${fromDate}` : '' %><%= toDate ? `&toDate=${toDate}` : '' %>" 
+                   class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a>
+            <% } %>
+        
+            <% if (currentPage < totalPages) { %>
+                <a href="?page=<%= currentPage + 1 %><%= filterType ? `&filterType=${filterType}` : '' %><%= fromDate ? `&fromDate=${fromDate}` : '' %><%= toDate ? `&toDate=${toDate}` : '' %>">Next &raquo;</a>
+            <% } %>
+        </div>
+    <% } else { %>
+        <div class="no-results">
+            <p>No sales data found for the selected period.</p>
+        </div>
+    <% } %>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterType = document.getElementById('filterType');
+        const fromDate = document.getElementById('fromDate');
+        const toDate = document.getElementById('toDate');
+        
+        filterType.addEventListener('change', function() {
+            if (this.value === 'Custom') {
+                fromDate.required = true;
+                toDate.required = true;
+            } else {
+                fromDate.required = false;
+                toDate.required = false;
+            }
+        });
+        
+        document.getElementById('filterForm').addEventListener('submit', function(e) {
+            if (fromDate.value && toDate.value) {
+                if (new Date(fromDate.value) > new Date(toDate.value)) {
+                    e.preventDefault();
+                    alert('Start date cannot be after end date');
+                }
+            }
+        });
+    });
+</script>
 
 <%- include("../../views/partials/admin/footer") %>

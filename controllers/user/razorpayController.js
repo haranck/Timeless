@@ -76,6 +76,7 @@ const verifyPayment = async (req, res) => {
                 total: totalAmount,
                 finalAmount: totalAmount,
                 status: "pending",
+                paymentStatus: "success",
                 couponApplied: couponCode ? true : false,
                 discount: discountAmount || 0,
                 razorpay_order_id,
@@ -249,9 +250,36 @@ const verifyRetryPayment = async (req, res) => {
 
         if (generatedSignature === razorpay_signature) {
             failedOrder.status = "pending";
+            failedOrder.paymentStatus = "success";
             failedOrder.razorpay_order_id = razorpay_order_id;
             failedOrder.razorpay_payment_id = razorpay_payment_id;
             await failedOrder.save();
+
+
+            let cart = await Cart.findOne({ userId: req.session.user });
+
+            if (!cart) {
+                cart = new Cart({
+                    userId: req.session.user,
+                    items: [],
+                    cartTotal: 0
+                });
+
+            } else {
+                cart.items = [];
+                cart.cartTotal = 0;
+            }
+
+            await cart.save();
+
+            // orderedItems.forEach(async (item) => {
+            //     await Product.updateOne(
+            //         { _id: item.productId._id },
+            //         { $inc: { quantity: -item.quantity } }
+            //     )
+            // })
+
+
 
             if (failedOrder.order_items && failedOrder.order_items.length > 0) {
                 for (const item of failedOrder.order_items) {

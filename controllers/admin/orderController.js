@@ -14,26 +14,22 @@ const { getDiscountPrice } = require("../../helpers/offerHelper");
 const getOrdersPage = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1
-        const limit = 5 
-        const skip = (page - 1)*limit
+        const limit = 5
+        const skip = (page - 1) * limit
         const count = await Order.countDocuments()
-        const totalPages = Math.ceil(count/limit)
+        const totalPages = Math.ceil(count / limit)
 
-        const orders = await Order.find()
+        const orders = await Order.find({ status: { $nin: ["failed"] } })
             .populate('user_id', 'name email mobile')
             .populate('order_items.productId', 'productName productImages price ')
             .sort({ createdAt: -1 }).skip(skip).limit(limit)
-        
-
-        // console.log(JSON.stringify(orders, null, 2));
 
         const returnRequests = orders.filter(order => order.status === 'Return requested');
-
 
         res.render('order-mgt', {
             orders,
             returnRequests,
-            currentPage:page,
+            currentPage: page,
             totalPages
         })
 
@@ -43,7 +39,6 @@ const getOrdersPage = async (req, res) => {
 }
 
 const updateOrder = async (req, res) => {
-
     try {
         const { orderId, status } = req.body
 
@@ -59,23 +54,21 @@ const updateOrder = async (req, res) => {
 
         await updatedOrder.save()
 
-        res.status(200).json({ success: true, message: "order updated successfully",status:updatedOrder.status })
+        res.status(200).json({ success: true, message: "order updated successfully", status: updatedOrder.status })
 
     } catch (error) {
         console.log("error updating order", error)
         res.status(500).json({ success: false, message: "internal server error" })
     }
-
 }
 
 const cancelOrder = async (req, res) => {
-
     try {
         const { orderId } = req.body
-        if(!orderId){
+        if (!orderId) {
             return res.status(404).json({ success: false, message: "order not found" })
         }
-        await Order.findByIdAndUpdate(orderId, {status:'cancelled'})
+        await Order.findByIdAndUpdate(orderId, { status: 'cancelled' })
 
 
         res.status(200).json({ success: true, message: "order deleted successfully" })
@@ -84,16 +77,15 @@ const cancelOrder = async (req, res) => {
         console.log("error deleting order", error)
         res.status(500).json({ success: false, message: "internal server error" })
     }
-
 }
 
 const approveReturn = async (req, res) => {
     try {
         const { orderId } = req.body
-        if(!orderId){
+        if (!orderId) {
             return res.status(404).json({ success: false, message: "order not found" })
         }
-        const order = await Order.findByIdAndUpdate(orderId, {status:'Return approved'})
+        const order = await Order.findByIdAndUpdate(orderId, { status: 'Return approved' })
 
         const userId = order.user_id
 
@@ -120,9 +112,7 @@ const approveReturn = async (req, res) => {
 
         await wallet.save();
 
-        
-
-        res.status(200).json({ success: true, message: "Return approved" })             
+        res.status(200).json({ success: true, message: "Return approved" })
     } catch (error) {
         console.log("error approving return", error)
         res.status(500).json({ success: false, message: "internal server error" })
@@ -131,55 +121,114 @@ const approveReturn = async (req, res) => {
 
 const rejectReturn = async (req, res) => {
     try {
-        const {reason} = req.body
+        const { reason } = req.body
         const orderId = req.params.orderId
         console.log("Rejecting return with reason:", reason);
         console.log("Order ID:", orderId);
 
-        if(!orderId){
+        if (!orderId) {
             return res.status(404).json({ success: false, message: "order not found" })
         }
         const order = await Order.findById(orderId)
-        if(!order){
+        if (!order) {
             return res.status(404).json({ success: false, message: "order not found" })
         }
         order.status = "Return rejected"
-        order.adminReturnStatus =  reason
+        order.adminReturnStatus = reason
 
         await order.save()
 
-        res.status(200).json({ success: true, message: "Return rejected" })         
+        res.status(200).json({ success: true, message: "Return rejected" })
     } catch (error) {
         console.log("error rejecting return", error)
         res.status(500).json({ success: false, message: "internal server error" })
     }
 }
 
+const getDateRange = (filterType, fromDate, toDate) => {
+    const today = new Date();
+    const startOfDay = new Date(today);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(today);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    if (fromDate && toDate) {
+        const start = new Date(fromDate);
+        start.setHours(0, 0, 0, 0);
+
+        const end = new Date(toDate);
+        end.setHours(23, 59, 59, 999);
+
+        return { start, end };
+    }
+
+    switch (filterType) {
+        case 'Daily':
+            return { start: startOfDay, end: endOfDay };
+
+        case 'Weekly':
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay());
+            startOfWeek.setHours(0, 0, 0, 0);
+            return { start: startOfWeek, end: endOfDay };
+
+        case 'Monthly':
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            startOfMonth.setHours(0, 0, 0, 0);
+            return { start: startOfMonth, end: endOfDay };
+
+        case 'Yearly':
+            const startOfYear = new Date(today.getFullYear(), 0, 1);
+            startOfYear.setHours(0, 0, 0, 0);
+            return { start: startOfYear, end: endOfDay };
+
+        default:
+            return { start: new Date(0), end: endOfDay };
+    }
+};
+
 const getSalesReport = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1; 
-        const limit = 10; 
-        const skip = (page - 1) * limit; 
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const skip = (page - 1) * limit;
 
-        const totalOrders = await Order.countDocuments({status: { $in: ["delivered", "Return rejected"] }})
-        const totalSales =  await Order.find({ status: { $in: ["delivered", "Return rejected"] } }).select('total').then(orders => orders.reduce((sum, order) => sum + order.total, 0))
-        const totalPages = Math.ceil(totalOrders / limit); 
+        const filterType = req.query.filterType || 'All';
+        const fromDate = req.query.fromDate;
+        const toDate = req.query.toDate;
 
-        const orders = await Order.find({status: { $in: ["delivered", "Return rejected"] } })
+        const dateRange = getDateRange(filterType, fromDate, toDate);
+
+        const query = {
+            status: { $in: ["delivered", "Return rejected"] },
+            createdAt: { $gte: dateRange.start, $lte: dateRange.end }
+        };
+
+        const totalOrders = await Order.countDocuments(query);
+
+        const totalSales = await Order.find(query)
+            .select('total')
+            .then(orders => orders.reduce((sum, order) => sum + order.total, 0));
+
+        const totalPages = Math.ceil(totalOrders / limit);
+
+        const orders = await Order.find(query)
             .populate('user_id', 'name email mobile')
             .populate('order_items.productId', 'productName price')
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
 
-        // const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
-
-        res.render('sales', { 
-            orders, 
-            totalSales, 
-            totalOrders, 
-            currentPage: page, 
-            totalPages 
+        res.render('sales', {
+            orders,
+            totalSales,
+            totalOrders,
+            currentPage: page,
+            totalPages,
+            filterType,
+            fromDate,
+            toDate
         });
 
     } catch (error) {
@@ -190,7 +239,18 @@ const getSalesReport = async (req, res) => {
 
 const getSalesReportPDF = async (req, res) => {
     try {
-        const orders = await Order.find({status: { $in: ["delivered", "Return rejected"] } })
+        const filterType = req.query.filterType || 'All';
+        const fromDate = req.query.fromDate;
+        const toDate = req.query.toDate;
+
+        const dateRange = getDateRange(filterType, fromDate, toDate);
+
+        const query = {
+            status: { $in: ["delivered", "Return rejected"] },
+            createdAt: { $gte: dateRange.start, $lte: dateRange.end }
+        };
+
+        const orders = await Order.find(query)
             .populate('user_id', 'name email mobile')
             .populate('order_items.productId', 'productName price')
             .sort({ createdAt: -1 });
@@ -198,7 +258,6 @@ const getSalesReportPDF = async (req, res) => {
         const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
         const totalOrders = orders.length;
 
-        // Create a new PDF document
         const doc = new PDFDocument({
             margin: 50,
             size: 'A4'
@@ -207,109 +266,107 @@ const getSalesReportPDF = async (req, res) => {
         const stream = fs.createWriteStream(filePath);
         doc.pipe(stream);
 
-        // Add company logo/name
         doc.fontSize(24)
-           .font('Helvetica-Bold')
-           .text('TIMELESS AURA', { align: 'center' })
-           .moveDown(0.5);
+            .font('Helvetica-Bold')
+            .text('TIMELESS AURA', { align: 'center' })
+            .moveDown(0.5);
 
-        // Add report title
         doc.fontSize(16)
-           .font('Helvetica')
-           .text('Sales Report', { align: 'center' })
-           .moveDown(0.5);
+            .font('Helvetica')
+            .text(`Sales Report - ${filterType}`, { align: 'center' })
+            .moveDown(0.5);
 
-        // Add date
+        if (fromDate && toDate) {
+            doc.fontSize(10)
+                .text(`Date Range: ${new Date(fromDate).toLocaleDateString()} to ${new Date(toDate).toLocaleDateString()}`, { align: 'center' })
+                .moveDown(0.5);
+        } else if (filterType !== 'All') {
+            doc.fontSize(10)
+                .text(`Filter: ${filterType}`, { align: 'center' })
+                .moveDown(0.5);
+        }
+
         doc.fontSize(10)
-           .text(`Generated on: ${new Date().toLocaleDateString('en-US', {
-               year: 'numeric',
-               month: 'long',
-               day: 'numeric'
-           })}`, { align: 'center' })
-           .moveDown(1);
+            .text(`Generated on: ${new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })}`, { align: 'center' })
+            .moveDown(1);
 
-        // Summary Section with box
         doc.rect(50, doc.y, 500, 60).stroke();
         doc.fontSize(12)
-           .text('Summary', 60, doc.y + 10)
-           .fontSize(10)
-           .text(`Total Orders: ${totalOrders}`, 60, doc.y + 5)
-           .text(`Total Sales: ₹${totalSales.toLocaleString()}.00`, 60, doc.y + 5)
-           .moveDown(2);
+            .text('Summary', 60, doc.y + 10)
+            .fontSize(10)
+            .text(`Total Orders: ${totalOrders}`, 60, doc.y + 5)
+            .text(`Total Sales: ₹${totalSales.toLocaleString()}.00`, 60, doc.y + 5)
+            .moveDown(2);
 
-        // Table Header with background
         const tableTop = doc.y;
         const tableHeaders = ['Order ID', 'Date', 'Customer Name', 'Status', 'Amount'];
         const columnWidths = [120, 80, 140, 80, 80];
         let xPosition = 50;
 
-        // Draw header background
         doc.rect(50, tableTop, 500, 20).fill('#f0f0f0');
 
-        // Draw header text
         doc.font('Helvetica-Bold').fontSize(10);
         tableHeaders.forEach((header, i) => {
             doc.fillColor('black')
-               .text(header, xPosition, tableTop + 5, {
-                   width: columnWidths[i],
-                   align: header === 'Amount' ? 'right' : 'left'
-               });
+                .text(header, xPosition, tableTop + 5, {
+                    width: columnWidths[i],
+                    align: header === 'Amount' ? 'right' : 'left'
+                });
             xPosition += columnWidths[i];
         });
 
-        // Table Data
         doc.font('Helvetica').fontSize(9);
         let yPosition = tableTop + 25;
 
         orders.forEach((order, index) => {
-            // Add page if needed
             if (yPosition > 750) {
                 doc.addPage();
                 yPosition = 50;
-                
-                // Redraw headers on new page
+
                 xPosition = 50;
                 doc.rect(50, yPosition, 500, 20).fill('#f0f0f0');
                 doc.font('Helvetica-Bold').fontSize(10);
                 tableHeaders.forEach((header, i) => {
                     doc.fillColor('black')
-                       .text(header, xPosition, yPosition + 5, {
-                           width: columnWidths[i],
-                           align: header === 'Amount' ? 'right' : 'left'
-                       });
+                        .text(header, xPosition, yPosition + 5, {
+                            width: columnWidths[i],
+                            align: header === 'Amount' ? 'right' : 'left'
+                        });
                     xPosition += columnWidths[i];
                 });
                 doc.font('Helvetica').fontSize(9);
                 yPosition += 25;
             }
 
-            // Draw alternating row background
             if (index % 2 === 0) {
                 doc.rect(50, yPosition - 5, 500, 20).fill('#f9f9f9');
             }
 
-            // Draw row data
             xPosition = 50;
             doc.fillColor('black')
-               .text("#"+order._id.toString().slice(-20), xPosition, yPosition, {
-                   width: columnWidths[0]
-               });
-            
+                .text("#" + order._id.toString().slice(-20), xPosition, yPosition, {
+                    width: columnWidths[0]
+                });
+
             xPosition += columnWidths[0];
             doc.text(new Date(order.createdAt).toLocaleDateString(), xPosition, yPosition, {
                 width: columnWidths[1]
             });
-            
+
             xPosition += columnWidths[1];
             doc.text(order.user_id.name, xPosition, yPosition, {
                 width: columnWidths[2]
             });
-            
+
             xPosition += columnWidths[2];
             doc.text(order.status, xPosition, yPosition, {
                 width: columnWidths[3]
             });
-            
+
             xPosition += columnWidths[3];
             doc.text(`₹${order.total.toLocaleString()}.00`, xPosition, yPosition, {
                 width: columnWidths[4],
@@ -319,11 +376,9 @@ const getSalesReportPDF = async (req, res) => {
             yPosition += 20;
         });
 
-        // Add footer
         doc.fontSize(8)
-           .text('© 2024 TIMELESS AURA. All rights reserved.', 50, 780, { align: 'center' });
+            .text('© 2024 TIMELESS AURA. All rights reserved.', 50, 780, { align: 'center' });
 
-        // Finalize PDF and send response
         doc.end();
 
         stream.on('finish', () => {
@@ -332,7 +387,6 @@ const getSalesReportPDF = async (req, res) => {
                     console.error("Error downloading PDF:", err);
                     res.status(500).send("Error downloading PDF");
                 }
-                // Clean up: Delete the file after download
                 fs.unlinkSync(filePath);
             });
         });
@@ -343,18 +397,12 @@ const getSalesReportPDF = async (req, res) => {
     }
 };
 
-
-
 module.exports = {
     getOrdersPage,
     updateOrder,
     cancelOrder,
     approveReturn,
-    cancelOrder,
-    approveReturn,
     rejectReturn,
     getSalesReport,
-    getSalesReportPDF,
-    
+    getSalesReportPDF
 }
-
