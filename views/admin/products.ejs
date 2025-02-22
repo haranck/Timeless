@@ -151,7 +151,7 @@
             }
 
             .products-table tbody tr:nth-child(even) {
-                background-color: #f8f9fa;
+                background-color: #ffffff;
             }
 
             .products-table tbody tr:hover {
@@ -337,6 +337,12 @@
                     text-align: center;
                 }
             }
+            .product-image{
+                width: 50px;
+                height: 50px;
+                object-fit: cover;
+            }
+            
         </style>
     </head>
 
@@ -371,11 +377,13 @@
                 </thead>
                 <tbody>
                     <% data.forEach(function(product) { %>
-                        <tr data-product-id="<%= product._id %>">
-                            <td>
+                        <tr class="div-product" data-product-id="<%= product._id %>">
+                            <td style="display: flex; align-items: center;">
+                                <img class="product-image" src="/uploads/product-images/<%= product.productImages[0] %>"
+                                    alt="<%= product.productName %>">
                                 <%= product.productName %>
                             </td>
-                            <td>
+                            <td> 
                                 <%= product.category ? product.category.name : 'No Category' %>
                             </td>
                             <td>₹<%= product.salePrice %>

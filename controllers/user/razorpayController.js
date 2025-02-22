@@ -280,7 +280,6 @@ const verifyRetryPayment = async (req, res) => {
             // })
 
 
-
             if (failedOrder.order_items && failedOrder.order_items.length > 0) {
                 for (const item of failedOrder.order_items) {
                     await Product.updateOne(

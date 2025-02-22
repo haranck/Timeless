@@ -471,6 +471,12 @@
             background-color: #dc3545;
             transform: translateY(-1px);
         }
+        .product-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            
+        }
     </style>
 
 
@@ -612,9 +618,13 @@
                                                     <% cart.items.forEach(item=> { %>
                                                         <% if (item.productId) { %>
                                                             <tr>
-                                                                <td>
+                                                                
+                                                                <td style="display: flex; align-items: center;">
+                                                                    <img class="product-image" src="/uploads/product-images/<%= item.productId.productImages[0] %>"
+                                                                    alt="<%= item.productId.productName %>" class="product-image">
                                                                     <%= item.productId.productName %>
-                                                                </td>
+                                                                </td>     
+                                                                
                                                                 <td class="text-end">₹<%= item.productId.finalPrice %>
                                                                 </td>
                                                                 <td class="text-center">X<%= item.quantity %>
@@ -950,14 +960,16 @@
                     const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
                     const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
-                    const sanitizedOrderItems = sanitizeQuotes('<%- JSON.stringify(cart.items) %>');
-                    const orderedItems = JSON.parse(sanitizedOrderItems);
+                    const sanitizedOrderItems = sanitizeQuotes(<%- JSON.stringify(cart.items) %>);
+                    const orderedItems = sanitizedOrderItems
+
                     let subtotalText = document.getElementById("total").innerText.replace("₹", "").trim();
                     let totalAmount = parseFloat(subtotalText);
                     const couponCode = document.getElementById("couponCode").value.trim();
                     const discountText = document.getElementById("discount").innerText.replace("₹", "").replace("-", "").trim();
                     const discountAmount = parseFloat(discountText) || 0;
                     const appliedCouponCode = currentCouponCode;
+
 
                     const confirmResult = await Swal.fire({
                         title: 'Confirm Order',

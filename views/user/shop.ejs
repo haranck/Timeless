@@ -521,8 +521,22 @@
                                                     <li>
                                                         <label>
                                                             <input type="radio" name="filter-price" class="filter-price"
-                                                                value="1000-10000" />
-                                                            ₹1000 - ₹10000
+                                                                value="500-1000" />
+                                                            ₹500 - ₹1000
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="1000-5000" />
+                                                            ₹1000 - ₹5000
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label>
+                                                            <input type="radio" name="filter-price" class="filter-price"
+                                                                value="5000-10000" />
+                                                            ₹5000 - ₹10000
                                                         </label>
                                                     </li>
                                                     <li>
@@ -542,28 +556,14 @@
                                                     <li>
                                                         <label>
                                                             <input type="radio" name="filter-price" class="filter-price"
-                                                                value="100000-1000000" />
-                                                            ₹100000 - ₹1000000
+                                                                value="100000-200000" />
+                                                            ₹100000 - ₹200000
                                                         </label>
                                                     </li>
                                                     <li>
                                                         <label>
                                                             <input type="radio" name="filter-price" class="filter-price"
-                                                                value="1000000-2000000" />
-                                                            ₹1000000 - ₹2000000
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label>
-                                                            <input type="radio" name="filter-price" class="filter-price"
-                                                                value="2000000-4000000" />
-                                                            ₹2000000 - ₹4000000
-                                                        </label>
-                                                    </li>
-                                                    <li>
-                                                        <label>
-                                                            <input type="radio" name="filter-price" class="filter-price"
-                                                                value="5000001" />
+                                                                value="200000-500000" />
                                                             ₹500000+
                                                         </label>
                                                     </li>
@@ -1041,6 +1041,8 @@
             applyFilter();
         }
 
+
+
         async function addToWishlist(productId){
             try {
                 const response = await fetch("/addToWishlist",{
@@ -1048,6 +1050,14 @@
                     headers:{"Content-Type":"application/json"},
                     body:JSON.stringify({productId})
                 })
+
+                
+                const contentType = response.headers.get("content-type");
+                if (!contentType || !contentType.includes("application/json")) {
+                    showErrorMessage('You loged first then add to Wishlist');
+                    return;
+                }
+
                 const data = await response.json();
 
                 if(data.success){

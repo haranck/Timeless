@@ -9,10 +9,7 @@ const loadCart = async (req, res) => {
     try {
         const userId = req.session.user;
 
-        const page = parseInt(req.query.page) || 1;
-        const limit = 3;
-        const skip = (page - 1) * limit;
-        
+        // Fetch the cart for the user
         let cart = await Cart.findOne({ userId }).populate({
             path: "items.productId", 
             populate: { path: "category" }
@@ -24,26 +21,22 @@ const loadCart = async (req, res) => {
                 cart: {
                     items: [],
                     totalPrice: 0,
-                },
-                currentPage: 1,
-                totalPages: 1
+                }
             });
         }
+
+        // Process the cart items and calculate total price
         const processedData = cart.items
             .map(item => ({...item, productId: getDiscountPriceCart(item.productId)}))
             .filter(item => item.productId);
 
         cart.items = processedData;
         cart.totalPrice = cart.items.reduce((total, item) => total + item.totalPrice, 0);
-        const paginatedItems = cart.items.slice(skip, skip + limit);
-        const totalPages = Math.ceil(cart.items.length / limit);
-        cart.items = paginatedItems;
 
+        // Render the cart without pagination
         res.render("cart", {
             user: req.session.userData, 
-            cart,
-            currentPage: page,
-            totalPages
+            cart
         });
 
     } catch (error) {

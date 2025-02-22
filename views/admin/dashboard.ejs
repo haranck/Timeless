@@ -1,104 +1,6 @@
-<!-- 
-<- include("../../views/partials/admin/header") %>
-    <main class="main-content">
-        <div class="breadcrumbs">
-            Admin <span>></span> <span id="currentPage">Dashboard</span>
-        </div>
 
-        <div class="dashboard-grid">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Total Sales</h3>
-                </div>
-                <div class="chart-container">
-                    <canvas id="salesChart"></canvas>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Customers</h3>  
-                </div>
-                <div class="chart-container">
-                    <canvas id="customersChart"></canvas>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Total Orders</h3>
-                </div>
-                <div class="chart-container">
-                    <canvas id="ordersChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div class="card recent-orders">
-            <div class="card-header">
-                <h3 class="card-title">Recent Orders</h3>
-            </div>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Date</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Luxury Watch X1</td>
-                        <td>Jan 20, 2025</td>
-                        <td>$599.99</td>
-                        <td><span class="status completed">Completed</span></td>
-                    </tr>
-                    <tr>
-                        <td>Classic Watch Y2</td>
-                        <td>Jan 19, 2025</td>
-                        <td>$399.99</td>
-                        <td><span class="status pending">Pending</span></td>
-                    </tr>
-                    <tr>
-                        <td>Smart Watch Z3</td>
-                        <td>Jan 19, 2025</td>
-                        <td>$299.99</td>
-                        <td><span class="status completed">Completed</span></td>
-                    </tr>
-                    <tr>
-                        <td>Diamond Watch A4</td>
-                        <td>Jan 18, 2025</td>
-                        <td>$899.99</td>
-                        <td><span class="status completed">Completed</span></td>
-                    </tr>
-                    <tr>
-                        <td>Sports Watch B5</td>
-                        <td>Jan 18, 2025</td>
-                        <td>$199.99</td>
-                        <td><span class="status pending">Pending</span></td>
-                    </tr>
-                    <tr>
-                        <td>Gold Watch C6</td>
-                        <td>Jan 17, 2025</td>
-                        <td>$799.99</td>
-                        <td><span class="status completed">Completed</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="card best-selling">
-            <div class="card-header">
-                <h3 class="card-title">Best Selling This Month</h3>
-            </div>
-            <div class="chart-container">
-                <canvas id="bestSellingChart"></canvas>
-            </div>
-        </div>
-    </main>
-    <- include("../../views/partials/admin/footer") %> -->
-
-
-<%- include("../../views/partials/admin/header") %>
+    <%- include("../../views/partials/admin/header") %>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <!-- Main Content -->
     <main class="main-content">
@@ -108,59 +10,68 @@
     
         <!-- Summary Cards -->
         <div class="summary-cards">
+            <a href="/admin/salesReport" style="text-decoration: none; color: inherit;">
             <div class="summary-card">
                 <div class="summary-icon">
                     <i class="fa fa-chart-line" style="color: #000000;"></i>
                 </div>
                 <div class="summary-info">
-                    <h3>₹1,250,000</h3>
+                    <h3>₹<%= Math.round(dashboardData.summary.totalRevenue).toLocaleString() %></h3>
                     <p>Total Revenue</p>
                 </div>
-                <div class="summary-change increase">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>15.2%</span>
+                <div class="summary-change <%= dashboardData.summary.revenueGrowth >= 0 ? 'increase' : 'decrease' %>">
+                    <i class="fas fa-arrow-<%= dashboardData.summary.revenueGrowth >= 0 ? 'up' : 'down' %>"></i>
+                    <span><%= Math.abs(dashboardData.summary.revenueGrowth) %>%</span>
                 </div>
             </div>
+            </a>
+            <a href="/admin/customers" style="text-decoration: none; color: inherit;">
             <div class="summary-card">
                 <div class="summary-icon">
                     <i class="fa fa-users" style="color: #000000;"></i>
                 </div>
                 <div class="summary-info">
-                    <h3>2,450</h3>
+                    <h3><%= dashboardData.summary.totalCustomers.toLocaleString() %></h3>
                     <p>Total Customers</p>
                 </div>
-                <div class="summary-change increase">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>8.7%</span>
+                <div class="summary-change <%= dashboardData.summary.customerGrowth >= 0 ? 'increase' : 'decrease' %>">
+                    <i class="fas fa-arrow-<%= dashboardData.summary.customerGrowth >= 0 ? 'up' : 'down' %>"></i>
+                    <span><%= Math.abs(dashboardData.summary.customerGrowth) %>%</span>
                 </div>
             </div>
+            </a>
+            <a href="/admin/orders" style="text-decoration: none; color: inherit;">
             <div class="summary-card">
                 <div class="summary-icon">
                     <i class="fas fa-shopping-cart" style="color: #000000;"></i>
                 </div>
                 <div class="summary-info">
-                    <h3>750</h3>
+                    <h3><%= dashboardData.summary.totalOrders.toLocaleString() %></h3>
                     <p>Total Orders</p>
                 </div>
-                <div class="summary-change increase">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>12.3%</span>
+                <div class="summary-change <%= dashboardData.summary.orderGrowth >= 0 ? 'increase' : 'decrease' %>">
+                    <i class="fas fa-arrow-<%= dashboardData.summary.orderGrowth >= 0 ? 'up' : 'down' %>"></i>
+                    <span><%= Math.abs(dashboardData.summary.orderGrowth) %>%</span>
                 </div>
             </div>
+            </a>
         </div>
+
+        <div class="chart-filter-container">
+            <label for="salesChartFilter" class="chart-label">Select Time Filter:</label>
+            <select id="salesChartFilter" class="chart-select">
+                <option value="yearly">Yearly</option>
+                <option value="monthly">Monthly</option>
+                <option value="weekly" selected>Weekly</option>
+            </select>
+        </div>
+        
     
         <!-- Charts Section -->
         <div class="dashboard-grid">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Sales Revenue</h3>
-                    <div class="chart-filter">
-                        <select id="salesChartFilter" class="chart-select">
-                            <option value="yearly">Yearly</option>
-                            <option value="monthly" selected>Monthly</option>
-                            <option value="weekly">Weekly</option>
-                        </select>
-                    </div>
                 </div>
                 <div class="chart-container">
                     <canvas id="salesChart"></canvas>
@@ -169,13 +80,13 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Customer Growth</h3>
-                    <div class="chart-filter">
+                    <!-- <div class="chart-filter">
                         <select id="customersChartFilter" class="chart-select">
                             <option value="yearly">Yearly</option>
-                            <option value="monthly" selected>Monthly</option>
-                            <option value="weekly">Weekly</option>
+                            <option value="monthly" >Monthly</option>
+                            <option value="weekly" selected>Weekly</option>
                         </select>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="chart-container">
                     <canvas id="customersChart"></canvas>
@@ -187,13 +98,13 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Orders Overview</h3>
-                    <div class="chart-filter">
+                    <!-- <div class="chart-filter"> 
                         <select id="ordersChartFilter" class="chart-select">
                             <option value="yearly">Yearly</option>
-                            <option value="monthly" selected>Monthly</option>
-                            <option value="weekly">Weekly</option>
+                            <option value="monthly" >Monthly</option>
+                            <option value="weekly" selected>Weekly</option>
                         </select>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="chart-container">
                     <canvas id="ordersChart"></canvas>
@@ -201,14 +112,14 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Watch Category Performance</h3>
-                    <div class="chart-filter">
+                    <h3 class="card-title">Category Performance</h3>
+                    <!-- <div class="chart-filter">
                         <select id="categoryChartFilter" class="chart-select">
                             <option value="yearly">Yearly</option>
-                            <option value="monthly" selected>Monthly</option>
-                            <option value="quarterly">Quarterly</option>
+                            <option value="monthly" >Monthly</option>
+                            <option value="weekly" selected>Weekly</option>
                         </select>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="chart-container">
                     <canvas id="categoryChart"></canvas>
@@ -219,8 +130,10 @@
         <!-- Recent Orders -->
         <div class="card recent-orders">
             <div class="card-header">
-                <h3 class="card-title">Recent Orders</h3>
-                <a href="/admin/orders" class="view-all-btn">View All</a>
+                <div style="display: flex;justify-content: space-between;margin-bottom: 24px;">
+                    <h3 class="card-title">Recent Orders</h3>
+                    <a href="/admin/orders" class="view-all-btn">View All</a>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table">
@@ -228,43 +141,29 @@
                         <tr>
                             <th>Order ID</th>
                             <th>Customer</th>
-                            <th>Product</th>
+                            <!-- <th>Product</th> -->
                             <th>Date</th>
                             <th>Amount</th>
                             <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td class="order-link">#1234</td>
-                            <td>John Doe</td>
-                            <td>Luxury Watch X1</td>
-                            <td>Feb 15, 2025</td>
-                            <td class="amount">₹599.99</td>
-                            <td>
-                                <span class="status completed">Completed</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="order-link">#1235</td>
-                            <td>Jane Smith</td>
-                            <td>Smart Watch Z3</td>
-                            <td>Feb 14, 2025</td>
-                            <td class="amount">₹299.99</td>
-                            <td>
-                                <span class="status pending">Pending</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="order-link">#1236</td>
-                            <td>Mike Johnson</td>
-                            <td>Diamond Watch A4</td>
-                            <td>Feb 13, 2025</td>
-                            <td class="amount">₹899.99</td>
-                            <td>
-                                <span class="status completed">Completed</span>
-                            </td>
-                        </tr>
+                        <% dashboardData.recentOrders.forEach(order => { %>
+                            <tr>
+                                <td class="order-link">#<%= order.orderId %></td>
+                                <td><%= order.customer %></td>
+                                <!-- <td><img src="/uploads/product-images/<order.productImages %>" alt=""></td> -->
+                                <td><%= new Date(order.date).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                }) %></td>
+                                <td class="amount">₹<%= order.amount.toLocaleString() %></td>
+                                <td>
+                                    <span class="status <%= order.status.toLowerCase() %>"><%= order.status %></span>
+                                </td>
+                            </tr>
+                        <% }); %>
                     </tbody>
                 </table>
             </div>
@@ -272,28 +171,9 @@
     </main>
     
     <script>
-        window.dashboardData = {
-            sales: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                data: [200000, 250000, 300000, 280000, 320000, 350000]
-            },
-            customers: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                data: [350, 400, 450, 420, 480, 500]
-            },
-            orders: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                data: [100, 120, 140, 130, 160, 180]
-            },
-            categories: {
-                labels: ['Luxury', 'Smart', 'Classic', 'Sports'],
-                data: [350000, 250000, 200000, 150000]
-            }
-        };
-
-
+        // Pass dashboard data to client-side JavaScript
+        window.dashboardData = <%-JSON.stringify(dashboardData) %>;
         
     </script>
     
     <%- include("../../views/partials/admin/footer") %>
-    

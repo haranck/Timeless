@@ -422,25 +422,19 @@ button:hover {
                                     : order.status === 'Return requested' ? 'purple' 
                                     : order.status === 'Return approved' ? 'green'
                                     : order.status === 'Return rejected' ? 'red'
-                                    : 'black' %>" <%=order.status==='cancelled' ? 'disabled' : '' %>>
-                                    <option value="pending" <%=order.status==='pending' ? 'selected' : '' %>>Pending
-                                    </option>
-                                    <option value="shipped" <%=order.status==='shipped' ? 'selected' : '' %>>Shipped
-                                    </option>
-                                    <option value="delivered" <%=order.status==='delivered' ? 'selected' : '' %>
-                                        >Delivered</option>
-                                    <option value="cancelled" <%=order.status==='cancelled' ? 'selected' : '' %>
-                                        >Cancelled</option>
-                                        <% if(order.status === 'Return requested') {  %> 
-                                    <option value="Return requested" <%=order.status==='Return requested' ? 'selected' : '' %>
-                                        >Return requested</option>
-                                        <% }else if(order.status === 'Return approved') { %> 
-                                    <option value="Return approved" <%=order.status==='Return approved' ? 'selected' : '' %>
-                                        >Return approved</option>
-                                        <% }else if(order.status === 'Return rejected') { %> 
-                                    <option value="Return rejected" <%=order.status==='Return rejected' ? 'selected' : '' %>
-                                        >Return rejected</option>
-                                        <% } %> 
+                                    : 'black' %>" 
+                                    <%= order.status === 'cancelled' || order.status === 'delivered' || order.status === 'Return requested' || order.status === 'Return approved' || order.status === 'Return rejected' ? 'disabled' : '' %>>
+                                    <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                                    <option value="shipped" <%= order.status === 'shipped' ? 'selected' : '' %>>Shipped</option>
+                                    <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
+                                    <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                    <% if (order.status === 'Return requested') { %> 
+                                        <option value="Return requested" <%= order.status === 'Return requested' ? 'selected' : '' %>>Return requested</option>
+                                    <% } else if (order.status === 'Return approved') { %> 
+                                        <option value="Return approved" <%= order.status === 'Return approved' ? 'selected' : '' %>>Return approved</option>
+                                    <% } else if (order.status === 'Return rejected') { %> 
+                                        <option value="Return rejected" <%= order.status === 'Return rejected' ? 'selected' : '' %>>Return rejected</option>
+                                    <% } %> 
                                 </select>
                             </td>
                             <td>
@@ -707,6 +701,9 @@ button:hover {
                         timer: 1500
                     })
                     if (status.toLowerCase() === 'cancelled') {
+                        selectElement.disabled = true;
+                    }
+                    if (status.toLowerCase() === 'delivered') {
                         selectElement.disabled = true;
                     }
                     const orderRow = document.querySelector(`tr[data-order-id="${orderId}"]`);

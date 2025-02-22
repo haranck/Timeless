@@ -331,6 +331,8 @@ const filterProducts = async (req, res) => {
 
        let filter = {};
 
+       
+
        const listedCategories = await Category.find({ isListed:true}).lean()
        const filteredCategories = listedCategories.filter((cat)=>categories.includes(cat._id.toString()))
       //  console.log(listedCategories)
@@ -398,5 +400,4 @@ module.exports = {
    logout,
    loadShoppingPage,
    filterProducts
-
 }
