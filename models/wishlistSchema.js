@@ -11,13 +11,15 @@ const wishlistSchema = new Schema({
       type: Date,
       default: Date.now
    },
-   items: [{
+   items: [
+      {
          productId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Product",
             required: true
          },
-      }]
+      }
+   ]
 })
 
 

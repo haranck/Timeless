@@ -7,7 +7,7 @@ const nodemailer = require('nodemailer');
 const mongoose = require('mongoose')
 const env = require('dotenv').config()
 const { getDiscountPrice } = require("../../helpers/offerHelper");
-
+const Wallet = require('../../models/walletSchema')
 
 // const getDiscountPrice = (product) => {
 //    let productOffer = product.productOffer || 0;
@@ -38,13 +38,18 @@ const loadHompage = async (req, res) => {
       .sort({ createdOn: -1 }).limit(8)
 
       const processedProducts = productData.map(getDiscountPrice)
+      let walletBalance = 0;
 
       if (user) {
          const userData = await User.findById(user);
+         const wallet = await Wallet.findOne({ userId: user });
+         if (wallet) {
+             walletBalance = wallet.balance;
+         }
 
-         return res.render('home', { user: userData, products: processedProducts ,brands:brands});
+         return res.render('home', { user: userData, products: processedProducts ,brands:brands,wallet:walletBalance});
       } else {
-         return res.render('home', { products: processedProducts,brands:brands})
+         return res.render('home', { products: processedProducts,brands:brands,wallet:walletBalance})
       }
       
    } catch (error) {
@@ -303,6 +308,14 @@ const loadShoppingPage = async (req, res) => {
          brandName: brand.brandName,
          brandImage: brand.brandImage
       }));
+      let walletBalance = 0;
+
+      if (user) {
+          const wallet = await Wallet.findOne({ userId: user});
+          if (wallet) {
+              walletBalance = wallet.balance;
+          }
+      }
 
       res.render('shop', {
          user: userData,
@@ -313,7 +326,8 @@ const loadShoppingPage = async (req, res) => {
          brand: brands,
          totalProducts: totalProducts,
          currentPage: page,
-         totalPages: totalPages
+         totalPages: totalPages,
+         wallet:walletBalance
       })
 
    } catch (error) {
