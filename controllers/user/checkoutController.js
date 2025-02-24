@@ -10,17 +10,39 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 
-
 const loadCheckout = async (req, res) => {
     try {
         const userId = req.session.user;
-        let cart = await Cart.findOne({ userId }).populate({ path: "items.productId", populate: { path: "category" } });
-        const processedData = cart.items.map(item => ({ ...item, productId: getDiscountPriceCart(item.productId) }))
-        cart.items = processedData;
+
+        let cart = await Cart.findOne({ userId }).populate({ 
+            path: "items.productId", 
+            populate: { path: "category" } 
+        });
+
+        if (!cart || cart.items.length === 0) {
+            return res.status(400).json({ success: false, message: "Cart is empty" });
+        }
+
+        const availableItems = cart.items.filter(item => 
+            item.productId && item.productId.isListed
+        );
+
+        const unavailableItems = cart.items.filter(item => 
+            !item.productId || !item.productId.isListed
+        );
+
+        if (unavailableItems.length > 0) {
+            req.flash("error", `Some products are no longer available: ${unavailableItems.map(item => item.productId.name).join(", ")}`);
+        }
+
+        cart.items = availableItems;
+        cart.totalPrice = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+
         const user = await User.findById(userId);
         const addressDoc = await Address.findOne({ userId: userId });
-        const carttotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+        let userAddress = addressDoc ? addressDoc.address : [];
 
+        const carttotal = cart.totalPrice;
         const date = new Date();
         const coupon = await Coupon.find({
             couponMinAmount: { $lte: carttotal },
@@ -29,12 +51,6 @@ const loadCheckout = async (req, res) => {
             couponValidity: { $gte: date }
         });
 
-        let userAddress = [];
-        if (addressDoc && addressDoc.address) {
-            userAddress = addressDoc.address;
-        }
-        cart.totalPrice = cart.items.reduce((total, item) => total + item.totalPrice, 0);
-        cart.items = cart.items.filter(item => item.productId);
         res.render("checkout", {
             cart,
             user,
@@ -43,10 +59,10 @@ const loadCheckout = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("error in checkout", error);
+        console.log("Error in checkout:", error);
         res.redirect("/pageNotFound");
     }
-}
+};
 
 const editCheckoutAddress = async (req, res) => {
     try {
@@ -189,6 +205,7 @@ const placeOrder = async (req, res) => {
             if (!product) {
                 throw new Error(`Product not found for ID: ${item.productId}`);
             }
+            
             return {
                 productId: product._id,
                 quantity: item.quantity,

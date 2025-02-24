@@ -12,35 +12,67 @@ const orderController = require('../controllers/admin/orderController')
 const couponController = require('../controllers/admin/couponController')
 
 
-const storage = multer.diskStorage({ 
+
+// const storage = multer.diskStorage({ 
+//     destination: function (req, file, cb) {
+//         if (req.originalUrl.includes('/addBrand')) {
+//             cb(null, path.join(__dirname, '../public/uploads/brands'))
+//         } else {
+//             cb(null, path.join(__dirname, '../public/uploads/product-images'))
+//         }
+//     },
+//     filename: function (req, file, cb) {
+//         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+//         cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
+//     }
+// })
+
+// const fileFilter = (req, file, cb) => {
+//     if (file.mimetype.startsWith('image/')) {
+//         cb(null, true)
+//     } else {
+//         cb(new Error('Not an image! Please upload an image.'), false)
+//     }
+// }
+const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         if (req.originalUrl.includes('/addBrand')) {
-            cb(null, path.join(__dirname, '../public/uploads/brands'))
+            cb(null, path.join(__dirname, '../public/uploads/brands'));
         } else {
-            cb(null, path.join(__dirname, '../public/uploads/product-images'))
+            cb(null, path.join(__dirname, '../public/uploads/product-images'));
         }
     },
     filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
     }
-})
+});
 
 const fileFilter = (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
-        cb(null, true)
+        cb(null, true);
     } else {
-        cb(new Error('Not an image! Please upload an image.'), false)
+        cb(new Error('Not an image! Please upload an image.'), false);
     }
-}
+};
 
-const uploads = multer({
+// This middleware will handle any fields (useful for mixed form data)
+const uploadAny = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB file 
+        fileSize: 5 * 1024 * 1024 // 5MB file size limit
     }
-})
+}).any();
+// const uploads = multer({
+//     storage: storage,
+//     fileFilter: fileFilter,
+//     limits: {
+//         fileSize: 5 * 1024 * 1024 // 5MB file 
+//     }
+// })
+
+
 
 router.get('/login', adminController.loadLogin)
 router.post('/login', adminController.login)
@@ -64,12 +96,12 @@ router.post('/editCategory/:id', adminAuth, categoryController.editCategory)
 //product mgt
 
 router.get("/addProducts", adminAuth, productController.getProductAddPage)
-router.post("/addProducts", adminAuth, uploads.array("images", 4), productController.addProducts)
+router.post("/addProducts", adminAuth, uploadAny, productController.addProducts)
 router.get('/products', adminAuth, productController.getAllProducts)
 router.patch('/toggle-list/:id', adminAuth, productController.toggleProductList)
 router.patch('/toggleCategory/:id', adminAuth, categoryController.toggleCategory)
 router.get('/editProduct', adminAuth, productController.getEditProduct)
-router.post("/editProduct/:id", adminAuth, uploads.array("croppedImage1", 4), productController.editProduct)
+router.post("/editProduct/:id", adminAuth, uploadAny, productController.editProduct)
 router.post('/deleteImage', adminAuth, productController.deleteSingleImage)
 router.post('/addProductOffer', adminAuth, productController.addProductOffer)
 router.post('/deleteProductOffer', adminAuth, productController.deleteProductOffer)
@@ -77,8 +109,8 @@ router.post('/deleteProductOffer', adminAuth, productController.deleteProductOff
 
 //brand mgt
 
-router.get('/brands', adminAuth, brandController.getBrandPage)
-router.post('/addBrand', adminAuth, uploads.single("image"), brandController.addBrand)
+router.get('/brands', adminAuth, brandController.getBrandPage)  
+router.post('/addBrand', adminAuth, uploadAny, brandController.addBrand)
 router.get('/blockBrand', adminAuth, brandController.blockBrand)
 router.get('/unblockBrand', adminAuth, brandController.unblockBrand)
 router.get('/deleteBrand', adminAuth, brandController.deleteBrand)

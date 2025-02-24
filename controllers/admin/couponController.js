@@ -20,10 +20,10 @@ const getCouponPage = async (req, res) => {
 
 const addCoupon = async (req, res) => {
     try {
-        const { couponCode, couponType, discount, minPurchase,maxDiscount, expiryDate,  } = req.body;
+        const { couponCode, couponType, discount, minPurchase,maxDiscount, expiryDate, usageLimit } = req.body;
 
         // Validate input fields
-        if (!couponCode || !couponType || !discount || !minPurchase || !expiryDate || !maxDiscount) {
+        if (!couponCode || !couponType || !discount || !minPurchase || !expiryDate || !maxDiscount || !usageLimit) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required!",
@@ -34,7 +34,7 @@ const addCoupon = async (req, res) => {
                     minPurchase: !minPurchase,
                     maxDiscount:!maxDiscount,
                     expiryDate: !expiryDate,
-                
+                    usageLimit: !usageLimit
                 }
             });
         }
@@ -57,6 +57,7 @@ const addCoupon = async (req, res) => {
         const parsedDiscount = parseFloat(discount);
         const parsedMinPurchase = parseFloat(minPurchase);
         const parsedMaxDiscount = parseFloat(maxDiscount);
+        const parsedUsageLimit = parseFloat(usageLimit);
 
         // Validate discount based on coupon type
         if (isNaN(parsedDiscount) || parsedDiscount <= 0) {
@@ -96,6 +97,13 @@ const addCoupon = async (req, res) => {
             });
         }
 
+        if (isNaN(parsedUsageLimit) || parsedUsageLimit <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Usage limit must be a positive number"
+            });
+        }
+
         const newCoupon = new Coupon({
             couponCode,
             couponType,
@@ -103,6 +111,7 @@ const addCoupon = async (req, res) => {
             couponMinAmount: parsedMinPurchase,
             couponMaxAmount:parsedMaxDiscount,
             couponValidity: parsedExpiryDate,
+            limit: parsedUsageLimit,
             isActive:true
         });
 

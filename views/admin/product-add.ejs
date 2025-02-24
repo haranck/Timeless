@@ -185,7 +185,7 @@
         }
 
         /* Image Upload Section Styles */
-        .image-upload-section {
+        /* .image-upload-section {
             background-color: #f8f9fa;
             border-radius: 10px;
             padding: 20px;
@@ -263,8 +263,121 @@
             align-items: center;
             gap: 15px;
             width: 100%;
-        }
-    </style>
+        } */
+         /* Image Upload Section Styles */
+.image-upload-section {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.image-upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.image-upload-row {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.image-preview {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px dashed #e0e4e8;
+}
+
+.image-cropper {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.image-cropper img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.save-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.save-button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+/* Thumbnails styling */
+.thumbnails-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.thumbnail-wrapper {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #e0e4e8;
+}
+
+.remove-thumbnail {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.remove-thumbnail:hover {
+    background-color: #c0392b;
+}
+</style>
+
     <section class="content-main">
         <div class="row">
             <div class="col-12">
@@ -646,87 +759,155 @@
             document.getElementById('imgView3').src = URL.createObjectURL(event.target.files[0])
         }
 
-        function viewImage(event, index) {
-            let input = event.target
-            let reader = new FileReader()
-            reader.onload = function () {
-                let dataURL = reader.result
-                let image = document.getElementById("imgView" + index)
-                image.src = dataURL
-                let cropper = new Cropper(image, {
-                    aspectRatio: 1,
-                    viewMode: 1,
-                    guides: true,
-                    background: false,
-                    autoCropArea: 1,
-                    zoomable: true,
-                    center: true,
-                    cropBoxResizable: true,
-                    quickCropBox: true
-                })
+        let croppers = {};
 
-                let cropperContainer = document.querySelector("#croppedImg" + index).parentNode
-                cropperContainer.style.display = "block"
-                 //save
-                let saveButton = document.querySelector("#saveButton" + index)
-                saveButton.addEventListener("click", async function () {
-                    let croppedCanvas = cropper.getCroppedCanvas()
-                    let croppedImage = document.getElementById("croppedImg" + index)
-                    croppedImage.src = croppedCanvas.toDataURL("image/jpeg", 1.0)
-                    let timestamp = new Date().getTime()
-                    let fileName = `cropped-img-${timestamp}-${index}.png`
+function viewImage(event, index) {
+    const input = event.target;
+    const reader = new FileReader();
+    const imgView = document.getElementById(`imgView${index}`);
+    const cropperContainer = document.querySelector(`#input${index}`).closest('.image-upload-row');
+    const croppedImgContainer = cropperContainer.querySelector('.image-cropper');
+    const croppedImg = document.getElementById(`croppedImg${index}`);
 
-
-                    await croppedCanvas.toBlob(blob => {
-                        let input = document.createElement("input" + index)
-                        let imgFile = new File([blob], fileName, blob)
-                        const fileList = new DataTransfer()
-                        fileList.items.add(imgFile)
-                        input.files = fileList.files
-                    })
-
-                    cropperrContainer.style.display = "none"
-                    cropper.destroy()
-                })
-
-            }
-            reader.readAsDataURL(input.files[0])
+    reader.onload = function() {
+        // Destroy existing cropper if any
+        if (croppers[index]) {
+            croppers[index].destroy();
         }
 
-        const selectedImages = []
-        document.getElementById('input1').addEventListener('change', handleFileSelect)
-
-        function handleFileSelect(event) {
-            const addedImagesContainer = document.getElementById('addedImagesContainer')
-            addedImagesContainer.innerHTML = ""
-            const files = event.target.files
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i]
-                selectedImages.push(file)
-                const thumbnail = document.createElement('img')
-                const img = document.createElement('img')
-                img.src = URL.createObjectURL(file)
-                img.alt = "thumbnail"
-                img.style.width = "50px"
-                img.style.height = "auto"
-                const remomveIcon = document.createElement("span")
-                removeIcon.classList.add("remove-icon")
-                removeIcon.innerHTML = "&times;"
-                removeIcon.addEventListener("click", function () {
-                    const index = selectedImages.indexOf(file)
-                    if (index !== -1) {
-                        selectedImages.splice(index, 1)
-                    }
-                    thumbnail.remove()
-
-
-                })
-                thumbnail.appendChild(img)
-                thumbnail.appendChild(removeIcon)
-                addedImagesContainer.appendChild(thumbnail)
+        imgView.src = reader.result;
+        
+        // Initialize Cropper
+        croppers[index] = new Cropper(imgView, {
+            aspectRatio: 1,
+            viewMode: 1,
+            guides: true,
+            background: false,
+            autoCropArea: 0.8,
+            cropBoxResizable: true,
+            dragMode: 'move',
+            ready: function() {
+                croppedImgContainer.style.display = 'flex';
             }
+        });
 
+        // Save button handler
+        document.querySelector(`#saveButton${index}`).onclick = async function() {
+            const canvas = croppers[index].getCroppedCanvas({
+                width: 440,
+                height: 440
+            });
+
+            // Convert canvas to blob
+            canvas.toBlob(async (blob) => {
+                // Create new file from blob
+                const timestamp = new Date().getTime();
+                const fileName = `cropped-img-${timestamp}-${index}.jpeg`;
+                const croppedFile = new File([blob], fileName, { type: 'image/jpeg' });
+
+                // Create a new FileList with the cropped image
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(croppedFile);
+                
+                // Update the file input
+                document.getElementById(`input${index}`).files = dataTransfer.files;
+
+                // Update preview
+                croppedImg.src = canvas.toDataURL('image/jpeg');
+                
+                // Show cropped result
+                imgView.style.display = 'none';
+                croppedImg.style.display = 'block';
+                
+                // Destroy cropper
+                croppers[index].destroy();
+                croppers[index] = null;
+
+                // Update thumbnails
+                updateThumbnails();
+            }, 'image/jpeg', 0.9);
+        };
+    };
+
+    if (input.files && input.files[0]) {
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function updateThumbnails() {
+    const container = document.getElementById('addedImagesContainer');
+    container.innerHTML = '';
+
+    // Collect all uploaded images
+    const inputs = document.querySelectorAll('input[type="file"][name="images"]');
+    inputs.forEach((input, index) => {
+        if (input.files && input.files[0]) {
+            const thumbnail = document.createElement('div');
+            thumbnail.className = 'thumbnail-wrapper';
+            
+            const img = document.createElement('img');
+            img.className = 'thumbnail';
+            img.src = URL.createObjectURL(input.files[0]);
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-thumbnail';
+            removeBtn.innerHTML = '×';
+            removeBtn.onclick = () => {
+                input.value = '';
+                const croppedImg = document.getElementById(`croppedImg${index + 1}`);
+                const imgView = document.getElementById(`imgView${index + 1}`);
+                croppedImg.src = '';
+                imgView.src = '';
+                imgView.style.display = 'block';
+                thumbnail.remove();
+            };
+
+            thumbnail.appendChild(img);
+            thumbnail.appendChild(removeBtn);
+            container.appendChild(thumbnail);
         }
+    });
+}
+
+// Form validation with image check
+function validateForm() {
+    let isValid = true;
+    const errors = {};
+
+    // Basic field validation
+    const requiredFields = ['productName', 'description', 'regularPrice', 'category'];
+    requiredFields.forEach(field => {
+        const input = document.querySelector(`[name="${field}"]`);
+        if (!input.value.trim()) {
+            errors[field] = `${field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} is required`;
+            isValid = false;
+        }
+    });
+
+    // Image validation
+    const imageInputs = document.querySelectorAll('input[type="file"][name="images"]');
+    let imageCount = 0;
+    imageInputs.forEach(input => {
+        if (input.files && input.files[0]) {
+            imageCount++;
+        }
+    });
+
+    if (imageCount < 3) {
+        errors.images = 'At least 3 images are required';
+        isValid = false;
+    }
+
+    // Display errors
+    Object.keys(errors).forEach(field => {
+        const errorElement = document.getElementById(`${field}-error`);
+        if (errorElement) {
+            errorElement.textContent = errors[field];
+        }
+    });
+
+    return isValid;
+}
 
     </script>
 

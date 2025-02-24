@@ -322,6 +322,9 @@
 
                     <label for="expiryDate">Expiration Date</label>
                     <input type="date" name="expiryDate" required>
+
+                    <label for="usageLimit">Usage Limit</label>
+                    <input type="number" name="usageLimit" placeholder="Usage Limit" required>
                 </div>
                 <button type="submit" class="save-btn">Save Coupon</button>
             </form>
@@ -368,6 +371,7 @@
                 const minPurchase = document.querySelector("input[name='minPurchase']").value;
                 const maxDiscount = document.querySelector("input[name='maxDiscount']").value;
                 const expiryDate = document.querySelector("input[name='expiryDate']").value;
+                const usageLimit = document.querySelector("input[name='usageLimit']").value;
 
                 try {
                     const response = await fetch("/admin/addCoupon", {
@@ -381,7 +385,8 @@
                             discount,
                             minPurchase,
                             expiryDate,
-                            maxDiscount
+                            maxDiscount,
+                            usageLimit
                         })
                     });
 

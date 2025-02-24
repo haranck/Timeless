@@ -277,11 +277,12 @@
                                 <div class="card-body">
                                     <div class="image-upload-container">
                                         <input type="file" 
-                                               id="imageUpload" 
-                                               name="images" 
-                                               class="form-control" 
-                                               accept="image/*" 
-                                               onchange="openCropperModal(event)">
+                                        id="imageUpload" 
+                                        name="images" 
+                                        class="form-control" 
+                                        accept="image/*" 
+                                        multiple
+                                        onchange="openCropperModal(event)">
                                         
                                         <!-- Hidden input to store cropped images -->
                                         <input type="hidden" id="deletedImagesInput" name="deletedImages" value="[]">
@@ -336,36 +337,7 @@
     let croppedImagesCount = 0;
 
     function validateForm() {
-        // const totalImages = existingImages.length - deletedImages.length + croppedImagesCount;
-
-        // if (totalImages < 3 || totalImages > 4) {
-        //     Swal.fire({
-        //         icon: 'error',
-        //         title: 'Invalid Image Count',
-        //         text: 'You must have between 3 and 4 images in total',
-        //         confirmButtonColor: '#3085d6'
-        //     });
-        //     return false;
-        // }
-
-        // // Confirmation before submitting
-        // Swal.fire({
-        //     title: 'Update Product',
-        //     text: 'Are you sure you want to update this product?',
-        //     icon: 'warning',
-        //     showCancelButton: true,
-        //     confirmButtonColor: '#3085d6',
-        //     cancelButtonColor: '#d33',
-        //     confirmButtonText: 'Yes, update it!'
-        // }).then((result) => {
-        //     if (result.isConfirmed) {
-        //         document.querySelector('form').submit();
-        //     }
-        // });
-
-        // return false; // Prevent immediate form submission
-
-        const form = document.querySelector('form');
+    const form = document.querySelector('form');
     const totalImages = existingImages.length - deletedImages.length + croppedImagesCount;
 
     if (totalImages < 3 || totalImages > 4) {
@@ -383,30 +355,42 @@
     // Add deleted images array
     formData.set('deletedImages', JSON.stringify(deletedImages));
 
+    // Get the file input element
+    const fileInput = document.getElementById('imageUpload');
+    
+    // Check if there are files selected in the file input
+    if (fileInput && fileInput.files.length > 0) {
+        // Remove any existing images fields (in case they were added before)
+        formData.delete('images');
+        
+        // Add each file with the field name 'images'
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append('images', fileInput.files[i]);
+        }
+    }
+
     // Add cropped images
     const addedImagesContainer = document.getElementById('addedImagesContainer');
     const croppedImages = addedImagesContainer.getElementsByTagName('img');
     
     function dataURLtoFile(dataUrl, filename) {
-    let arr = dataUrl.split(','),
-        mime = arr[0].match(/:(.*?);/)[1],
-        bstr = atob(arr[1]),
-        n = bstr.length,
-        u8arr = new Uint8Array(n);
-    
-    while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
+        let arr = dataUrl.split(','),
+            mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]),
+            n = bstr.length,
+            u8arr = new Uint8Array(n);
+        
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+
+        return new File([u8arr], filename, { type: mime });
     }
 
-    return new File([u8arr], filename, { type: mime });
-}
-
-// Convert and append images as files
-Array.from(croppedImages).forEach((img, index) => {
-    let file = dataURLtoFile(img.src, `croppedImage${index + 1}.png`);
-    formData.append(`croppedImage${index + 1}`, file);
-});
-
+    // Convert and append cropped images
+    Array.from(croppedImages).forEach((img, index) => {
+        formData.append(`croppedImage${index + 1}`, dataURLtoFile(img.src, `croppedImage${index + 1}.png`));
+    });
 
     // Submit form with AJAX
     fetch(form.action, {
@@ -441,8 +425,7 @@ Array.from(croppedImages).forEach((img, index) => {
     });
 
     return false;
-
-    }
+}
 
     function deleteExistingImage(imageName, index) {
         Swal.fire({
@@ -481,45 +464,49 @@ Array.from(croppedImages).forEach((img, index) => {
     }
 
     function openCropperModal(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
-        // Validate file type
-        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-        if (!validTypes.includes(file.type)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid File Type',
-                text: 'Please upload a valid image (JPEG, PNG, or GIF)',
-                confirmButtonColor: '#3085d6'
-            });
-            return;
+    // Process only the first file for now
+    // Later you can implement a queue system for multiple files
+    const file = files[0];
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid File Type',
+            text: 'Please upload a valid image (JPEG, PNG, or GIF)',
+            confirmButtonColor: '#3085d6'
+        });
+        return;
+    }
+
+    // Read file
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const cropperImage = document.getElementById('cropperImage');
+        cropperImage.src = e.target.result;
+
+        // Destroy existing cropper if any
+        if (cropper) {
+            cropper.destroy();
         }
 
-        // Read file
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const cropperImage = document.getElementById('cropperImage');
-            cropperImage.src = e.target.result;
+        // Initialize Cropper
+        cropper = new Cropper(cropperImage, {
+            aspectRatio: 1, // Square crop
+            viewMode: 1,
+            minCropBoxWidth: 100,
+            minCropBoxHeight: 100
+        });
 
-            // Destroy existing cropper if any
-            if (cropper) {
-                cropper.destroy();
-            }
-
-            // Initialize Cropper
-            cropper = new Cropper(cropperImage, {
-                aspectRatio: 1, // Square crop
-                viewMode: 1,
-                minCropBoxWidth: 100,
-                minCropBoxHeight: 100
-            });
-
-            // Show modal
-            document.getElementById('cropperModal').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-    }
+        // Show modal
+        document.getElementById('cropperModal').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+}
 
     function saveCroppedImage() {
         if (!cropper) return;

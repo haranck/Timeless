@@ -115,33 +115,38 @@
                             <tbody>
                                 <% if(cart.items.length > 0) { %>
                                     <% cart.items.forEach(item => { %>
-                                        <tr>
+                                        <tr class="<%= !item.productId.isListed ? 'unavailable-product' : '' %>">
                                             <td class="product__cart__item">
                                                 <div class="product__cart__item__pic">
-                                                    <img class="cart-img" src="/uploads/product-images/<%= item.productId.productImages[0] %> " alt="">
+                                                    <img class="cart-img" src="/uploads/product-images/<%= item.productId.productImages[0] %>" alt="">
                                                 </div>
                                                 <div class="product__cart__item__text">
-                                                    <h6><%= item.productId.productName %></h6>
+                                                    <h6>
+                                                        <%= item.productId.productName %>
+                                                        <% if (!item.productId.isListed) { %>
+                                                            <span class="text-danger">(Unavailable)</span>
+                                                        <% } %>
+                                                    </h6>
                                                     <h5>₹<%= item.productId.finalPrice %></h5>
                                                 </div>
                                             </td>
                                             <td class="quantity__item">
                                                 <div class="custom-quantity-input">
                                                     <button class="quantity-btn" onclick="updateItemQuantity('<%= item.productId._id %>', 'decrease')">-</button>
-                                                    <input type="number" class="quantity-value" value="<%= item.quantity %>" min="1" 
+                                                    <input type="number" class="quantity-value" value="<%= item.quantity %>" min="1"
                                                         onchange="updateItemQuantity('<%= item.productId._id %>', 'set', this.value)"
                                                         readonly>
                                                     <button class="quantity-btn" onclick="updateItemQuantity('<%= item.productId._id %>', 'increase')">+</button>
                                                 </div>
                                             </td>
-                                            <td class="cart__price">₹<%= item.totalPrice%></td>
+                                            <td class="cart__price">₹<%= item.totalPrice %></td>
                                             <td class="cart__close">
                                                 <a href="javascript:void(0);" onclick="confirmRemove('<%= item.productId._id %>')">
                                                     <i class="fa fa-close"></i>
                                                 </a>
                                             </td>
-                                            
                                         </tr>
+                                        
                                     <% }); %>
                                 <% } else { %>      
                                     <tr>
@@ -181,7 +186,7 @@
                             <li>Total <span>₹<%=cart.totalPrice %></span></li>
                         </ul>
                         <% if (cart.totalPrice !== 0) { %> 
-                        <a href="/checkout" class="primary-btn">Proceed to checkout</a>
+                        <a href="/checkout" id="checkout-btn" class="primary-btn">Proceed to checkout</a>
                         <% } %>
                     </div>
                 </div>
@@ -211,6 +216,25 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkoutBtn = document.getElementById("checkout-btn");
+        const unavailableItems = document.querySelectorAll(".unavailable-product");
+
+        if (unavailableItems.length > 0) {
+            checkoutBtn.addEventListener("click", function (event) {
+                event.preventDefault();
+                Swal.fire({
+                    title: "Some items are unavailable!",
+                    text: "Please remove unavailable products from your cart before proceeding.",
+                    icon: "warning",
+                    confirmButtonText: "OK"
+                });
+            });
+
+            checkoutBtn.classList.add("disabled");
+        }
+    });
+
         function confirmRemove(productId) {
             // Find the cart row before removal
             const cartRow = document.querySelector(`a[onclick="confirmRemove('${productId}')"]`).closest('tr');

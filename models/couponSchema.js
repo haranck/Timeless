@@ -40,7 +40,7 @@ const couponSchema = new Schema({
     },
     limit: {
         type: Number,
-        default: 1 // How many times a user can use this coupon
+        default: 1
     },
     usageCount: {
         type: Number,

@@ -192,11 +192,10 @@ const getEditProduct = async (req, res) => {
   }
 }
 
-
 const editProduct = async (req, res) => {
    try {
-      const id = req.params.id
-      const data = req.body
+      const id = req.params.id;
+      const data = req.body;
       let deletedImages = [];
       
       try {
@@ -204,7 +203,6 @@ const editProduct = async (req, res) => {
       } catch (error) {
          console.error('Error parsing deletedImages:', error);
       }
-
 
       if (!data.productName || !data.category || !data.regularPrice || !data.salePrice) {
          return res.status(400).json({
@@ -230,9 +228,6 @@ const editProduct = async (req, res) => {
             message: 'Invalid price values'
          });
       }
-
-    
-      
       
       const categoryId = await Category.findOne({ name: data.category });
       if (!categoryId) {
@@ -242,13 +237,14 @@ const editProduct = async (req, res) => {
          });
       }
 
-      // Handle image processing (existing code)
+      // Handle remaining images after deletion
       const remainingImages = existingProduct.productImages.filter(
          image => !deletedImages.includes(image)
       );
 
+      // Process uploaded files (req.files) - ONLY if not using cropped images
       const newImages = [];
-      if (req.files && req.files.length > 0) {
+      if (req.files && req.files.length > 0 && !Object.keys(data).some(key => key.startsWith('croppedImage'))) {
          for (let i = 0; i < req.files.length; i++) {
             const originalImagePath = req.files[i].path;
             const resizedImagePath = path.join("public", "uploads", "product-images", `resized-${req.files[i].filename}`);
@@ -261,6 +257,7 @@ const editProduct = async (req, res) => {
          }
       }
 
+      // Process cropped images (base64 data)
       const croppedImages = [];
       for (let i = 1; i <= 4; i++) {
          const croppedImageKey = `croppedImage${i}`;
@@ -278,7 +275,7 @@ const editProduct = async (req, res) => {
       // Combine remaining and new images
       const updatedImages = [...remainingImages, ...newImages, ...croppedImages];
 
-      // Validate total image count
+      // Validate total image count 
       if (updatedImages.length < 3 || updatedImages.length > 4) {
          return res.status(400).json({
             success: false, 
@@ -296,9 +293,6 @@ const editProduct = async (req, res) => {
       existingProduct.size = data.size;
       existingProduct.isListed = data.isListed === 'true';
       existingProduct.productImages = updatedImages;
-      
-      // Explicitly set product offer
-      
 
       // Save the updated product
       await existingProduct.save();
@@ -315,8 +309,7 @@ const editProduct = async (req, res) => {
 
       return res.status(200).json({
          success: true, 
-         message: "Product updated successfully",
-         
+         message: "Product updated successfully"
       });
 
    } catch (error) {
