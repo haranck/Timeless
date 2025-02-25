@@ -604,6 +604,11 @@
                                 <!-- Product List -->
                                 <div class="checkout__order__products mb-4">
                                     <div class="table-responsive">
+                                        <% if (messages.error) { %>
+                                            <div class="alert alert-danger">
+                                                <%= messages.error %>
+                                            </div>
+                                        <% } %>
                                         <table class="table">
                                             <thead>
                                                 <tr>
@@ -618,14 +623,12 @@
                                                     <% cart.items.forEach(item=> { %>
                                                         <% if (item.productId) { %>
                                                             <tr>
-                                                                
                                                                 <td style="display: flex; align-items: center;">
                                                                     <img class="product-image" src="/uploads/product-images/<%= item.productId.productImages[0] %>"
                                                                     alt="<%= item.productId.productName %>" class="product-image">
                                                                     <%= item.productId.productName %>
                                                                 </td>     
-                                                                
-                                                                <td class="text-end">₹<%= item.productId.finalPrice %>
+                                                                <td class="text-end">₹<%= item.price %> 
                                                                 </td>
                                                                 <td class="text-center">X<%= item.quantity %>
                                                                 </td>
@@ -639,7 +642,7 @@
                                                                 </tr>
                                                                 <% } %>
                                                                     <% }); %>
-                                                                        <% } %>
+                                                                <% } %>
                                             </tbody>
                                         </table>
                                     </div>
@@ -729,18 +732,30 @@
                                         <li class="d-flex justify-content-between mb-2">
                                             Subtotal <span id="subtotal">₹<%=cart.totalPrice%></span>
                                         </li>
+                                        <% if(cart.totalPrice===0) {  %>   
                                         <li class="d-flex justify-content-between mb-2">
-                                            Shipping Charge <span id="shipping-charge">₹40</span>
+                                            Shipping Charge <span id="shipping-charge">₹0</span>
                                         </li>
+                                        <% }else{ %>
+                                            <li class="d-flex justify-content-between mb-2">
+                                                Shipping Charge <span id="shipping-charge">₹40</span>
+                                            </li>
+                                        <% } %> 
                                         <li class="d-flex justify-content-between mb-2">
                                             Tax (0%) <span>₹0</span>
                                         </li>
                                         <li class="d-flex justify-content-between mb-2 text-success">
                                             Discount <span id="discount">-₹0</span>
                                         </li>
+                                        <% if(cart.totalPrice===0) {  %>   
                                         <li class="d-flex justify-content-between total-amount" id="total-amount">
-                                            <strong>Total</strong> <strong id="total">₹<%=cart.cartTotal+40 %></strong>
+                                            <strong>Total</strong> <strong id="total">₹0</strong>
                                         </li>
+                                        <% }else{ %>
+                                            <li class="d-flex justify-content-between total-amount" id="total-amount">
+                                                <strong>Total</strong> <strong id="total">₹<%= cart.totalPrice + 40 %></strong>
+                                            </li>
+                                        <% } %> 
                                         <div id="removeCouponSection" style="display: none;" class="mt-2 text-center">
                                             <small class="text-success mb-2 d-block" id="appliedCouponText"></small>
                                             <button class="btn btn-danger btn-sm w-100" id="removeCouponBtn"
@@ -969,6 +984,18 @@
                     const discountText = document.getElementById("discount").innerText.replace("₹", "").replace("-", "").trim();
                     const discountAmount = parseFloat(discountText) || 0;
                     const appliedCouponCode = currentCouponCode;
+
+                    if (totalAmount <= 0) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Please remove some items from your cart before proceeding.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        }).then(()=>{
+                            window.location.replace("/cart");
+                        })
+                        return;
+                    }
 
 
                     const confirmResult = await Swal.fire({

@@ -4,6 +4,7 @@ const path = require('path');
 const session = require('express-session');
 const env = require('dotenv').config()
 const db = require('./config/db');
+const flash = require("connect-flash");
 const nocache = require('nocache')
 db()
  
@@ -14,6 +15,7 @@ const passport = require("./config/passport");
 const adminRouter = require('./routes/adminRouter')
 
 app.use(express.json());
+app.use(flash());
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
       secret: process.env.SESSION_SECRET,

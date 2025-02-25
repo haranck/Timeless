@@ -6,6 +6,7 @@
     <title>Timeless Aura</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"> <!-- ✅ Added only this -->
 
 </head>
 <style>
@@ -43,35 +44,14 @@
         margin-bottom: 2rem;
         line-height: 1.6;
     }
-    .back-to-page-btn {
-        display: inline-block;
-        padding: 12px 24px;
-        background-color: #000;
-        color: #fff;
-        text-decoration: none;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        border: 2px solid #000;
-    }
-    .back-to-page-btn:hover {
-        background-color: #333;
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    .back-to-page-btn i {
-        margin-right: 8px;
-    }
 </style>
 
 <body>
 
-    <%- include("../../views/partials/user/header") %>
-
     <div class="error-container">
         <div class="error-wrapper">
             <div class="error-icon">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fa-solid fa-triangle-exclamation"></i> 
             </div>
             <h1 class="error-title">
                 <%= message ? 'Error' : 'Oops! Something Went Wrong' %>
@@ -79,14 +59,8 @@
             <p class="error-message">
                 <%= message || 'We apologize, but an unexpected error occurred. Please try again later or contact support.' %>
             </p>
-            <a href="/" class="back-to-page-btn">
-                <i class="fas fa-home"></i>
-                Back to Home
-            </a>
         </div>
     </div>
-
-    <%- include("../../views/partials/user/footer") %>
 
 </body>
 

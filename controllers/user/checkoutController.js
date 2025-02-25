@@ -9,6 +9,7 @@ const { getDiscountPrice, getDiscountPriceCart } = require("../../helpers/offerH
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
+const { INFINITY } = require("chart.js/helpers");
 
 const loadCheckout = async (req, res) => {
     try {
@@ -16,26 +17,20 @@ const loadCheckout = async (req, res) => {
 
         let cart = await Cart.findOne({ userId }).populate({ 
             path: "items.productId", 
-            populate: { path: "category" } 
+            populate: { path: "category" }
         });
 
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ success: false, message: "Cart is empty" });
         }
 
-        const availableItems = cart.items.filter(item => 
-            item.productId && item.productId.isListed
-        );
+        const availableItems = cart.items.filter(item => item.productId.isListed);
 
-        const unavailableItems = cart.items.filter(item => 
-            !item.productId || !item.productId.isListed
-        );
-
-        if (unavailableItems.length > 0) {
-            req.flash("error", `Some products are no longer available: ${unavailableItems.map(item => item.productId.name).join(", ")}`);
+        if(availableItems.length !== cart.items.length){
+            req.flash("error", "Some products are not available and have been removed from your cart.");
         }
-
         cart.items = availableItems;
+
         cart.totalPrice = cart.items.reduce((total, item) => total + item.totalPrice, 0);
 
         const user = await User.findById(userId);
@@ -55,7 +50,8 @@ const loadCheckout = async (req, res) => {
             cart,
             user,
             userAddress,
-            coupon
+            coupon,
+            messages: req.flash()
         });
 
     } catch (error) {
@@ -171,11 +167,17 @@ const addCheckoutAddress = async (req, res) => {
 const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user;
+        console.log("placeOrder", req.body)
         const { shippingAddress, paymentMethod, totalAmount, couponCode, discountAmount } = req.body;
+
+        if (totalAmount < 0) {
+            return res.status(400).json({ success: false, error: "Some products are not available and have been removed from your cart." });
+        }
 
         if (paymentMethod === "cod" && totalAmount > 1000) {
             return res.status(400).json({ success: false, error: "Minimum order amount for COD is ₹1000" });
         }
+        
 
         const orderedItems = JSON.parse(JSON.stringify(req.body.orderedItems));
 

@@ -161,9 +161,38 @@
             }
         }
 
-        .cart-img {
-            max-width: 62%;
+        .cart-img-container {
+            display: flex;
+            flex-wrap: nowrap; 
+            align-items: center;
+            overflow-x: auto; 
+            max-width: 200px; 
+            padding-bottom: 5px; 
         }
+
+        .cart-img-container::-webkit-scrollbar {
+            display: none; 
+        }
+
+        .cart-img-container::-webkit-scrollbar-thumb {
+            background: #888; /* Scrollbar color */
+            border-radius: 10px;
+        }
+
+        .cart-img {
+            max-width: 77%;
+            object-fit: cover;
+        }
+
+        .cart-img-container img:not(:last-child) {
+            margin-right: -6px; /* Create slight overlap */
+        }
+
+        .cart-img.single {
+            max-width: 77% !important; /* Full width if only one image */
+        }
+
+
 
         /* Wallet Tab Styles */
         #wallet {
@@ -235,6 +264,44 @@
             box-shadow: 0 4px 8px rgba(255, 165, 0, 0.2);
             color: #000;
         }
+        .order-id {
+            max-width: 150px; 
+            overflow-x: auto; 
+            white-space: nowrap; 
+            display: block; 
+            cursor: pointer; 
+            padding: 2px;   
+        }
+
+        /* Hide scrollbar */
+        .order-id::-webkit-scrollbar {
+            display: none; 
+        }
+
+        .order-id {
+            -ms-overflow-style: none; 
+            scrollbar-width: none; 
+        }
+        .status {
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: capitalize;
+}
+
+/* Specific status colors */
+.status.delivered { color: #28a745; } /* Green */
+.status.cancelled { color: #dc3545; } /* Red */
+.status.shipped { color: #007bff; } /* Blue */
+.status.pending { color: #fd7e14; } /* Orange */
+
+/* Default for unknown statuses */
+.status.default {
+    color: #000; /* Black */
+}
+
+
+
+
     </style>
 
     <!-- Breadcrumb Section Begin -->
@@ -339,7 +406,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th>Image</th>
-                                                            <th>Order</th>
+                                                            <th>OrderId</th>
                                                             <th>Status</th>
                                                             <th>Total</th>
                                                             <th>Actions</th>
@@ -354,15 +421,33 @@
                                                             <% orders.forEach(order => { %>
                                                                 <tr>
                                                                     <td>
-                                                                        <img class="cart-img"
-                                                                            src="/uploads/product-images/<%= order.order_items[0].productId.productImages[0] %>"
-                                                                            alt="">
+                                                                        <div class="cart-img-container">
+                                                                            <% if (order.order_items.length === 1) { %>
+                                                                                <img class="cart-img single" src="/uploads/product-images/<%= order.order_items[0].productId.productImages[0] %>" alt="">
+                                                                            <% } else { %>
+                                                                                <% order.order_items.forEach(item => { %>
+                                                                                    <img class="cart-img" src="/uploads/product-images/<%= item.productId.productImages[0] %>" alt="">
+                                                                                <% }); %>
+                                                                            <% } %>
+                                                                        </div>
+                                                                    </td>
+                                                                    
+                                                                    <td class="order-id">
+                                                                        #<%= order.orderId %>
                                                                     </td>
                                                                     <td>
-                                                                        <%= order.order_items[0].productId.productName %>
-                                                                    </td>
-                                                                    <td>
-                                                                        <%= order.status %>
+                                                                        <% const statusClasses = {
+                                                                            delivered: "delivered",
+                                                                            cancelled: "cancelled",
+                                                                            shipped: "shipped",
+                                                                            pending: "pending"
+                                                                        }; %>
+                                                                    
+                                                                        <% if (statusClasses[order.status]) { %>
+                                                                            <span class="status <%= statusClasses[order.status] %>"><%= order.status.charAt(0).toUpperCase() + order.status.slice(1) %></span>
+                                                                        <% } else { %>
+                                                                            <span class="status default"><%= order.status %></span>
+                                                                        <% } %>
                                                                     </td>
                                                                     <td>₹<%= order.total %></td>
                                                                     <td>
