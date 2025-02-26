@@ -36,7 +36,7 @@
     }
 
     .pdf-btn {
-        background: linear-gradient(to right, #FFD700, #FF8C00); /* Yellow to Orange */
+        background: linear-gradient(to right, #FFD700, #FF8C00); 
         color: white;
         border: none;
         padding: 10px 20px;
@@ -48,39 +48,11 @@
         
     }
     .pdf-btn:hover{
-        background: linear-gradient(to right, #FF8C00, #FFD700); 
+        background: linear-gradient(to right, #FF8C00, #af7105); 
     }
 
     .excel-btn {
-        background-color: green;
-        color: white;
-    }
-
-    .filters {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 20px;
-        padding: 10px;
-        background: #f9f9f9;
-        border-radius: 5px;
-    }
-
-    .filters input,
-    .filters select {
-        padding: 5px;
-        border-radius: 4px;
-        border: 1px solid #ddd;
-    }
-    
-    .filters input:focus,
-    .filters select:focus {
-        outline: none;
-        border-color: #FFD700;
-    }
-
-    .generate-btn {
-        background: linear-gradient(to right, #77ff00, #00ff11); /* Green gradient */
+        background: linear-gradient(to right, #509352, #213f23);
         color: white;
         border: none;
         padding: 10px 20px;
@@ -90,8 +62,70 @@
         cursor: pointer;
         transition: 0.3s;
     }
-    .generate-btn:hover{
-        background: linear-gradient(to right, #00ff11, #77ff00);
+    
+    .excel-btn:hover {
+        background: linear-gradient(to right, #2d562e, #285a29); 
+    }
+    
+    .top-buttons {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+    }
+
+    .filter-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+    
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .filter-select, .date-input {
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        transition: 0.3s;
+    }
+    
+    .filter-select:focus, .date-input:focus {
+        outline: none;
+        border-color: #FFD700;
+        box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+    
+    .date-range {
+        display: flex;
+        gap: 17px;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn.filter-btn {
+        background: linear-gradient(to right, #4dd686, #27e112);
+        color: white;
+        font-weight: bold;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 20px;
+    }
+    .btn.filter-btn:hover {
+        background: linear-gradient(to right, #29794b, #157a0a);
     }
 
     .summary {
@@ -219,16 +253,15 @@
         color: #777;
     }
     
-    .filter-active {
+    /* .filter-active {
         background-color: #f0f8ff;
         border: 2px solid #FFD700;
         padding: 8px;
         margin-bottom: 10px;
         text-align: center;
         border-radius: 5px;
-    }
+    } */
 </style>
-
 <div class="container">
     <h2>Sales Report</h2>
     
@@ -236,37 +269,54 @@
         <a href="/admin/salesReportPDF/pdf<%= filterType ? `?filterType=${filterType}` : '' %><%= fromDate ? `&fromDate=${fromDate}` : '' %><%= toDate ? `&toDate=${toDate}` : '' %>">
             <button class="pdf-btn">Download PDF</button>
         </a>
+        <a href="/admin/salesReportExcel/excel<%= filterType ? `?filterType=${filterType}` : '' %><%= fromDate ? `&fromDate=${fromDate}` : '' %><%= toDate ? `&toDate=${toDate}` : '' %>">
+            <button class="excel-btn">Download Excel</button>
+        </a>
     </div>
 
-    <form id="filterForm" action="/admin/salesReport" method="GET">
-        <div class="filters">
-            <label>Filter By:</label>
-            <select name="filterType" id="filterType">
+    <form id="filterForm" action="/admin/salesReport" method="GET" class="filter-container">
+        <div class="filter-group">
+            <label for="filterType">Filter By:</label>
+            <select name="filterType" id="filterType" class="filter-select">
                 <option value="All" <%= filterType === 'All' ? 'selected' : '' %>>All Time</option>
                 <option value="Daily" <%= filterType === 'Daily' ? 'selected' : '' %>>Daily</option>
                 <option value="Weekly" <%= filterType === 'Weekly' ? 'selected' : '' %>>Weekly</option>
                 <option value="Monthly" <%= filterType === 'Monthly' ? 'selected' : '' %>>Monthly</option>
                 <option value="Yearly" <%= filterType === 'Yearly' ? 'selected' : '' %>>Yearly</option>
+                <option value="Custom" <%= filterType === 'Custom' || (!filterType && !fromDate && !toDate) ? 'selected' : '' %>>Custom Range</option>
             </select>
-            
-            <label>From:</label>
-            <input type="date" name="fromDate" id="fromDate" value="<%= fromDate || '' %>">
-            
-            <label>To:</label>
-            <input type="date" name="toDate" id="toDate" value="<%= toDate || '' %>">
-            
-            <button type="submit" class="generate-btn">Filter</button>
         </div>
+        
+        <div id="dateRangeFields" class="date-range" style=" <%= (fromDate && toDate) || filterType === 'Custom' ? 'display: flex;' : 'display: none;' %>">
+            <div class="filter-group">
+                <label for="fromDate">From:</label>
+                <input type="date" name="fromDate" id="fromDate" value="<%= fromDate || '' %>" class="date-input">
+            </div>
+            
+            <div class="filter-group">
+                <label for="toDate">To:</label>
+                <input type="date" name="toDate" id="toDate" value="<%= toDate || '' %>" class="date-input">
+            </div>
+        </div>
+        
+        <button type="submit" class="btn filter-btn">Apply Filter</button>
     </form>
     
-    <% if (filterType !== 'All' || fromDate || toDate) { %>
+    <% if (filterType !== 'All') { %>
         <div class="filter-active">
-            <% if (filterType !== 'All') { %>
-                <strong>Active Filter:</strong> <%= filterType %>
-            <% } %>
-            <% if (fromDate && toDate) { %>
-                <strong><%= filterType !== 'All' ? ' - ' : 'Date Range: ' %></strong>
-                <%= new Date(fromDate).toLocaleDateString() %> to <%= new Date(toDate).toLocaleDateString() %>
+            <strong>Active Filter:</strong>
+            <% if (filterType === 'Daily') { %>
+                Today
+            <% } else if (filterType === 'Weekly') { %>
+                Last 7 Days
+            <% } else if (filterType === 'Monthly') { %>
+                Last 30 Days
+            <% } else if (filterType === 'Yearly') { %>
+                Last 365 Days
+            <% } else if (fromDate && toDate) { %>
+                Custom: <%= new Date(fromDate).toLocaleDateString() %> to <%= new Date(toDate).toLocaleDateString() %>
+            <% } else { %>
+                <%= filterType %>
             <% } %>
         </div>
     <% } %>
@@ -336,22 +386,34 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const filterType = document.getElementById('filterType');
+        const dateRangeFields = document.getElementById('dateRangeFields');
         const fromDate = document.getElementById('fromDate');
         const toDate = document.getElementById('toDate');
         
+        // Show/hide date fields based on filter type
         filterType.addEventListener('change', function() {
             if (this.value === 'Custom') {
+                dateRangeFields.style.display = 'flex';
                 fromDate.required = true;
                 toDate.required = true;
             } else {
+                dateRangeFields.style.display = 'none';
                 fromDate.required = false;
                 toDate.required = false;
+                
+                // Clear date values when switching to a preset filter
+                fromDate.value = '';
+                toDate.value = '';
             }
         });
         
+        // Form validation
         document.getElementById('filterForm').addEventListener('submit', function(e) {
-            if (fromDate.value && toDate.value) {
-                if (new Date(fromDate.value) > new Date(toDate.value)) {
+            if (filterType.value === 'Custom') {
+                if (!fromDate.value || !toDate.value) {
+                    e.preventDefault();
+                    alert('Please select both start and end dates for custom range');
+                } else if (new Date(fromDate.value) > new Date(toDate.value)) {
                     e.preventDefault();
                     alert('Start date cannot be after end date');
                 }

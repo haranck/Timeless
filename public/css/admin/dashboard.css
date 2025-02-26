@@ -544,3 +544,21 @@ body {
        padding: 10px;
    }
 }
+.category-card {
+   width: 100%;
+   margin: auto;
+   margin-top: 10px;
+}
+.dashboard-container {
+   display: flex;
+   flex-direction: column;
+   gap: 20px; /* Adds space between cards */
+   max-width: 800px; /* Adjust width to look good */
+   margin: auto; /* Centers content */
+}
+.product-image {
+   width: 50px;
+   height: 50px;
+   object-fit: cover;
+   border-radius: 5px;
+}

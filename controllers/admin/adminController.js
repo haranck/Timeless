@@ -65,13 +65,70 @@ const loadDashboard = async (req, res) => {
             .populate('order_items.productId', 'productName productImages price ')
             .sort({ createdAt: -1 })
 
-       // Get filter from query params, default to monthly
        const timeFilter = req.query.timeFilter || 'weekly';
        
-       // Get dashboard data
        const dashboardData = await getDashboardData(timeFilter);
-       
-       return res.render('dashboard', { dashboardData, orders });
+
+       const topSellingProducts = await Order.aggregate([
+        { $unwind: "$order_items" },
+        {
+            $group: {
+                _id: "$order_items.productId",
+                totalSold: { $sum: "$order_items.quantity" }
+            }
+        },
+        { $sort: { totalSold: -1 } },
+        { $limit: 5 },
+        {
+            $lookup: {
+                from: "products",
+                localField: "_id",
+                foreignField: "_id",
+                as: "productDetails"
+            }
+        },
+        { $unwind: "$productDetails" },
+        {
+            $project: {
+                productName: "$productDetails.productName",
+                productImages: "$productDetails.productImages",
+                totalSold: 1
+            }
+        }
+    ]);
+    
+    const topSellingCategories = await Order.aggregate([
+        { $unwind: "$order_items" },
+        {
+            $lookup: {
+                from: "products",
+                localField: "order_items.productId",
+                foreignField: "_id",
+                as: "productDetails"
+            }
+        },
+        { $unwind: "$productDetails" },
+        {
+            $lookup: {
+                from: "categories",
+                localField: "productDetails.category",
+                foreignField: "_id",
+                as: "categoryDetails"
+            }
+        },
+        { $unwind: "$categoryDetails" },
+        {
+            $group: {
+                _id: "$categoryDetails._id",
+                name: { $first: "$categoryDetails.name" },
+                totalSold: { $sum: "$order_items.quantity" }
+            }
+        },
+        { $sort: { totalSold: -1 } },
+        { $limit: 5 }
+    ]);
+
+       return res.render('dashboard', { dashboardData, orders, topSellingProducts, topSellingCategories });
    } catch (err) {
        console.log('Dashboard load error:', err);
        res.status(500).json({ error: 'Internal server error' });

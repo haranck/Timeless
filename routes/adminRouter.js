@@ -134,6 +134,7 @@ router.patch('/toggle-coupon/:id', adminAuth, couponController.toggleCoupon)
 
 router.get('/salesReport', adminAuth, orderController.getSalesReport)
 router.get('/salesReportPDF/pdf', adminAuth, orderController.getSalesReportPDF)
+router.get('/salesReportExcel/excel', adminAuth, orderController.getSalesReportExcel);
 
 
 module.exports = router

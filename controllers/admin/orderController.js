@@ -7,6 +7,7 @@ const Order = require('../../models/orderSchema')
 const { default: mongoose } = require('mongoose')
 const Wallet = require('../../models/walletSchema')
 const PDFDocument = require('pdfkit');
+const ExcelJS = require('exceljs');
 const fs = require('fs');
 const path = require('path');
 const { getDiscountPrice } = require("../../helpers/offerHelper");
@@ -144,7 +145,6 @@ const rejectReturn = async (req, res) => {
         res.status(500).json({ success: false, message: "internal server error" })
     }
 }
-
 const getDateRange = (filterType, fromDate, toDate) => {
     const today = new Date();
     const startOfDay = new Date(today);
@@ -153,6 +153,7 @@ const getDateRange = (filterType, fromDate, toDate) => {
     const endOfDay = new Date(today);
     endOfDay.setHours(23, 59, 59, 999);
 
+    // If custom date range is provided
     if (fromDate && toDate) {
         const start = new Date(fromDate);
         start.setHours(0, 0, 0, 0);
@@ -165,25 +166,31 @@ const getDateRange = (filterType, fromDate, toDate) => {
 
     switch (filterType) {
         case 'Daily':
+            // Current day only
             return { start: startOfDay, end: endOfDay };
 
         case 'Weekly':
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - today.getDay());
-            startOfWeek.setHours(0, 0, 0, 0);
-            return { start: startOfWeek, end: endOfDay };
+            // Last 7 days
+            const lastWeek = new Date(today);
+            lastWeek.setDate(today.getDate() - 6); // 6 days back plus today = 7 days
+            lastWeek.setHours(0, 0, 0, 0);
+            return { start: lastWeek, end: endOfDay };
 
         case 'Monthly':
-            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            startOfMonth.setHours(0, 0, 0, 0);
-            return { start: startOfMonth, end: endOfDay };
+            // Last 30 days
+            const lastMonth = new Date(today);
+            lastMonth.setDate(today.getDate() - 29); // 29 days back plus today = 30 days
+            lastMonth.setHours(0, 0, 0, 0);
+            return { start: lastMonth, end: endOfDay };
 
         case 'Yearly':
-            const startOfYear = new Date(today.getFullYear(), 0, 1);
-            startOfYear.setHours(0, 0, 0, 0);
-            return { start: startOfYear, end: endOfDay };
+            // Last 365 days
+            const lastYear = new Date(today);
+            lastYear.setDate(today.getDate() - 364); // 364 days back plus today = 365 days
+            lastYear.setHours(0, 0, 0, 0);
+            return { start: lastYear, end: endOfDay };
 
-        default:
+        default: // 'All'
             return { start: new Date(0), end: endOfDay };
     }
 };
@@ -281,8 +288,24 @@ const getSalesReportPDF = async (req, res) => {
                 .text(`Date Range: ${new Date(fromDate).toLocaleDateString()} to ${new Date(toDate).toLocaleDateString()}`, { align: 'center' })
                 .moveDown(0.5);
         } else if (filterType !== 'All') {
+            let periodText = "";
+            switch (filterType) {
+                case 'Daily':
+                    periodText = "Today";
+                    break;
+                case 'Weekly':
+                    periodText = "Last 7 days";
+                    break;
+                case 'Monthly':
+                    periodText = "Last 30 days";
+                    break;
+                case 'Yearly':
+                    periodText = "Last 365 days";
+                    break;
+            }
+            
             doc.fontSize(10)
-                .text(`Filter: ${filterType}`, { align: 'center' })
+                .text(`Period: ${periodText}`, { align: 'center' })
                 .moveDown(0.5);
         }
 
@@ -396,6 +419,169 @@ const getSalesReportPDF = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
+const getSalesReportExcel = async (req, res) => {
+    try {
+        const filterType = req.query.filterType || 'All';
+        const fromDate = req.query.fromDate;
+        const toDate = req.query.toDate;
+
+        const dateRange = getDateRange(filterType, fromDate, toDate);
+
+        const query = {
+            status: { $in: ["delivered", "Return rejected"] },
+            createdAt: { $gte: dateRange.start, $lte: dateRange.end }
+        };
+
+        const orders = await Order.find(query)
+            .populate('user_id', 'name email mobile')
+            .populate('order_items.productId', 'productName price')
+            .sort({ createdAt: -1 });
+
+        const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
+        const totalOrders = orders.length;
+
+        // Create a new Excel workbook and worksheet
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Sales Report');
+
+        // Add a title row
+        worksheet.mergeCells('A1:F1');
+        worksheet.getCell('A1').value = 'TIMELESS AURA';
+        worksheet.getCell('A1').font = { size: 16, bold: true };
+        worksheet.getCell('A1').alignment = { horizontal: 'center' };
+
+        // Add report subtitle
+        worksheet.mergeCells('A2:F2');
+        worksheet.getCell('A2').value = `Sales Report - ${filterType}`;
+        worksheet.getCell('A2').font = { size: 12 };
+        worksheet.getCell('A2').alignment = { horizontal: 'center' };
+
+        // Add date range if applicable
+        let rowIndex = 3;
+        if (fromDate && toDate) {
+            worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
+            worksheet.getCell(`A${rowIndex}`).value = `Date Range: ${new Date(fromDate).toLocaleDateString()} to ${new Date(toDate).toLocaleDateString()}`;
+            worksheet.getCell(`A${rowIndex}`).alignment = { horizontal: 'center' };
+            rowIndex++;
+        } else if (filterType !== 'All') {
+            let periodText = "";
+            switch (filterType) {
+                case 'Daily':
+                    periodText = "Today";
+                    break;
+                case 'Weekly':
+                    periodText = "Last 7 days";
+                    break;
+                case 'Monthly':
+                    periodText = "Last 30 days";
+                    break;
+                case 'Yearly':
+                    periodText = "Last 365 days";
+                    break;
+            }
+            
+            worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
+            worksheet.getCell(`A${rowIndex}`).value = `Period: ${periodText}`;
+            worksheet.getCell(`A${rowIndex}`).alignment = { horizontal: 'center' };
+            rowIndex++;
+        }
+
+        // Add generated date
+        worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
+        worksheet.getCell(`A${rowIndex}`).value = `Generated on: ${new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        })}`;
+        worksheet.getCell(`A${rowIndex}`).alignment = { horizontal: 'center' };
+        rowIndex += 2;
+
+        // Add summary section
+        worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
+        worksheet.getCell(`A${rowIndex}`).value = 'Summary';
+        worksheet.getCell(`A${rowIndex}`).font = { bold: true };
+        rowIndex++;
+
+        worksheet.mergeCells(`A${rowIndex}:C${rowIndex}`);
+        worksheet.getCell(`A${rowIndex}`).value = `Total Orders: ${totalOrders}`;
+        rowIndex++;
+
+        worksheet.mergeCells(`A${rowIndex}:C${rowIndex}`);
+        worksheet.getCell(`A${rowIndex}`).value = `Total Sales: ₹${totalSales.toLocaleString()}.00`;
+        rowIndex += 2;
+
+        // Add table headers
+        const headers = ['Order ID', 'Date', 'Customer Name', 'Product', 'Status', 'Amount'];
+        const headerRow = worksheet.addRow(headers);
+        headerRow.eachCell((cell) => {
+            cell.font = { bold: true };
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'f0f0f0' }
+            };
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        });
+
+        // Add data rows
+        orders.forEach((order, index) => {
+            const row = worksheet.addRow([
+                `#${order._id.toString().slice(-20)}`,
+                new Date(order.createdAt).toLocaleDateString(),
+                order.user_id.name,
+                order.order_items[0].productId.productName,
+                order.status,
+                `₹${(order.finalAmount || order.total).toFixed(2)}`
+            ]);
+
+            // Add alternating row colors
+            if (index % 2 === 0) {
+                row.eachCell((cell) => {
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'f9f9f9' }
+                    };
+                });
+            }
+
+            // Add borders to all cells
+            row.eachCell((cell) => {
+                cell.border = {
+                    top: { style: 'thin' },
+                    left: { style: 'thin' },
+                    bottom: { style: 'thin' },
+                    right: { style: 'thin' }
+                };
+            });
+        });
+
+        // Adjust column widths
+        worksheet.columns.forEach(column => {
+            column.width = 20;
+        });
+
+        // Set the filename
+        const fileName = 'TIMELESS_AURA_sales_report.xlsx';
+        
+        // Set the content type and headers
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+
+        // Write to response
+        await workbook.xlsx.write(res);
+        res.end();
+
+    } catch (error) {
+        console.log("Error generating Excel report", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
 
 module.exports = {
     getOrdersPage,
@@ -404,5 +590,6 @@ module.exports = {
     approveReturn,
     rejectReturn,
     getSalesReport,
-    getSalesReportPDF
-}
+    getSalesReportPDF,
+    getSalesReportExcel
+};

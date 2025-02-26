@@ -168,16 +168,17 @@
             
                 const data = await response.json();
                 if (data.success) {
+                    
                    Swal.fire({
-    title: 'Success!',
-    text: isBlocked ? 'Customer unblocked successfully' : 'Customer blocked successfully',
-    toast: true,
-    position: 'top-end',
-    icon: 'success',
-    showConfirmButton: false,
-    timer: 1500,
-    background: 'linear-gradient(to right, #4CAF50, #A5D6A7)', // Darker to lighter green
-});
+                        title: 'Success!',
+                        text: isBlocked ? 'Customer unblocked successfully' : 'Customer blocked successfully',
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        background: 'linear-gradient(to right, #4CAF50, #A5D6A7)',
+                    });
                     const button = document.querySelector(`button[onclick="toggleBlock('${userId}', ${isBlocked})"]`);
                     button.innerText = isBlocked ? "Block" : "Unblock";
                     button.classList.toggle('btn-danger');
