@@ -253,14 +253,14 @@
         color: #777;
     }
     
-    /* .filter-active {
+    .filter-active {
         background-color: #f0f8ff;
         border: 2px solid #FFD700;
         padding: 8px;
         margin-bottom: 10px;
         text-align: center;
         border-radius: 5px;
-    } */
+    }
 </style>
 <div class="container">
     <h2>Sales Report</h2>
@@ -302,24 +302,25 @@
         <button type="submit" class="btn filter-btn">Apply Filter</button>
     </form>
     
-    <% if (filterType !== 'All') { %>
-        <div class="filter-active">
-            <strong>Active Filter:</strong>
-            <% if (filterType === 'Daily') { %>
-                Today
-            <% } else if (filterType === 'Weekly') { %>
-                Last 7 Days
-            <% } else if (filterType === 'Monthly') { %>
-                Last 30 Days
-            <% } else if (filterType === 'Yearly') { %>
-                Last 365 Days
-            <% } else if (fromDate && toDate) { %>
-                Custom: <%= new Date(fromDate).toLocaleDateString() %> to <%= new Date(toDate).toLocaleDateString() %>
-            <% } else { %>
-                <%= filterType %>
-            <% } %>
-        </div>
-    <% } %>
+
+<% if (filterType !== 'All') { %>
+    <div class="filter-active">
+        <strong>Active Filter:</strong>
+        <% if (filterType === 'Daily') { %>
+            Today
+        <% } else if (filterType === 'Weekly') { %>
+            This Week (From Sunday)
+        <% } else if (filterType === 'Monthly') { %>
+            Current Month
+        <% } else if (filterType === 'Yearly') { %>
+            Current Year
+        <% } else if (fromDate && toDate) { %>
+            Custom: <%= new Date(fromDate).toLocaleDateString() %> to <%= new Date(toDate).toLocaleDateString() %>
+        <% } else { %>
+            <%= filterType %>
+        <% } %>
+    </div>
+<% } %>
 
     <div class="summary">
         <div class="box">

@@ -152,10 +152,9 @@ const getDashboardDataAPI = async (req, res) => {
 };
 
 async function getDashboardData(timeFilter) {
-   // Get current date
+   
    const currentDate = new Date();
    
-   // Set time range based on filter
    let startDate, labels, format, aggregateBy;
    
    switch(timeFilter) {

@@ -124,7 +124,9 @@
                                                     <h6>
                                                         <%= item.productId.productName %>
                                                         <% if (!item.productId.isListed) { %>
-                                                            <span class="text-danger">(Unavailable)</span>
+                                                            <span class="text-danger">(Product Unavailable)</span>
+                                                        <% } else if (item.productId.category && !item.productId.category.isListed) { %>
+                                                            <span class="text-danger">(Category Unavailable)</span>
                                                         <% } %>
                                                     </h6>
                                                     <h5>₹<%= item.productId.finalPrice %></h5>
@@ -177,7 +179,7 @@
                             <input type="text" placeholder="Coupon code">
                             <button type="submit">Apply</button>
                         </form>
-                    </div> -->
+                    </div> -->                                                               
                     <div class="cart__total">
                         <h6>Cart total</h6>
                         <ul>
@@ -192,25 +194,7 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="pagination">
-            < if (currentPage > 1) { %>
-                <a href="?page=< currentPage - 1 %>" class="prev">&laquo; Previous</a>
-            < else { %>
-                <span class="disabled">&laquo; Previous</span>
-            < } %>
-            < for (let i = 1; i <= totalPages; i++) { %>
-                < if (i === currentPage) { >
-                    <span class="active"><= i ></span>
-                < } else { >
-                    <a href="?page=<= i >"><= i ></a>
-                < } >
-            < } >
-            < if (currentPage < totalPages) { >
-                <a href="?page=<= currentPage + 1 >" class="next">Next &raquo;</a>
-            < } else { >
-                <span class="disabled">Next &raquo;</span>
-            < } >
-        </div> -->
+   
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -220,19 +204,27 @@
         const checkoutBtn = document.getElementById("checkout-btn");
         const unavailableItems = document.querySelectorAll(".unavailable-product");
 
-        if (unavailableItems.length > 0) {
-            checkoutBtn.addEventListener("click", function (event) {
-                event.preventDefault();
-                Swal.fire({
-                    title: "Some items are unavailable!",
-                    text: "Please remove unavailable products from your cart before proceeding.",
-                    icon: "warning",
-                    confirmButtonText: "OK"
+        function checkCartAvailability() {
+            const unavailableProductItems = document.querySelectorAll('tr .text-danger');
+            
+            if (unavailableProductItems.length > 0) {
+                checkoutBtn.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    Swal.fire({
+                        title: "Some items are unavailable!",
+                        text: "Please remove unavailable products or products from unavailable categories from your cart before proceeding.",
+                        icon: "warning",
+                        confirmButtonText: "OK"
+                    });
                 });
-            });
 
-            checkoutBtn.classList.add("disabled");
+                checkoutBtn.classList.add("disabled");
+                return false;
+            }
+            return true;
         }
+        checkCartAvailability();
+        
     });
 
         function confirmRemove(productId) {

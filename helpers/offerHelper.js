@@ -15,6 +15,12 @@ const getDiscountPrice = (product) => {
  }
 
 const getDiscountPriceCart = (product) => {
+  // if (!product) return null;
+    
+  //   if (!product.category || !product.category.isListed) {
+  //       product.isAvailable = false;
+  //       return product;
+  //   }
   let productOffer = product.productOffer || 0;
   let categoryOffer = product.category?.categoryOffer || 0;
 

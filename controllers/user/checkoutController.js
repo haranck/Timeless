@@ -24,10 +24,14 @@ const loadCheckout = async (req, res) => {
             return res.status(400).json({ success: false, message: "Cart is empty" });
         }
 
-        const availableItems = cart.items.filter(item => item.productId.isListed);
+        const availableItems = cart.items.filter(item =>
+             item.productId.isListed &&
+             item.productId.category &&
+             item.productId.category.isListed
+            );
 
         if(availableItems.length !== cart.items.length){
-            req.flash("error", "Some products are not available and have been removed from your cart.");
+            req.flash("error", "Some products or their categories are unavailable and have been removed from your checkout.");
         }
         cart.items = availableItems;
 

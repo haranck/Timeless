@@ -25,15 +25,24 @@ const loadCart = async (req, res) => {
             });
         }
 
-        // Process the cart items and calculate total price
         const processedData = cart.items
-            .map(item => ({...item, productId: getDiscountPriceCart(item.productId)}))
-            .filter(item => item.productId);
+        .map(item => {
+            if (!item.productId) return null;
+            
+            const productAvailable = item.productId.isListed;
+            const categoryAvailable = item.productId.category && item.productId.category.isListed;
+            
+            item.productId.isAvailable = productAvailable && categoryAvailable;
+            
+            return {...item, productId: getDiscountPriceCart(item.productId)};
+        })
+        .filter(item => item && item.productId);
 
         cart.items = processedData;
-        cart.totalPrice = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+        // cart.totalPrice = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+        cart.items.reduce((total, item) => 
+            (item.productId.isAvailable ? item.totalPrice : 0) + total, 0);
 
-        // Render the cart without pagination
         res.render("cart", {
             user: req.session.userData, 
             cart

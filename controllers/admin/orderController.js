@@ -145,6 +145,7 @@ const rejectReturn = async (req, res) => {
         res.status(500).json({ success: false, message: "internal server error" })
     }
 }
+
 const getDateRange = (filterType, fromDate, toDate) => {
     const today = new Date();
     const startOfDay = new Date(today);
@@ -153,7 +154,6 @@ const getDateRange = (filterType, fromDate, toDate) => {
     const endOfDay = new Date(today);
     endOfDay.setHours(23, 59, 59, 999);
 
-    // If custom date range is provided
     if (fromDate && toDate) {
         const start = new Date(fromDate);
         start.setHours(0, 0, 0, 0);
@@ -166,31 +166,25 @@ const getDateRange = (filterType, fromDate, toDate) => {
 
     switch (filterType) {
         case 'Daily':
-            // Current day only
             return { start: startOfDay, end: endOfDay };
 
         case 'Weekly':
-            // Last 7 days
-            const lastWeek = new Date(today);
-            lastWeek.setDate(today.getDate() - 6); // 6 days back plus today = 7 days
-            lastWeek.setHours(0, 0, 0, 0);
-            return { start: lastWeek, end: endOfDay };
+            const lastSunday = new Date(today);
+            lastSunday.setDate(today.getDate() - today.getDay());
+            lastSunday.setHours(0, 0, 0, 0);
+            return { start: lastSunday, end: endOfDay };
 
         case 'Monthly':
-            // Last 30 days
-            const lastMonth = new Date(today);
-            lastMonth.setDate(today.getDate() - 29); // 29 days back plus today = 30 days
-            lastMonth.setHours(0, 0, 0, 0);
-            return { start: lastMonth, end: endOfDay };
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            startOfMonth.setHours(0, 0, 0, 0);
+            return { start: startOfMonth, end: endOfDay };
 
         case 'Yearly':
-            // Last 365 days
-            const lastYear = new Date(today);
-            lastYear.setDate(today.getDate() - 364); // 364 days back plus today = 365 days
-            lastYear.setHours(0, 0, 0, 0);
-            return { start: lastYear, end: endOfDay };
+            const startOfYear = new Date(today.getFullYear(), 0, 1);
+            startOfYear.setHours(0, 0, 0, 0);
+            return { start: startOfYear, end: endOfDay };
 
-        default: // 'All'
+        default: 
             return { start: new Date(0), end: endOfDay };
     }
 };
@@ -294,13 +288,13 @@ const getSalesReportPDF = async (req, res) => {
                     periodText = "Today";
                     break;
                 case 'Weekly':
-                    periodText = "Last 7 days";
+                    periodText = "This Week (From Sunday)";
                     break;
                 case 'Monthly':
-                    periodText = "Last 30 days";
+                    periodText = "Current Month";
                     break;
                 case 'Yearly':
-                    periodText = "Last 365 days";
+                    periodText = "Current Year";
                     break;
             }
             
@@ -440,23 +434,19 @@ const getSalesReportExcel = async (req, res) => {
         const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
         const totalOrders = orders.length;
 
-        // Create a new Excel workbook and worksheet
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Sales Report');
 
-        // Add a title row
         worksheet.mergeCells('A1:F1');
         worksheet.getCell('A1').value = 'TIMELESS AURA';
         worksheet.getCell('A1').font = { size: 16, bold: true };
         worksheet.getCell('A1').alignment = { horizontal: 'center' };
 
-        // Add report subtitle
         worksheet.mergeCells('A2:F2');
         worksheet.getCell('A2').value = `Sales Report - ${filterType}`;
         worksheet.getCell('A2').font = { size: 12 };
         worksheet.getCell('A2').alignment = { horizontal: 'center' };
 
-        // Add date range if applicable
         let rowIndex = 3;
         if (fromDate && toDate) {
             worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
@@ -470,13 +460,13 @@ const getSalesReportExcel = async (req, res) => {
                     periodText = "Today";
                     break;
                 case 'Weekly':
-                    periodText = "Last 7 days";
+                    periodText = "This Week (From Sunday)";
                     break;
                 case 'Monthly':
-                    periodText = "Last 30 days";
+                    periodText = "Current Month";
                     break;
                 case 'Yearly':
-                    periodText = "Last 365 days";
+                    periodText = "Current Year";
                     break;
             }
             
@@ -486,7 +476,6 @@ const getSalesReportExcel = async (req, res) => {
             rowIndex++;
         }
 
-        // Add generated date
         worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
         worksheet.getCell(`A${rowIndex}`).value = `Generated on: ${new Date().toLocaleDateString('en-US', {
             year: 'numeric',
@@ -496,7 +485,6 @@ const getSalesReportExcel = async (req, res) => {
         worksheet.getCell(`A${rowIndex}`).alignment = { horizontal: 'center' };
         rowIndex += 2;
 
-        // Add summary section
         worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
         worksheet.getCell(`A${rowIndex}`).value = 'Summary';
         worksheet.getCell(`A${rowIndex}`).font = { bold: true };
@@ -510,7 +498,6 @@ const getSalesReportExcel = async (req, res) => {
         worksheet.getCell(`A${rowIndex}`).value = `Total Sales: ₹${totalSales.toLocaleString()}.00`;
         rowIndex += 2;
 
-        // Add table headers
         const headers = ['Order ID', 'Date', 'Customer Name', 'Product', 'Status', 'Amount'];
         const headerRow = worksheet.addRow(headers);
         headerRow.eachCell((cell) => {
@@ -528,7 +515,6 @@ const getSalesReportExcel = async (req, res) => {
             };
         });
 
-        // Add data rows
         orders.forEach((order, index) => {
             const row = worksheet.addRow([
                 `#${order._id.toString().slice(-20)}`,
@@ -539,7 +525,6 @@ const getSalesReportExcel = async (req, res) => {
                 `₹${(order.finalAmount || order.total).toFixed(2)}`
             ]);
 
-            // Add alternating row colors
             if (index % 2 === 0) {
                 row.eachCell((cell) => {
                     cell.fill = {

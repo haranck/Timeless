@@ -59,9 +59,6 @@ const returnOrder = async (req,res) =>{
             return res.status(400).json({ success: false, message: 'Only delivered orders can be returned' });
         }
 
-        // for (let item of order.order_items) {
-        //     await Product.findByIdAndUpdate(item.productId, { $inc: { quantity: item.quantity } });
-        // }
 
         order.status = 'Return requested';
         order.returnReason = reason;
