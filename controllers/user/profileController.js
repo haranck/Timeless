@@ -459,7 +459,7 @@ const postEditAddress = async (req, res) => {
 
         )
 
-        res.redirect("/address")
+        return res.status(200).json({ success: true, message: "Address updated successfully" })
 
 
     } catch (error) {
@@ -471,13 +471,18 @@ const postEditAddress = async (req, res) => {
 const deleteAddress = async (req, res) => {
 
     try {
-        const addressId = req.query.id
+        const addressId = req.body.addressId;
+        console.log("Deleting address", addressId)
+
+        if (!addressId) {
+            return res.status(400).json({ success: false, message: "Invalid address ID" })
+        }
         const findAddress = await Address.findOne({
             "address._id": addressId,
         })
 
         if (!findAddress) {
-            return res.redirect("/pageNotFound")
+            return res.status(400).json({ success: false, message: "Address not found" })
         }
         await Address.updateOne(
             { "address._id": addressId },
@@ -490,7 +495,7 @@ const deleteAddress = async (req, res) => {
             }
         )
         
-        res.redirect("/address")
+        return res.status(200).json({ success: true, message: "Address deleted successfully" })
 
     } catch (error) {
         console.log("Error deleting address", error)

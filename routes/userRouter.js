@@ -60,9 +60,9 @@ router.post('/update-password', userAuth, profileController.updatePassword)
 router.get("/addAddress", userAuth, profileController.addAddress)
 router.post("/addAddress", userAuth, profileController.postAddAddress)
 router.get("/address", userAuth, profileController.getAllAddresses) 
-router.get("/editAddress", userAuth, profileController.editAddress)
+// router.get("/editAddress", userAuth, profileController.editAddress)
 router.post("/editAddress", userAuth, profileController.postEditAddress)
-router.get("/deleteAddress", userAuth, profileController.deleteAddress)
+router.post("/deleteAddress", userAuth, profileController.deleteAddress)
 
 
 // Cart Management
