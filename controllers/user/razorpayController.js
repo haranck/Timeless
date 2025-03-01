@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const Order = require("../../models/orderSchema");
 const Cart = require("../../models/cartSchema");
 const Product = require("../../models/productSchema");
+const Address = require("../../models/addressSchema")
 
 const razorpayInstance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -52,6 +53,21 @@ const verifyPayment = async (req, res) => {
         if (!req.session.user) {
             return res.status(401).json({ success: false, message: "Not authenticated" });
         }
+        const userAddress = await Address.findOne({
+            userId:req.session.user,
+            "address._id":shippingAddress
+        })
+
+       if (!userAddress) {
+           return res.status(400).json({ success: false, message: 'Invalid shipping address' });
+       }
+       const selectedAddress = userAddress.address.find(addr => addr._id.toString() === shippingAddress);
+
+       console.log("selectedAddress", selectedAddress)
+
+       if (!selectedAddress) {
+           return res.status(400).json({ success: false, message: 'Selected address not found' });
+       }
 
         const parsedOrderItems = typeof orderedItems === 'string' ? JSON.parse(orderedItems) : orderedItems;
 
@@ -71,6 +87,16 @@ const verifyPayment = async (req, res) => {
             const newOrder = new Order({
                 user_id: req.session.user,
                 address_id: shippingAddress,
+                shippingAddress:{
+                    addressType: selectedAddress.addressType,
+                    name: selectedAddress.name,
+                    city: selectedAddress.city,
+                    landMark: selectedAddress.landMark,
+                    state: selectedAddress.state,
+                    pincode: selectedAddress.pincode,
+                    phone: selectedAddress.phone,
+                    altPhone: selectedAddress.altPhone
+                },
                 payment_method: "razorpay",
                 order_items: transformedOrderItems,
                 total: totalAmount,
@@ -128,7 +154,22 @@ const verifyPayment = async (req, res) => {
             const failedOrder = new Order({
                 user_id: req.session.user,
                 address_id: shippingAddress,
+                shippingAddress:{
+                    addressType: selectedAddress.addressType,
+                    name: selectedAddress.name,
+                    city: selectedAddress.city,
+                    landMark: selectedAddress.landMark,
+                    state: selectedAddress.state,
+                    pincode: selectedAddress.pincode,
+                    phone: selectedAddress.phone,
+                    altPhone: selectedAddress.altPhone
+                },
                 payment_method: "razorpay",
+                order_items: transformedOrderItems,
+                total: totalAmount,
+                finalAmount: totalAmount,
+                status: "failed",
+                couponApplied: couponCode ? true : false,
                 order_items: transformedOrderItems,
                 total: totalAmount,
                 finalAmount: totalAmount,

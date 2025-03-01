@@ -183,14 +183,15 @@
                     <div class="cart__total">
                         <h6>Cart total</h6>
                         <ul>
-                            <li>Subtotal <span>₹<%=cart.totalPrice%></span></li>
+                            <li>Subtotal <span>₹<%= cart.totalPrice %></span></li>
                             <br>
-                            <li>Total <span>₹<%=cart.totalPrice %></span></li>
+                            <li>Total <span id="cart-total">₹</span></li>
                         </ul>
-                        <% if (cart.totalPrice !== 0) { %> 
-                        <a href="/checkout" id="checkout-btn" class="primary-btn">Proceed to checkout</a>
+                        <% if (cart.items.length !== 0) { %> 
+                            <a href="/checkout" id="checkout-btn" class="primary-btn">Proceed to checkout</a>
                         <% } %>
                     </div>
+                   
                 </div>
             </div>
         </div>
@@ -201,34 +202,33 @@
 
     <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const checkoutBtn = document.getElementById("checkout-btn");
-        const unavailableItems = document.querySelectorAll(".unavailable-product");
-
-        function checkCartAvailability() {
-            const unavailableProductItems = document.querySelectorAll('tr .text-danger');
+            const checkoutBtn = document.getElementById("checkout-btn");
             
-            if (unavailableProductItems.length > 0) {
-                checkoutBtn.addEventListener("click", function (event) {
-                    event.preventDefault();
-                    Swal.fire({
-                        title: "Some items are unavailable!",
-                        text: "Please remove unavailable products or products from unavailable categories from your cart before proceeding.",
-                        icon: "warning",
-                        confirmButtonText: "OK"
-                    });
-                });
+            function checkCartAvailability() {
+                const unavailableProductItems = document.querySelectorAll('tr .text-danger');
 
-                checkoutBtn.classList.add("disabled");
-                return false;
+                if (unavailableProductItems.length > 0) {
+                    checkoutBtn.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        Swal.fire({
+                            title: "Some items are unavailable!",
+                            text: "Please remove unavailable products or products from unavailable categories from your cart before proceeding.",
+                            icon: "warning",
+                            confirmButtonText: "OK"
+                        });
+                    });
+
+                    checkoutBtn.classList.add("disabled");
+                    return false;
+                }
+                return true;
             }
-            return true;
-        }
-        checkCartAvailability();
-        
-    });
+
+            checkCartAvailability();
+        })
 
         function confirmRemove(productId) {
-            // Find the cart row before removal
+            
             const cartRow = document.querySelector(`a[onclick="confirmRemove('${productId}')"]`).closest('tr');
             
             Swal.fire({
@@ -253,10 +253,8 @@
                             
                             cartRow.remove();
                             
-
                             calculateTotalPrice();
                             
-                            // Check if cart is empty
                             const remainingItems = document.querySelectorAll('tr').length;
                             if (remainingItems <= 1) {
                                 location.reload();
@@ -365,5 +363,6 @@
             }
         }
     </script>
+
 
     <%- include("../../views/partials/user/footer") %>

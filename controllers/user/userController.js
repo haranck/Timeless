@@ -9,20 +9,6 @@ const env = require('dotenv').config()
 const { getDiscountPrice } = require("../../helpers/offerHelper");
 const Wallet = require('../../models/walletSchema')
 
-// const getDiscountPrice = (product) => {
-//    let productOffer = product.productOffer || 0;
-//    let categoryOffer = product.category?.categoryOffer || 0;
-
-//    let maxOffer = Math.max(productOffer, categoryOffer);
-//    let discountedPrice = product.salePrice - (product.salePrice * maxOffer) / 100;
-
-//   return {
-//     ...product.toObject(),
-//     finalPrice: discountedPrice,
-//     appliedOffer: maxOffer,
-//     regularPrice: product.regularPrice
-//   };
-// }
 
 const loadHompage = async (req, res) => {
    try {
@@ -148,10 +134,7 @@ const verifyOtp = async (req, res) => {
          });
 
          await saveUserData.save();
-         // req.session.user = saveUserData._id;
 
-
-         // Clear OTP session data after successful verification
          delete req.session.userOtp;
          delete req.session.userData;
 

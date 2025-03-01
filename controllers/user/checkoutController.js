@@ -15,8 +15,8 @@ const loadCheckout = async (req, res) => {
     try {
         const userId = req.session.user;
 
-        let cart = await Cart.findOne({ userId }).populate({ 
-            path: "items.productId", 
+        let cart = await Cart.findOne({ userId }).populate({
+            path: "items.productId",
             populate: { path: "category" }
         });
 
@@ -25,12 +25,12 @@ const loadCheckout = async (req, res) => {
         }
 
         const availableItems = cart.items.filter(item =>
-             item.productId.isListed &&
-             item.productId.category &&
-             item.productId.category.isListed
-            );
+            item.productId.isListed &&
+            item.productId.category &&
+            item.productId.category.isListed
+        );
 
-        if(availableItems.length !== cart.items.length){
+        if (availableItems.length !== cart.items.length) {
             req.flash("error", "Some products or their categories are unavailable and have been removed from your checkout.");
         }
         cart.items = availableItems;
@@ -174,6 +174,8 @@ const placeOrder = async (req, res) => {
         console.log("placeOrder", req.body)
         const { shippingAddress, paymentMethod, totalAmount, couponCode, discountAmount } = req.body;
 
+        console.log("shippingAddress", shippingAddress)
+
         if (totalAmount < 0) {
             return res.status(400).json({ success: false, error: "Some products are not available and have been removed from your cart." });
         }
@@ -181,7 +183,21 @@ const placeOrder = async (req, res) => {
         if (paymentMethod === "cod" && totalAmount > 1000) {
             return res.status(400).json({ success: false, error: "Minimum order amount for COD is ₹1000" });
         }
-        
+
+        const address = await Address.findOne({
+             userId,
+            'address._id': shippingAddress
+        });
+        console.log("address", address)
+
+        if (!address) {
+            return res.status(400).json({ success: false, message: 'Invalid shipping address' });
+        }
+
+        const orderAddress = address.address.find(addr => addr._id.toString() === shippingAddress);
+
+        console.log("orderAddress", orderAddress)
+
 
         const orderedItems = JSON.parse(JSON.stringify(req.body.orderedItems));
 
@@ -211,7 +227,7 @@ const placeOrder = async (req, res) => {
             if (!product) {
                 throw new Error(`Product not found for ID: ${item.productId}`);
             }
-            
+
             return {
                 productId: product._id,
                 quantity: item.quantity,
@@ -227,11 +243,22 @@ const placeOrder = async (req, res) => {
             price: item.price,
             productName: item.productName,
 
+
         }));
 
         const newOrder = new Order({
             user_id: userId,
             address_id: shippingAddress,
+            shippingAddress:{
+                addressType: orderAddress.addressType,
+                name: orderAddress.name,
+                city: orderAddress.city,
+                landMark: orderAddress.landMark,
+                state: orderAddress.state,
+                pincode: orderAddress.pincode,
+                phone: orderAddress.phone,
+                altPhone: orderAddress.altPhone
+            },
             payment_method: paymentMethod,
             finalAmount: cleanedTotal,
             order_items: formattedItems,
@@ -240,7 +267,6 @@ const placeOrder = async (req, res) => {
             couponCode: couponCode || null,
             couponApplied: !!coupon,
             discount: cleanedDiscount
-
 
         });
 
@@ -303,22 +329,15 @@ const viewOrder = async (req, res) => {
             return res.redirect('/profile');
         }
 
-        const addressDoc = await Address.findOne({ userId: userId });
-
-        let deliveryAddress = null;
-        if (addressDoc && addressDoc.address && addressDoc.address.length > 0) {
-            deliveryAddress = addressDoc.address.find(addr =>
-                addr._id && order.address_id && addr._id.toString() === order.address_id.toString()
-            );
-            
-        }
+        // const addressDoc = await Address.findOne({ userId: userId });
+        const deliveryAddress = order.shippingAddress || null;
 
         const orderData = {
             ...order.toObject(),
             address: deliveryAddress,
             totalAmount: order.totalAmount || order.total || order.finalAmount,
             orderStatus: order.status,
-            couponApplied: order.coupenApplied
+            couponApplied: order.couponApplied
         };
 
         return res.render("order", { order: orderData, user: req.session.userData });
@@ -342,6 +361,7 @@ const cancelOrder = async (req, res) => {
 
 
         const order = await Order.findById(orderId);
+        
 
         if (!orderReason) {
             return res.status(400).json({ success: false, message: 'Reason is required' });
@@ -367,14 +387,21 @@ const cancelOrder = async (req, res) => {
                 transactions: []
             })
         }
-        wallet.balance += order.total
-        wallet.transactions.push({
-            type: 'credit',
-            amount: order.total,
-            description: "refund for cancelled order",
-            status: 'completed'
-        })
-        await wallet.save()
+        console.log("Paymentmethod",order.payment_method)
+        console.log("Status",order.status)
+
+        if (order.payment_method !== "cod" && order.status === "cancelled") {
+            wallet.balance += order.total;
+            wallet.transactions.push({
+                type: 'credit',
+                amount: order.total,
+                description: "Refund for cancelled order",
+                status: 'completed'
+            });
+
+            await wallet.save();
+        }
+    
 
         return res.status(200).json({ success: true, message: 'Order cancelled successfully' });
 

@@ -921,7 +921,6 @@
                     document.getElementById("edit_phone").value = address.phone || '';
                     document.getElementById("edit_altPhone").value = address.altPhone || '';
                     document.getElementById("edit_address_id").value = address._id;
-
                     document.getElementById("editAddressModal").style.display = "flex";
                     document.body.style.overflow = 'hidden';
                 }
@@ -989,6 +988,17 @@
                         Swal.fire({
                             title: 'Error',
                             text: 'Please remove some items from your cart before proceeding.',
+                            icon: 'error',
+                            confirmButtonText: 'GO TO CART'
+                        }).then(()=>{
+                            window.location.replace("/cart");
+                        })
+                        return;
+                    }
+                    if(orderedItems.includes(undefined)){
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Please remove all undefined items from your cart before proceeding.',
                             icon: 'error',
                             confirmButtonText: 'OK'
                         }).then(()=>{
@@ -1215,7 +1225,6 @@
                     });
                 }
             }
-
 
 
             // let currentAppliedCoupon = '';

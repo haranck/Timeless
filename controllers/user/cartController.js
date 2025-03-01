@@ -147,6 +147,8 @@ const addToCart = async (req, res) => {
             return total + (Number(item.totalPrice) || 0);
         }, 0);
 
+        
+
         await cart.save();
         
 

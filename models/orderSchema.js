@@ -19,6 +19,40 @@ const orderSchema = new Schema({
       ref: "Address",
       required: true
    },
+   shippingAddress: {
+      addressType: {
+          type: String,
+          required: true
+      },
+      name: {
+          type: String,
+          required: true
+      },
+      city: {
+          type: String,
+          required: true
+      },
+      landMark: {
+          type: String,
+          required: true
+      },
+      state: {
+          type: String,
+          required: true
+      },
+      pincode: {
+          type: Number,
+          required: true
+      },
+      phone: {
+          type: Number,
+          required: true
+      },
+      altPhone: { 
+          type: Number,
+          required: false
+      }
+  },
    payment_method: {
       type: String,
       enum: ["cod", "razorpay"],
