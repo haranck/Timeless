@@ -6,7 +6,7 @@
     <meta name="keywords" content="Male_Fashion, unica, creative, html" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Male-Fashion</title>
+    <title>Timeless Aura</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css" />
@@ -57,7 +57,7 @@
             font-weight: 500;
         }
         .form-control {
-            width: 100%;
+            width: 90%;
             height: 45px;
             padding: 8px 15px;
             border: 1px solid #ddd;
@@ -237,12 +237,7 @@
         }
         
         function resendOTP() {
-            clearInterval(timerInterval);
-            timer = 60;
-            document.getElementById('otp').disabled = false;
-            document.getElementById("timerValue").classList.remove("expired");
-            document.getElementById("timerValue").textContent = timer;
-            startTimer();
+
             
             $.ajax({
                 type: "POST",
@@ -251,11 +246,19 @@
                     if(response.success) {
                         Swal.fire({
                             icon: "success",
-                            title: "Resent otp successfully",
-                            text: "OTP sent successfully",
+                            toast: true, 
+                            position: "top-end", 
+                            title: "Success",
+                            text: "Resent OTP sent successfully",
                             showConfirmButton: false,
                             timer: 1500
                         });
+                        clearInterval(timerInterval);
+                        timer = 60;
+                        document.getElementById('otp').disabled = false;
+                        document.getElementById("timerValue").classList.remove("expired");
+                        document.getElementById("timerValue").textContent = timer;
+                        startTimer();
                     } else {
                         Swal.fire({
                             icon: "error",

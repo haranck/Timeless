@@ -124,8 +124,14 @@ const resendtOTP = async (req, res) => {
     try {
         const otp = generateOtp()
         req.session.userOtp = otp
-        const email = req.session.email
-        console.log("resending otp", otp)
+        const email = req.session.userData?.email
+
+        if(!email){
+            return res.status(400).json({success:false,message:"Email not found in session"})
+        }
+
+        // console.log("resending otp", otp)
+
         const emailSent = await sendVerificationEmail(email, otp);
         if (emailSent) {
             console.log("Resent otp sent", otp)
@@ -350,9 +356,9 @@ const addAddress = async (req, res) => {
 
 const postAddAddress = async (req, res) => {
     try {
-        const userId = req.session.user
-        const { addressType, name, city, landMark, state, pincode, phone, altPhone } = req.body
-        const userAddress = await Address.findOne({ userId: userId })
+        const userId = req.session.user;
+        const { addressType, name, city, landMark, state, pincode, phone, altPhone } = req.body;
+        const userAddress = await Address.findOne({ userId: userId });
 
         if (!userAddress) {
             const newAddress = new Address({
@@ -369,9 +375,8 @@ const postAddAddress = async (req, res) => {
                         altPhone: altPhone || "N/A",
                     },
                 ],
-            })
-            await newAddress.save()
-            
+            });
+            await newAddress.save();
         } else {
             userAddress.address.push({
                 addressType,
@@ -382,15 +387,16 @@ const postAddAddress = async (req, res) => {
                 pincode,
                 phone,
                 altPhone: altPhone || "N/A",
-            })
-            await userAddress.save()
+            });
+            await userAddress.save();
         }
-        res.redirect("/address")
+        res.json({ success: true, message: "Address added successfully!" });
     } catch (error) {
-        console.error("Error in postAddAddress:", error)
-        res.redirect("/pageNotFound")
+        console.error("Error in postAddAddress:", error);
+        res.status(500).json({ success: false, message: "Something went wrong!" });
     }
-}
+};
+
 
 
 

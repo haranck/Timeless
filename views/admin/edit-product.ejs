@@ -201,6 +201,16 @@
         justify-content: center;
         cursor: pointer;
     }
+    #flexy{
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .content-title{
+        margin-bottom: 30px;
+    margin-top: 16px;
+    font-size: 34px;
+    }
 </style>
 <section class="content-main">
     <div class="row">
@@ -213,20 +223,20 @@
                     <div class="card-body">
                         <% if (product) { %>
                         <form method="POST" action="/admin/editProduct/<%= product._id %>" enctype="multipart/form-data" onsubmit="return validateForm()">
-                            <div class="mb-4">
+                            <div class="mb-4" id="flexy">
                                 <label for="product_name" class="form-label">Product Name</label>
                                 <input type="text" placeholder="Type here" name="productName" class="form-control" id="product_name" value="<%= product.productName %>">
                                 <div id="productName-error" class="error-message"></div>
                             </div>
 
-                            <div class="mb-4">
+                            <div class="mb-4" id="flexy">
                                 <label for="description" class="form-label">Description</label>
                                 <textarea placeholder="Type here" name="description" class="form-control" id="description" rows="4"><%= product.description %></textarea>
                                 <div id="description-error" class="error-message"></div>
                             </div>
 
                             <div class="row">
-                                <div class="col-lg-6 mb-4">
+                                <div class="col-lg-6 mb-4" id="flexy">
                                     <label for="category" class="form-label">Category</label>
                                     <select name="category" class="form-select" id="category">
                                         <% cat.forEach(function(category) { %>
@@ -236,18 +246,18 @@
                                         <% }); %>
                                     </select>
                                 </div>
-                                <div class="col-lg-6 mb-4">
+                                <div class="col-lg-6 mb-4" id="flexy">
                                     <label for="quantity" class="form-label">Quantity</label>
                                     <input type="number" placeholder="Enter quantity" name="quantity" class="form-control" id="quantity" value="<%= product.quantity %>">
                                 </div>
                             </div>
 
                             <div class="row">
-                                <div class="col-lg-4 mb-4">
+                                <div class="col-lg-4 mb-4" id="flexy">
                                     <label for="regularPrice" class="form-label">Regular Price</label>
                                     <input type="number" placeholder="Enter regular price" name="regularPrice" class="form-control" id="regularPrice" value="<%= product.regularPrice %>">
                                 </div>
-                                <div class="col-lg-4 mb-4">
+                                <div class="col-lg-4 mb-4" id="flexy">
                                     <label for="salePrice" class="form-label">Sale Price</label>
                                     <input type="number" placeholder="Enter sale price" name="salePrice" class="form-control" id="salePrice" value="<%= product.salePrice %>">
                                 </div>

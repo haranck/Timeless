@@ -2,13 +2,37 @@
     <%- include("../../views/partials/admin/header") %>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-    <!-- Main Content -->
+    <style>
+       .dashboard-hed {
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 33px;
+            color: #fff;
+            text-align: justify;
+            /* text-transform: uppercase; */
+            background: linear-gradient(45deg, #251a1a, #fc913a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 3px;
+            text-shadow: 3px 3px 10px rgba(191, 190, 190, 0.4);
+            animation: glowText 1.5s infinite alternate ease-in-out;    
+        }
+
+        @keyframes glowText {
+            from {
+                text-shadow: 3px 3px 10px rgba(191, 190, 190, 0.4);
+            }
+            to {
+                text-shadow: 5px 5px 20px rgba(191, 190, 190, 0.8);
+            }
+        } 
+
+
+    </style>
     <main class="main-content">
-        <div class="breadcrumbs">
-            Admin <span>></span> <span id="currentPage">Dashboard</span>
-        </div>
-    
-        <!-- Summary Cards -->
+        
+        <h1 class="dashboard-hed">Dashboard</h1>
+
         <div class="summary-cards">
             <a href="/admin/salesReport" style="text-decoration: none; color: inherit;">
             <div class="summary-card">
@@ -36,8 +60,8 @@
                 </div>
                 <div class="summary-change <%= dashboardData.summary.customerGrowth >= 0 ? 'increase' : 'decrease' %>">
                     <i class="fas fa-arrow-<%= dashboardData.summary.customerGrowth >= 0 ? 'up' : 'down' %>"></i>
-                    <!-- <span><Math.abs(dashboardData.summary.customerGrowth) %>%</span> -->
-                    <span>89%</span>
+                    <span><%= Math.abs(dashboardData.summary.customerGrowth) %>%</span>
+                    <!-- <span>89%</span> -->
                 </div>
             </div>
             </a>

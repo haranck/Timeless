@@ -1,6 +1,7 @@
 
  
  <%- include("../../views/partials/user/header") %>
+
  <div class="container mt-4">
     <h3 class="mt-3" style="color: #046963; margin-bottom:70px">Add New Address</h3>
     <form id="addressForm" method="POST" action="/addAddress" class="border-0 p-3">
@@ -52,16 +53,54 @@
         </div>
     </form>
  </div>
+
+
  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
  
-    
 
 <script>
   
-   document.getElementById('addressForm').addEventListener('submit', function(event) {
+   document.getElementById('addressForm').addEventListener('submit',async function(event) {
+    event.preventDefault();
        if (!validateForm()) {
-           event.preventDefault();
+           return;
        }
+       const formData = new FormData(this);
+    const formObject = Object.fromEntries(formData.entries());
+
+    try {
+        const response = await fetch("/addAddress", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formObject),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire({
+                title: "Success!",
+                text: data.message,
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false,
+            }).then(() => {
+                window.location.href = "/address"; 
+            });
+        } else {
+            Swal.fire({
+                title: "Error!",
+                text: data.message,
+                icon: "error",
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            title: "Error!",
+            text: "Something went wrong!",
+            icon: "error",
+        });
+    }
    });
 
 
