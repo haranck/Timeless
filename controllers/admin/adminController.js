@@ -135,7 +135,7 @@ const loadDashboard = async (req, res) => {
    }
 };
 
-// API endpoint to get updated dashboard data
+
 const getDashboardDataAPI = async (req, res) => {
    try {
        const { timeFilter } = req.query;
@@ -184,21 +184,19 @@ async function getDashboardData(timeFilter) {
            aggregateBy = { month: '$createdAt' };
    }
 
-   // Get total revenue
+
    const totalRevenue = await Order.aggregate([
        { $match: { status: { $nin: ['cancelled', 'failed', 'Return approved', 'refunded','pending'] } } },
        { $group: { _id: null, total: { $sum: '$finalAmount' } } }
    ]);
 
-   // Get total customers
+
    const totalCustomers = await User.countDocuments({ isAdmin: false });
 
-   // Get total orders
    const totalOrders = await Order.countDocuments({ 
        status: { $nin: ['cancelled', 'failed'] } 
    });
 
-   // Get revenue growth percentage compared to previous period
    const previousPeriodStart = moment(startDate).subtract(
        timeFilter === 'weekly' ? 7 : 
        timeFilter === 'yearly' ? 6 : 6, 
@@ -231,7 +229,6 @@ async function getDashboardData(timeFilter) {
        previousPeriodRevenue[0]?.total || 0
    );
 
-   // Get customer growth percentage
    const currentPeriodCustomers = await User.countDocuments({ 
        createdAt: { $gte: startDate, $lte: currentDate },
        isAdmin: false
@@ -427,33 +424,29 @@ async function getDashboardData(timeFilter) {
    };
 }
 
-// Helper function to calculate growth percentage
+
 function calculateGrowthPercentage(current, previous) {
    if (previous === 0) return current > 0 ? 100 : 0;
    return Number(((current - previous) / previous * 100).toFixed(1));
 }
 
-// Helper function to map database results to chart labels
+
 function mapDataToLabels(data, labels, timeFilter, valueField) {
    const result = [];
    const dataMap = new Map();
    
-   // Convert data array to map for easy lookup
    data.forEach(item => {
        let key;
        if (timeFilter === 'weekly') {
-           // Extract day of week from YYYY-MM-DD
            key = moment(item._id).format('ddd');
        } else if (timeFilter === 'yearly') {
-           key = item._id; // Already in YYYY format
+           key = item._id; 
        } else {
-           // Convert YYYY-MM to month name
            key = moment(item._id, 'YYYY-MM').format('MMM');
        }
        dataMap.set(key, item[valueField]);
    });
    
-   // Fill in data for each label
    labels.forEach(label => {
        result.push(dataMap.get(label) || 0);
    });
@@ -465,10 +458,7 @@ function mapDataToLabels(data, labels, timeFilter, valueField) {
 const logout = async (req, res) => {
    try {
       req.session.admin = false
-         // if (err) {
-         //    console.log("Error destroying session", err);
-         //    return res.redirect("/pageerror")
-         // }
+   
          res.render("admin-login",{message:"Successfully logged out"})
       
    } catch (error) {

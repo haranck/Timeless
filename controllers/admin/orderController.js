@@ -42,20 +42,33 @@ const getOrdersPage = async (req, res) => {
 const updateOrder = async (req, res) => {
     try {
         const { orderId, status } = req.body
+        console.log("Updating order:", orderId, "to status:", status);
 
         if (!orderId || !status) {
             return res.status(400).json({ success: false, message: "order ID and status are required" })
         }
 
-        const updatedOrder = await Order.findByIdAndUpdate(orderId, { status }, { new: true })
+        const order = await Order.findById(orderId)
 
-        if (!updatedOrder) {
+        if (!order) {
             return res.status(404).json({ success: false, message: "order not found" })
         }
 
-        await updatedOrder.save()
+        order.status = status
+        
+        if (status === 'cancelled') {
+            for (const item of order.order_items) {
+                const product = await Product.findById(item.productId)
+                if (product) {
+                    product.quantity += item.quantity
+                    await product.save()
+                }
+            }
+        }
 
-        res.status(200).json({ success: true, message: "order updated successfully", status: updatedOrder.status })
+        await order.save()
+
+        res.status(200).json({ success: true, message: "order updated successfully", status: order.status })
 
     } catch (error) {
         console.log("error updating order", error)
@@ -66,16 +79,33 @@ const updateOrder = async (req, res) => {
 const cancelOrder = async (req, res) => {
     try {
         const { orderId } = req.body
+        
         if (!orderId) {
             return res.status(404).json({ success: false, message: "order not found" })
         }
-        await Order.findByIdAndUpdate(orderId, { status: 'cancelled' })
+        
+        const order = await Order.findById(orderId)
+        
+        if (!order) {
+            return res.status(404).json({ success: false, message: "order not found" })
+        }
+        
+        order.status = 'cancelled'
+        
+        for (const item of order.order_items) {
+            const product = await Product.findById(item.productId)
+            if (product) {
+                product.quantity += item.quantity
+                await product.save()
+            }
+        }
 
-
-        res.status(200).json({ success: true, message: "order deleted successfully" })
-
+        await order.save()
+        
+        res.status(200).json({ success: true, message: "order cancelled successfully" })
+        
     } catch (error) {
-        console.log("error deleting order", error)
+        console.log("error cancelling order", error)
         res.status(500).json({ success: false, message: "internal server error" })
     }
 }

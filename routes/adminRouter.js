@@ -12,28 +12,6 @@ const orderController = require('../controllers/admin/orderController')
 const couponController = require('../controllers/admin/couponController')
 
 
-
-// const storage = multer.diskStorage({ 
-//     destination: function (req, file, cb) {
-//         if (req.originalUrl.includes('/addBrand')) {
-//             cb(null, path.join(__dirname, '../public/uploads/brands'))
-//         } else {
-//             cb(null, path.join(__dirname, '../public/uploads/product-images'))
-//         }
-//     },
-//     filename: function (req, file, cb) {
-//         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-//         cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
-//     }
-// })
-
-// const fileFilter = (req, file, cb) => {
-//     if (file.mimetype.startsWith('image/')) {
-//         cb(null, true)
-//     } else {
-//         cb(new Error('Not an image! Please upload an image.'), false)
-//     }
-// }
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         if (req.originalUrl.includes('/addBrand')) {
@@ -56,7 +34,7 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// This middleware will handle any fields (useful for mixed form data)
+
 const uploadAny = multer({
     storage: storage,
     fileFilter: fileFilter,
@@ -64,13 +42,6 @@ const uploadAny = multer({
         fileSize: 5 * 1024 * 1024 // 5MB file size limit
     }
 }).any();
-// const uploads = multer({
-//     storage: storage,
-//     fileFilter: fileFilter,
-//     limits: {
-//         fileSize: 5 * 1024 * 1024 // 5MB file 
-//     }
-// })
 
 
 
@@ -81,8 +52,6 @@ router.get('/dashboard-data', adminController.getDashboardDataAPI);
 router.get('/logout', adminController.logout)
 router.get('/customers', adminAuth, customerController.customerInfo)
 
-// router.get('/blockedCustomer', adminAuth, customerController.customerBlocked)
-// router.get('/unblockedCustomer', adminAuth, customerController.customerunBlocked)
 
 router.post('/toggleBlock', adminAuth, customerController.toggleBlock);
 

@@ -218,15 +218,77 @@ const userProfile = async (req, res) => {
         });
     } catch (error) {
         console.error("Error in userProfile:", error);
-        res.redirect('/pageNotFound');
+        res.status(500).render('error', { message: 'Internal server error' });
     }
 };
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.session.user
+        const { name, phone } = req.body;
+
+        if (!name || !phone) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name and phone are required'
+            });
+        }
+
+        if (!/^\d{10}$/.test(phone.toString())) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please enter a valid 10-digit phone number'
+            });
+        }
+
+        // const existingUser = await User.findOne({ 
+        //     phone: phone,
+        //     _id: { $ne: userId } 
+        // });
+
+        // if (existingUser) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: 'This phone number is already in use by another account'
+        //     });
+        // }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { name, phone },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        req.session.user = updatedUser;
+
+        return res.status(200).json({
+            success: true,
+            message: 'Profile updated successfully',
+            user: {
+                name: updatedUser.name,
+                phone: updatedUser.phone
+            }
+        });
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'An error occurred while updating profile'
+        });
+    }
+}
 
 
 const changePassword = async (req, res) => {
     try {
 
-        res.render("change-password")
+        res.render("change-password", { user: req.session.userData })
 
 
     } catch (error) {
@@ -304,7 +366,9 @@ const updatePassword = async (req, res) => {
 
         res.json({ 
             success: true, 
-            message: 'Password updated successfully' 
+            message: 'Password updated successfully' ,
+            name: updatedUser.name,
+            phone: updatedUser.phone
         });
 
     } catch (error) {
@@ -525,5 +589,6 @@ module.exports = {
     postEditAddress,
     deleteAddress,
     verifyCurrentPassword,
-    updatePassword
+    updatePassword,
+    updateProfile
 }

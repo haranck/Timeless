@@ -171,10 +171,10 @@ const addCheckoutAddress = async (req, res) => {
 const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user;
-        console.log("placeOrder", req.body)
+        // console.log("placeOrder", req.body)
         const { shippingAddress, paymentMethod, totalAmount, couponCode, discountAmount } = req.body;
 
-        console.log("shippingAddress", shippingAddress)
+        // console.log("shippingAddress", shippingAddress)
 
         if (totalAmount < 0) {
             return res.status(400).json({ success: false, error: "Some products are not available and have been removed from your cart." });

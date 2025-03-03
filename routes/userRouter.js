@@ -51,6 +51,7 @@ router.post("/resend-forgot-otp", profileController.resendtOTP)
 router.post("/reset-password", profileController.postNewPassword)
 
 router.get('/userProfile', userAuth, profileController.userProfile)
+router.post('/update-profile', userAuth, profileController.updateProfile);
 router.get('/change-password', userAuth, profileController.changePassword)
 router.post('/verify-current-password', userAuth, profileController.verifyCurrentPassword);
 router.post('/update-password', userAuth, profileController.updatePassword)

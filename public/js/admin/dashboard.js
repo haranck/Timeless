@@ -60,7 +60,13 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error fetching chart data:', error);
                 containers.forEach(container => container.classList.remove('loading'));
-                alert('Error updating chart data. Please try again.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error updating chart data. Please try again.',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
             });
     }
     

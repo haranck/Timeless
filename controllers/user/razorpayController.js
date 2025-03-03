@@ -267,7 +267,7 @@ const retryPayment = async (req, res) => {
     }
 };
 
-const verifyRetryPayment = async (req, res) => {
+const   verifyRetryPayment = async (req, res) => {
     try {
         const {
             razorpay_order_id,

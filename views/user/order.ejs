@@ -458,7 +458,10 @@
                 <div class="info-item">
                     <div class="info-label">Payment Status</div>
                     <div class="info-value">
-                        <% if(order.paymentStatus ==='success'){  %>
+                        
+                        <% if(order.payment_method === 'razorpay' && order.orderStatus === 'cancelled') { %> 
+                        <span class="status status-delivered">Refunded</span>
+                        <% }else if(order.payment_method === 'razorpay' && (order.orderStatus === 'pending' || order.orderStatus === 'shipped'|| order.orderStatus === 'delivered')) { %>
                             <span class="status status-delivered">Paid</span>
                         <% }else if(order.orderStatus === 'cancelled' ) {%> 
                         <span class="status status-cancelled">Cancelled</span>

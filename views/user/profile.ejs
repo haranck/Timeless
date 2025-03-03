@@ -300,7 +300,87 @@
 }
 
 
+.custom-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
 
+    .custom-modal {
+        background-color: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        animation: modalFadeIn 0.3s ease-out;
+    }
+
+    .custom-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .custom-modal-title {
+        font-size: 1.25rem;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .custom-close-button {
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+    }
+
+    .custom-modal-body {
+        padding: 20px;
+    }
+
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .invalid-feedback {
+        display: block;
+        color: #dc3545;
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+    }
+
+    input.is-invalid {
+        border-color: #dc3545;
+    }
+
+    .btn-success {
+        background: linear-gradient(45deg, #ffa500, #ffd700);
+        border: none;
+        color: #000;
+        font-weight: 500;
+        padding: 8px 20px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(45deg, #ff8c00, #ffc000);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(255, 165, 0, 0.2);
+        color: #000;
+    }
 
     </style>
 
@@ -377,10 +457,10 @@
                                             <h5 class="mb-0 text-center">User Profile</h5>
                                         </div>
                                         <div class="card-body text-center">
-                                            <h5 class="card-title">
+                                            <h5 class="card-title" data-user-name>
                                                 <%=user.name%>
                                             </h5>
-                                            <p class="card-text">
+                                            <p class="card-text" data-user-phone>
                                                 <strong>Phone:</strong>
                                                 <%=user.phone%>
                                             </p>
@@ -388,9 +468,9 @@
                                                 <strong>Email:</strong>
                                                 <%=user.email%>
                                             </p>
-                                            <!-- <a href="/change-email" class="btn btn-sm btn-success ml-2">Change Email</a> -->
-                                            <a href="/change-password" class="btn btn-sm btn-success">Change
-                                                Password</a>
+                                            <button  class="btn btn-sm btn-success ml-2">Edit Profile</button>
+                                            <button href="/change-password" class="btn btn-sm btn-success">Change
+                                                Password</button>
                                         </div>
                                     </div>
                                 </div>
@@ -607,6 +687,32 @@
         </div>
     </main>
 
+    <div class="custom-modal-overlay" id="editProfileModal">
+    <div class="custom-modal">
+        <div class="custom-modal-header">
+            <h5 class="custom-modal-title">Edit Profile</h5>
+            <button type="button" class="custom-close-button" id="closeEditProfileModal">&times;</button>
+        </div>
+        <div class="custom-modal-body">
+            <form id="editProfileForm">
+                <div class="mb-3">
+                    <label for="editName" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="editName" name="name" value="<%= user.name %>" required>
+                    <div class="invalid-feedback" id="nameError"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="editPhone" class="form-label">Phone</label>
+                    <input type="text" class="form-control" id="editPhone" name="phone" value="<%= user.phone %>" required>
+                    <div class="invalid-feedback" id="phoneError"></div>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -671,7 +777,125 @@
             });
         });
 
+    const editProfileModal = document.getElementById('editProfileModal');
+    const closeEditProfileModalBtn = document.getElementById('closeEditProfileModal');
+    const editProfileForm = document.getElementById('editProfileForm');
+    const editProfileBtn = document.querySelector('.btn-success.ml-2'); 
 
+    function openEditProfileModal() {
+        editProfileModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; 
+    }
+
+    
+    function closeEditProfileModal() {
+        editProfileModal.style.display = 'none';
+        document.body.style.overflow = ''; 
+        
+        document.getElementById('nameError').textContent = '';
+        document.getElementById('phoneError').textContent = '';
+        document.getElementById('editName').classList.remove('is-invalid');
+        document.getElementById('editPhone').classList.remove('is-invalid');
+    }
+
+    if (editProfileBtn) {
+        editProfileBtn.addEventListener('click', openEditProfileModal);
+    }
+    
+    closeEditProfileModalBtn.addEventListener('click', closeEditProfileModal);
+    
+    // Close modal when clicking outside
+    editProfileModal.addEventListener('click', function(event) {
+        if (event.target === editProfileModal) {
+            closeEditProfileModal();
+        }
+    });
+
+    // Close modal with ESC key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && editProfileModal.style.display === 'flex') {
+            closeEditProfileModal();
+        }
+    });
+
+    // Handle form submission
+    editProfileForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        document.getElementById('nameError').textContent = '';
+        document.getElementById('phoneError').textContent = '';
+        document.getElementById('editName').classList.remove('is-invalid');
+        document.getElementById('editPhone').classList.remove('is-invalid');
+        
+        const name = document.getElementById('editName').value.trim();
+        const phone = document.getElementById('editPhone').value.trim();
+        
+
+        let hasError = false;
+        
+        if (name === '') {
+            document.getElementById('nameError').textContent = 'Name is required';
+            document.getElementById('editName').classList.add('is-invalid');
+            hasError = true;
+        }
+        
+        if (phone === '') {
+            document.getElementById('phoneError').textContent = 'Phone number is required';
+            document.getElementById('editPhone').classList.add('is-invalid');
+            hasError = true;
+        } else if (!/^\d{10}$/.test(phone)) {
+            document.getElementById('phoneError').textContent = 'Please enter a valid 10-digit phone number';
+            document.getElementById('editPhone').classList.add('is-invalid');
+            hasError = true;
+        }
+        
+        if (hasError) return;
+        
+        try {
+            const response = await fetch('/update-profile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, phone })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                
+                closeEditProfileModal();
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Profile updated successfully',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    
+                    const nameElement = document.querySelector('[data-user-name]');
+                    const phoneElement = document.querySelector('[data-user-phone]');
+                    nameElement.textContent = data.user.name;
+                    phoneElement.innerHTML = `<strong>Phone:</strong> ${data.user.phone}`;
+                    
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Failed to update profile'
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong. Please try again.'
+            });
+        }
+    });
 
     </script>
 

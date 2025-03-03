@@ -608,7 +608,7 @@ button:hover {
         </div>
     </main>
 
-    <!-- Reject Modal -->
+    
 
     <div id="rejectModal" class="modal">
         <div class="modal-content">
@@ -635,117 +635,154 @@ button:hover {
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Store orders data in JavaScript
-        const ordersData = <%- JSON.stringify(orders) %>;
+       const ordersData = <%- JSON.stringify(orders) %>;
 
-        function openModal(index) {
-            const order = ordersData[index];
+function openModal(index) {
+    const order = ordersData[index];
 
+    // Get the current status from the UI instead of using the cached data
+    const orderRow = document.querySelector(`tr[data-order-id="${order._id}"]`);
+    const statusSelect = orderRow.querySelector('.status-select');
+    const currentStatus = statusSelect.value;
 
-            document.getElementById('modalOrderId').textContent = `Order Details #${order._id}`;
-            document.getElementById('modalOrderIdValue').textContent = `#${order._id}`;
-            document.getElementById('modalOrderDate').textContent = new Date(order.createdAt).toLocaleDateString();
-            document.getElementById('modalPaymentMethod').textContent = order.payment_method;
-            // Update order status color
-            const modalOrderStatus = document.getElementById('modalOrderStatus');
-            modalOrderStatus.textContent = order.status;
-            modalOrderStatus.style.color = { pending: 'orange', shipped: 'blue', delivered: 'green', cancelled: 'red' }[order.status] || 'black';
+    // Update the order object with the current status
+    order.status = currentStatus;
 
+    document.getElementById('modalOrderId').textContent = `Order Details #${order._id}`;
+    document.getElementById('modalOrderIdValue').textContent = `#${order._id}`;
+    document.getElementById('modalOrderDate').textContent = new Date(order.createdAt).toLocaleDateString();
+    document.getElementById('modalPaymentMethod').textContent = order.payment_method;
+    
+    const modalOrderStatus = document.getElementById('modalOrderStatus');
+    modalOrderStatus.textContent = currentStatus;
+    modalOrderStatus.style.color = { 
+        pending: 'orange', 
+        shipped: 'blue', 
+        delivered: 'green', 
+        cancelled: 'red',
+        'Return requested': 'purple',
+        'Return approved': 'green',
+        'Return rejected': 'red'
+    }[currentStatus] || 'black';
 
-            document.getElementById('modalSubtotal').textContent = `₹${order.total}`;
-            document.getElementById('modalFinalAmount').textContent = `₹${order.finalAmount}`;
-            document.getElementById('modalDiscount').textContent = `₹${order.discount}`;
+    document.getElementById('modalSubtotal').textContent = `₹${order.total}`;
+    document.getElementById('modalFinalAmount').textContent = `₹${order.finalAmount}`;
+    document.getElementById('modalDiscount').textContent = `₹${order.discount}`;
+    
+    const productsList = document.getElementById('modalProductsList');
+    productsList.innerHTML = '';
 
-            // Update products list
-            const productsList = document.getElementById('modalProductsList');
-            productsList.innerHTML = '';
+    order.order_items.forEach(item => {
+        const row = document.createElement('tr');
+        const imageUrl = item.productId.productImages && item.productId.productImages.length > 0
+            ? `/uploads/product-images/${item.productId.productImages[0]}`
+            : '/uploads/product-images/default.jpg';
 
-            order.order_items.forEach(item => {
-                const row = document.createElement('tr');
-                const imageUrl = item.productId.productImages && item.productId.productImages.length > 0
-                    ? `/uploads/product-images/${item.productId.productImages[0]}`
-                    : '/uploads/product-images/default.jpg';
+        row.innerHTML = `
+        <td>
+            <img src="${imageUrl}" 
+                 alt="${item.productId.productName}" 
+                 class="product-img">
+        </td>
+        <td>${item.productId.productName}</td>
+        <td>${item.quantity}</td>
+        <td>₹${item.price}</td>
+        <td>₹${item.price * item.quantity}</td>
+    `;
+        productsList.appendChild(row);
+    });
 
-                row.innerHTML = `
-                <td>
-                    <img src="${imageUrl}" 
-                         alt="${item.productId.productName}" 
-                         class="product-img">
-                </td>
-                <td>${item.productId.productName}</td>
-                <td>${item.quantity}</td>
-                <td>₹${item.price}</td>
-                <td>₹${item.price * item.quantity}</td>
-            `;
-                productsList.appendChild(row);
-            });
-
-            document.getElementById('orderModal').classList.add('show');
-        }
-
-        function closeModal() {
+    document.getElementById('orderModal').classList.add('show');
+}
+function closeModal() {
             document.getElementById('orderModal').classList.remove('show');
         }
 
-        async function updateOrderStatus(orderId, selectElement) {
-            try {
-                const status = selectElement.value;
+async function updateOrderStatus(orderId, selectElement) {
+    try {
+        const status = selectElement.value;
 
-                const response = await fetch('/admin/updateOrder', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ orderId, status })
-                })
-                const data = await response.json();
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success!',
-                        text: 'Order status updated successfully',
-                        showConfirmButton: false,
-                        timer: 1500
-                    })
-                    if (status.toLowerCase() === 'cancelled') {
-                        selectElement.disabled = true;
-                    }
-                    if (status.toLowerCase() === 'delivered') {
-                        selectElement.disabled = true;
-                    }
-                    const orderRow = document.querySelector(`tr[data-order-id="${orderId}"]`);
-                    if (orderRow) {
-                        const statusSelect = orderRow.querySelector('.status-select');
-                        if (statusSelect) {
-                            statusSelect.value = status;
-                            statusSelect.style.color = { pending: 'orange', shipped: 'blue', delivered: 'green', cancelled: 'red' }[status] || 'black';
+        const response = await fetch('/admin/updateOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ orderId, status })
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Order status updated successfully',
+                showConfirmButton: false,
+                timer: 1500
+            });
+
+            // Update UI
+            selectElement.style.color = {
+                pending: 'orange',
+                shipped: 'blue',
+                delivered: 'green',
+                cancelled: 'red',
+                'Return requested': 'purple',
+                'Return approved': 'green',
+                'Return rejected': 'red'
+            }[status] || 'black';
+
+            if (status.toLowerCase() === 'delivered' || status.toLowerCase() === 'cancelled') {
+                selectElement.disabled = true;
+            }
+
+            const orderRow = document.querySelector(`tr[data-order-id="${orderId}"]`);
+            if (orderRow) {
+                const statusSelect = orderRow.querySelector('.status-select');
+                if (statusSelect) {
+                    statusSelect.value = status;
+
+                    if (status.toLowerCase() === 'shipped') {
+                        const pendingOption = statusSelect.querySelector('option[value="pending"]');
+                        if (pendingOption) {
+                            pendingOption.remove();
                         }
                     }
+                }
+                if (status.toLowerCase() === 'delivered' || status.toLowerCase() === 'cancelled') {
                     const cancelButton = orderRow.querySelector('.btn-cancel');
-                    if(status.toLowerCase() === 'delivered') {
+                    if (cancelButton) {
                         cancelButton.remove();
                     }
-
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: data.message || 'Failed to update order status',
-                        showConfirmButton: false,
-                        timer: 1500
-                    })
                 }
-            } catch (error) {
-                console.error(error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: 'Something went wrong',
-                    showConfirmButton: false,
-                    timer: 1500
-                })
             }
+
+            // Update the corresponding order in ordersData
+            const orderIndex = ordersData.findIndex(order => order._id === orderId);
+            if (orderIndex !== -1) {
+                ordersData[orderIndex].status = status;
+            }
+
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: data.message || 'Failed to update order status',
+                showConfirmButton: false,
+                timer: 1500
+            });
         }
+    } catch (error) {
+        console.error(error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'Something went wrong',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    }
+}
+
 
 
 
