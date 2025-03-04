@@ -1,5 +1,8 @@
 
 const getDiscountPrice = (product) => {
+  if (!product) {
+    return null;
+  }
     let productOffer = product.productOffer || 0;
     let categoryOffer = product.category?.categoryOffer || 0;
  
@@ -21,6 +24,10 @@ const getDiscountPriceCart = (product) => {
   //       product.isAvailable = false;
   //       return product;
   //   }
+  if (!product) {
+    console.error("getDiscountPriceCart: Received null/undefined product");
+    return null; 
+  }
   let productOffer = product.productOffer || 0;
   let categoryOffer = product.category?.categoryOffer || 0;
 

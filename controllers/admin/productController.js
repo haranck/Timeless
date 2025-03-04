@@ -23,70 +23,125 @@ const getProductAddPage = async (req, res) => {
 }
 
 
-
 const addProducts = async (req, res) => {
    try {
-
-      const products = req.body
+      const products = req.body;
+      
+      // Check if product exists using the correct field name
       const productExists = await product.findOne({
-         productName: products.productsName
-      })
+         productName: products.productName  // Fixed field name
+      });
 
       if (!productExists) {
-         const images = []
+         const images = [];
+         
+         // Process images if any were uploaded
          if (req.files && req.files.length > 0) {
             for (let i = 0; i < req.files.length; i++) {
                const originalImagePath = req.files[i].path;
+               const resizedImagePath = path.join("public", "uploads", "product-images", `resized-${req.files[i].filename}`);
 
-               const resizedImagePath = path.join("public", "uploads", "product-images", `resized-${req.files[i].filename}`)
-
-               await sharp(originalImagePath).resize({ width: 440, height: 440 }).toFile(resizedImagePath)
-
-               images.push(req.files[i].filename)
+               try {
+                  // Resize and save image
+                  await sharp(originalImagePath)
+                     .resize({ width: 440, height: 440 })
+                     .toFile(resizedImagePath);
+                  
+                  images.push(req.files[i].filename);
+               } catch (imgError) {
+                  console.error("Error processing image:", imgError);
+                  // Continue with other images even if one fails
+               }
             }
          }
 
-         const categoryId = await Category.findOne({ name: products.category })
+         // Validate category
+         const categoryId = await Category.findOne({ name: products.category });
          if (!categoryId) {
-            return res.status(400).json({ message: "Category not found" })
+            const category = await Category.find({ isListed: true });
+            const brand = await Brand.find({ isBlocked: false });
+            return res.render('product-add', { 
+               cat: category, 
+               brand: brand, 
+               message: "Category not found"
+            });
          }
-         const brandId = await Brand.findOne({ brandName: products.brand })
-         if(!brandId){
-            return res.status(400).json({ message: "Brand not found" })
+         
+         // Validate brand
+         const brandId = await Brand.findOne({ brandName: products.brand });
+         if (!brandId) {
+            const category = await Category.find({ isListed: true });
+            const brand = await Brand.find({ isBlocked: false });
+            return res.render('product-add', { 
+               cat: category, 
+               brand: brand, 
+               message: "Brand not found"
+            });
          }
 
+         // Validate required fields - server side validation
+         if (!products.productName || !products.description || !products.regularPrice) {
+            const category = await Category.find({ isListed: true });
+            const brand = await Brand.find({ isBlocked: false });
+            return res.render('product-add', { 
+               cat: category, 
+               brand: brand, 
+               message: "All required fields must be filled"
+            });
+         }
 
+         // Validate image count
+         if (images.length < 3) {
+            const category = await Category.find({ isListed: true });
+            const brand = await Brand.find({ isBlocked: false });
+            return res.render('product-add', { 
+               cat: category, 
+               brand: brand, 
+               message: "At least 3 product images are required"
+            });
+         }
+
+         // Create new product
          const newProduct = new product({
             productName: products.productName,
             description: products.description,
             category: categoryId._id,
             regularPrice: products.regularPrice,
+            salePrice: products.salePrice || products.regularPrice, // Default to regular price if sale price is not provided
             discountPrice: products.discountPrice,
-            salePrice: products.salePrice,
             createdAt: Date.now(),
             productImages: images,
-            isListed: products.isListed,
-            quantity: products.quantity,
+            isListed: products.isListed !== undefined ? products.isListed : true, // Default to true if not specified
+            quantity: products.quantity || 0, // Default to 0 if not specified
             brand: brandId._id,
             status: "available",
+         });
 
-         })
          await newProduct.save();
-         return res.redirect('/admin/products')
+         return res.redirect('/admin/products');
+      } else {
+         const category = await Category.find({ isListed: true });
+         const brand = await Brand.find({ isBlocked: false });
+         return res.render('product-add', { 
+            cat: category,
+            brand: brand, 
+            message: "Product already exists"
+         });
       }
-      else {
-
-         const category = await Category.find({ isListed: true })
-         const brand = await Brand.find({ isBlocked: false })
-         return res.render('product-add', { cat: category,brand, message: "product already exists" })
-      }
-
-
    } catch (error) {
-      console.log("error adding product", error)
-      res.redirect('/pageerror')
+      console.log("Error adding product", error);
+      
+      // Provide more detailed error message
+      const category = await Category.find({ isListed: true }).catch(e => []);
+      const brand = await Brand.find({ isBlocked: false }).catch(e => []);
+      
+      return res.render('product-add', { 
+         cat: category,
+         brand: brand, 
+         message: "Error adding product: " + error.message
+      });
    }
-}
+};
 
 const getAllProducts = async (req, res) => {
    try {

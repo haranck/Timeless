@@ -4,22 +4,6 @@ const User = require("../../models/userSchema")
 const Cart = require("../../models/cartSchema")
 const { getDiscountPrice, getDiscountPriceCart } = require("../../helpers/offerHelper");
 
-const getWishlistTotal = async (userId) => {
-    try {
-        const wishlist = await Wishlist.findOne({ userId }).populate('items.productId');
-        if (!wishlist) return 0;
-
-        let total = 0;
-        wishlist.items.forEach(item => {
-            total += item.productId.price; // Assuming price exists in Product schema
-        });
-
-        return total;
-    } catch (error) {
-        console.error("Error fetching wishlist total:", error);
-        return 0;
-    }
-};
 
 
 const loadWishlist = async (req, res) => {

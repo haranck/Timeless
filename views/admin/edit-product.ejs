@@ -340,6 +340,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.js" integrity="sha512-lR8d1BXfYQuiqoM/LeGFVtxFyspzWFTZNyYIiE5O2CcAGtTCRRUMLloxATRuLz8EmR2fYqdXYlrGh+D6TVGp3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     let existingImages = <%- JSON.stringify(product.productImages || []) %>;
     let deletedImages = [];
@@ -359,27 +360,20 @@
         return false;
     }
 
-    // Create FormData object
     const formData = new FormData(form);
     
-    // Add deleted images array
     formData.set('deletedImages', JSON.stringify(deletedImages));
 
-    // Get the file input element
     const fileInput = document.getElementById('imageUpload');
     
-    // Check if there are files selected in the file input
     if (fileInput && fileInput.files.length > 0) {
-        // Remove any existing images fields (in case they were added before)
         formData.delete('images');
         
-        // Add each file with the field name 'images'
         for (let i = 0; i < fileInput.files.length; i++) {
             formData.append('images', fileInput.files[i]);
         }
     }
 
-    // Add cropped images
     const addedImagesContainer = document.getElementById('addedImagesContainer');
     const croppedImages = addedImagesContainer.getElementsByTagName('img');
     
@@ -397,12 +391,10 @@
         return new File([u8arr], filename, { type: mime });
     }
 
-    // Convert and append cropped images
     Array.from(croppedImages).forEach((img, index) => {
         formData.append(`croppedImage${index + 1}`, dataURLtoFile(img.src, `croppedImage${index + 1}.png`));
     });
 
-    // Submit form with AJAX
     fetch(form.action, {
         method: 'POST',
         body: formData
@@ -453,12 +445,10 @@
                     container.remove();
                 }
                 
-                // Add the image to deleted images if not already present
                 if (!deletedImages.includes(imageName)) {
                     deletedImages.push(imageName);
                 }
                 
-                // Update hidden input for deleted images
                 document.getElementById('deletedImagesInput').value = JSON.stringify(deletedImages);
 
                 Swal.fire({
@@ -504,15 +494,14 @@
             cropper.destroy();
         }
 
-        // Initialize Cropper
         cropper = new Cropper(cropperImage, {
-            aspectRatio: 1, // Square crop
+            aspectRatio: 1, 
             viewMode: 1,
             minCropBoxWidth: 100,
             minCropBoxHeight: 100
         });
 
-        // Show modal
+        
         document.getElementById('cropperModal').style.display = 'block';
     };
     reader.readAsDataURL(file);
@@ -521,7 +510,6 @@
     function saveCroppedImage() {
         if (!cropper) return;
 
-        // Validate total images
         if (existingImages.length - deletedImages.length + croppedImagesCount >= 4) {
             Swal.fire({
                 icon: 'error',
@@ -533,11 +521,9 @@
             return;
         }
 
-        // Get cropped image
         const croppedCanvas = cropper.getCroppedCanvas();
         const croppedDataUrl = croppedCanvas.toDataURL('image/jpeg');
 
-        // Create thumbnail
         const thumbnailContainer = document.createElement('div');
         thumbnailContainer.style.position = 'relative';
 
@@ -545,7 +531,6 @@
         thumbnailImg.src = croppedDataUrl;
         thumbnailImg.classList.add('thumbnail');
 
-        // Remove button
         const removeBtn = document.createElement('button');
         removeBtn.innerHTML = '&times;';
         removeBtn.classList.add('remove-image-btn');
@@ -554,21 +539,17 @@
         thumbnailContainer.appendChild(thumbnailImg);
         thumbnailContainer.appendChild(removeBtn);
 
-        // Add to images container
         const addedImagesContainer = document.getElementById('addedImagesContainer');
         addedImagesContainer.appendChild(thumbnailContainer);
 
-        // Create hidden input for cropped image
         const hiddenInput = document.createElement('input');
         hiddenInput.type = 'hidden';
         hiddenInput.name = `croppedImage${croppedImagesCount + 1}`;
         hiddenInput.value = croppedDataUrl;
         document.querySelector('form').appendChild(hiddenInput);
 
-        // Increment cropped images count
         croppedImagesCount++;
 
-        // Clear file input
         document.getElementById('imageUpload').value = '';
 
         closeCropperModal();
@@ -585,10 +566,8 @@
             confirmButtonText: 'Yes, remove it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Remove thumbnail
                 thumbnailContainer.remove();
 
-                // Decrement cropped images count
                 croppedImagesCount--;
 
                 Swal.fire({
@@ -604,10 +583,8 @@
     }
 
     function closeCropperModal() {
-        // Hide modal
         document.getElementById('cropperModal').style.display = 'none';
 
-        // Destroy cropper
         if (cropper) {
             cropper.destroy();
             cropper = null;
@@ -620,5 +597,4 @@
 
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
 <%- include("../../views/partials/admin/footer") %>

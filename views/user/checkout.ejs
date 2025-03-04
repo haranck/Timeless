@@ -471,11 +471,12 @@
             background-color: #dc3545;
             transform: translateY(-1px);
         }
+
         .product-image {
             width: 50px;
             height: 50px;
             object-fit: cover;
-            
+
         }
     </style>
 
@@ -608,43 +609,46 @@
                                             <div class="alert alert-danger">
                                                 <%= messages.error %>
                                             </div>
-                                        <% } %>
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Product</th>
-                                                    <th class="text-end">Price</th>
-                                                    <th class="text-center">Qty</th>
-                                                    <th class="text-end">Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <% if(cart.items.length> 0) { %>
-                                                    <% cart.items.forEach(item=> { %>
-                                                        <% if (item.productId) { %>
-                                                            <tr>
-                                                                <td style="display: flex; align-items: center;">
-                                                                    <img class="product-image" src="/uploads/product-images/<%= item.productId.productImages[0] %>"
-                                                                    alt="<%= item.productId.productName %>" class="product-image">
-                                                                    <%= item.productId.productName %>
-                                                                </td>     
-                                                                <td class="text-end">₹<%= item.price %> 
-                                                                </td>
-                                                                <td class="text-center">X<%= item.quantity %>
-                                                                </td>
-                                                                <td class="text-end">₹<%= item.totalPrice %>
-                                                                </td>
-                                                            </tr>
-                                                            <% } else { %>
-                                                                <tr>
-                                                                    <td colspan="4" class="text-center">No products in
-                                                                        the cart</td>
-                                                                </tr>
-                                                                <% } %>
-                                                                    <% }); %>
-                                                                <% } %>
-                                            </tbody>
-                                        </table>
+                                            <% } %>
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Product</th>
+                                                            <th class="text-end">Price</th>
+                                                            <th class="text-center">Qty</th>
+                                                            <th class="text-end">Total</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% if(cart.items.length> 0) { %>
+                                                            <% cart.items.forEach(item=> { %>
+                                                                <% if (item.productId) { %>
+                                                                    <tr>
+                                                                        <td style="display: flex; align-items: center;">
+                                                                            <img class="product-image"
+                                                                                src="/uploads/product-images/<%= item.productId.productImages[0] %>"
+                                                                                alt="<%= item.productId.productName %>"
+                                                                                class="product-image">
+                                                                            <%= item.productId.productName %>
+                                                                        </td>
+                                                                        <td class="text-end">₹<%= item.price %>
+                                                                        </td>
+                                                                        <td class="text-center">X<%= item.quantity %>
+                                                                        </td>
+                                                                        <td class="text-end">₹<%= item.totalPrice %>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <% } else { %>
+                                                                        <tr>
+                                                                            <td colspan="4" class="text-center">No
+                                                                                products in
+                                                                                the cart</td>
+                                                                        </tr>
+                                                                        <% } %>
+                                                                            <% }); %>
+                                                                                <% } %>
+                                                    </tbody>
+                                                </table>
                                     </div>
                                 </div>
 
@@ -732,39 +736,46 @@
                                         <li class="d-flex justify-content-between mb-2">
                                             Subtotal <span id="subtotal">₹<%=cart.totalPrice%></span>
                                         </li>
-                                        <% if(cart.totalPrice===0) {  %>   
-                                        <li class="d-flex justify-content-between mb-2">
-                                            Shipping Charge <span id="shipping-charge">₹0</span>
-                                        </li>
-                                        <% }else{ %>
+                                        <% if(cart.totalPrice===0) { %>
                                             <li class="d-flex justify-content-between mb-2">
-                                                Shipping Charge <span id="shipping-charge">₹40</span>
+                                                Shipping Charge <span id="shipping-charge">₹0</span>
                                             </li>
-                                        <% } %> 
-                                        <li class="d-flex justify-content-between mb-2">
-                                            Tax (0%) <span>₹0</span>
-                                        </li>
-                                        <li class="d-flex justify-content-between mb-2 text-success">
-                                            Discount <span id="discount">-₹0</span>
-                                        </li>
-                                        <% if(cart.totalPrice===0) {  %>   
-                                        <li class="d-flex justify-content-between total-amount" id="total-amount">
-                                            <strong>Total</strong> <strong id="total">₹0</strong>
-                                        </li>
-                                        <% }else{ %>
-                                            <li class="d-flex justify-content-between total-amount" id="total-amount">
-                                                <strong>Total</strong> <strong id="total">₹<%= cart.totalPrice + 40 %></strong>
-                                            </li>
-                                        <% } %> 
-                                        <div id="removeCouponSection" style="display: none;" class="mt-2 text-center">
-                                            <small class="text-success mb-2 d-block" id="appliedCouponText"></small>
-                                            <button class="btn btn-danger btn-sm w-100" id="removeCouponBtn"
-                                                onclick="removeCoupon()">
-                                                <i class="fas fa-times-circle"></i> Remove Coupon
-                                            </button>
-                                        </div>
-                                        <p id="couponMessage" style="color: red;margin-left: 76px;margin-top: 12px;">
-                                        </p>
+                                            <% }else{ %>
+                                                <li class="d-flex justify-content-between mb-2">
+                                                    Shipping Charge <span id="shipping-charge">₹40</span>
+                                                </li>
+                                                <% } %>
+                                                    <li class="d-flex justify-content-between mb-2">
+                                                        Tax (0%) <span>₹0</span>
+                                                    </li>
+                                                    <li class="d-flex justify-content-between mb-2 text-success">
+                                                        Discount <span id="discount">-₹0</span>
+                                                    </li>
+                                                    <% if(cart.totalPrice===0) { %>
+                                                        <li class="d-flex justify-content-between total-amount"
+                                                            id="total-amount">
+                                                            <strong>Total</strong> <strong id="total">₹0</strong>
+                                                        </li>
+                                                        <% }else{ %>
+                                                            <li class="d-flex justify-content-between total-amount"
+                                                                id="total-amount">
+                                                                <strong>Total</strong> <strong id="total">₹<%=
+                                                                        cart.totalPrice + 40 %></strong>
+                                                            </li>
+                                                            <% } %>
+                                                                <div id="removeCouponSection" style="display: none;"
+                                                                    class="mt-2 text-center">
+                                                                    <small class="text-success mb-2 d-block"
+                                                                        id="appliedCouponText"></small>
+                                                                    <button class="btn btn-danger btn-sm w-100"
+                                                                        id="removeCouponBtn" onclick="removeCoupon()">
+                                                                        <i class="fas fa-times-circle"></i> Remove
+                                                                        Coupon
+                                                                    </button>
+                                                                </div>
+                                                                <p id="couponMessage"
+                                                                    style="color: red;margin-left: 76px;margin-top: 12px;">
+                                                                </p>
                                     </ul>
 
                                 </div>
@@ -975,7 +986,7 @@
                     const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
                     const sanitizedOrderItems = sanitizeQuotes(<%- JSON.stringify(cart.items) %>);
-                    const orderedItems = sanitizedOrderItems
+                    const orderedItems = sanitizedOrderItems;
 
                     let subtotalText = document.getElementById("total").innerText.replace("₹", "").trim();
                     let totalAmount = parseFloat(subtotalText);
@@ -987,26 +998,26 @@
                     if (totalAmount <= 0) {
                         Swal.fire({
                             title: 'Error',
-                            text: 'Please remove some items from your cart before proceeding.',
+                            text: 'Your cart is empty or contains invalid items.',
                             icon: 'error',
                             confirmButtonText: 'GO TO CART'
-                        }).then(()=>{
+                        }).then(() => {
                             window.location.replace("/cart");
-                        })
+                        });
                         return;
                     }
-                    if(orderedItems.includes(undefined)){
+
+                    if (orderedItems.includes(undefined)) {
                         Swal.fire({
                             title: 'Error',
                             text: 'Please remove all undefined items from your cart before proceeding.',
                             icon: 'error',
                             confirmButtonText: 'OK'
-                        }).then(()=>{
+                        }).then(() => {
                             window.location.replace("/cart");
-                        })
+                        });
                         return;
                     }
-
 
                     const confirmResult = await Swal.fire({
                         title: 'Confirm Order',
@@ -1031,7 +1042,6 @@
                     });
 
                     if (paymentMethod === "cod") {
-                        // COD payment handling remains the same
                         const response = await fetch("/checkout", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
@@ -1056,15 +1066,59 @@
                             });
                             window.location.href = `/viewOrder/${data.orderId}`;
                         } else {
-                            Swal.fire({
-                                title: 'Error!',
-                                text: data.message || 'Minimum order amount for COD is ₹1000',
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
+                            if (data.unavailableItems && data.unavailableItems.length > 0) {
+                                let unavailableMessage = 'The Some items are no longer available:<br><ul>';
+                                // data.unavailableItems.forEach(item => {
+                                //     unavailableMessage += `<li>${item.name}: ${item.reason}</li>`;
+                                // });
+                                // unavailableMessage += '</ul>';
+
+                                Swal.fire({
+                                    title: 'Products Unavailable',
+                                    html: unavailableMessage,
+                                    icon: 'error',
+                                    confirmButtonText: 'UPDATE CART'
+                                }).then(() => {
+                                    window.location.replace("/cart");
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: data.error || 'Failed to place order',
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
                         }
                     } else if (paymentMethod === "razorpay") {
-                        // Razorpay payment flow
+                    
+                        const validateResponse = await fetch("/validateCheckoutItems", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                orderedItems
+                            })
+                        });
+
+                        const validateData = await validateResponse.json();
+
+                        if (!validateData.success) {
+            
+                            if (validateData.unavailableItems && validateData.unavailableItems.length > 0) {
+                                let unavailableMessage = 'The some items are no longer available:<br><ul>';
+                                
+                                Swal.fire({
+                                    title: 'Products Unavailable',
+                                    html: unavailableMessage,
+                                    icon: 'error',
+                                    confirmButtonText: 'UPDATE CART'
+                                }).then(() => {
+                                    window.location.replace("/cart");
+                                });
+                                return;
+                            }
+                        }
+
                         const orderResponse = await fetch("/createOrder", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
@@ -1078,8 +1132,6 @@
                         if (!orderData.success) {
                             throw new Error("Failed to create Razorpay order");
                         }
-
-                        // let failedOrderId = null;
 
                         const options = {
                             key: orderData.key,
@@ -1102,8 +1154,7 @@
                                             totalAmount,
                                             couponCode: appliedCouponCode,
                                             discountAmount,
-                                            paymentMethod: "razorpay",
-                                            // paymentStatus: "failed"
+                                            paymentMethod: "razorpay"
                                         })
                                     });
 
@@ -1119,11 +1170,26 @@
                                         });
 
                                         window.location.href = `/viewOrder/${verifyData.orderId}`;
-
                                     } else {
-                                        
-                                        throw new Error(verifyData.message || 'Payment verification failed');
+                                        if (verifyData.unavailableItems && verifyData.unavailableItems.length > 0) {
+                                            let unavailableMessage = 'Payment successful but some items became unavailable:<br><ul>';
+                                            verifyData.unavailableItems.forEach(item => {
+                                                unavailableMessage += `<li>${item.name}: ${item.reason}</li>`;
+                                            });
+                                            unavailableMessage += '</ul><br>Your payment will be refunded.';
 
+                                            Swal.fire({
+                                                title: 'Products Unavailable',
+                                                html: unavailableMessage,
+                                                icon: 'warning',
+                                                confirmButtonText: 'OK'
+                                            }).then(() => {
+                                                window.location.replace("/cart");
+                                            });
+                                            return;
+                                        }
+
+                                        throw new Error(verifyData.message || 'Payment verification failed');
                                     }
                                 } catch (error) {
                                     console.error("Payment verification error:", error);
@@ -1143,7 +1209,7 @@
                                             couponCode: appliedCouponCode,
                                             discountAmount,
                                             paymentMethod: "razorpay",
-                                            
+
                                         })
                                     });
                                     const failedData = await failedResponse.json();
@@ -1156,7 +1222,7 @@
                             modal: {
                                 ondismiss: async function () {
                                     try {
-                                        // Create failed order when modal is dismissed
+                                       
                                         const response = await fetch("/verifyPayment", {
                                             method: "POST",
                                             headers: { "Content-Type": "application/json" },

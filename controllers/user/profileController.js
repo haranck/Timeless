@@ -339,6 +339,7 @@ const verifyCurrentPassword = async (req, res) => {
 const updatePassword = async (req, res) => {
     try {
         const userId = req.session.user;
+        console.log("userId",userId)
         const { newPassword } = req.body;
 
         if (!newPassword) {
@@ -348,7 +349,7 @@ const updatePassword = async (req, res) => {
             });
         }
 
-        // Validate password
+        
         if (newPassword.length < 6) {
             return res.status(400).json({ 
                 success: false, 
@@ -356,19 +357,15 @@ const updatePassword = async (req, res) => {
             });
         }
 
-        // Hash new password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        // Update password in database
         await User.findByIdAndUpdate(userId, { 
             password: hashedPassword 
         });
 
         res.json({ 
             success: true, 
-            message: 'Password updated successfully' ,
-            name: updatedUser.name,
-            phone: updatedUser.phone
+            message: 'Password updated successfully' 
         });
 
     } catch (error) {

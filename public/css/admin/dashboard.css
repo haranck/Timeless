@@ -338,6 +338,10 @@ body {
    background: rgba(255, 255, 255, 0.2);
    border-radius: 50%;
 }
+.summary-info{
+   margin-right: 50px;
+
+}
 
 .summary-info h3 {
    font-size: 1.8rem;

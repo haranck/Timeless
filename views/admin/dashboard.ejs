@@ -43,10 +43,10 @@
                     <h3>₹<%= Math.round(dashboardData.summary.totalRevenue).toLocaleString() %></h3>
                     <p>Total Revenue</p>
                 </div>
-                <div class="summary-change <%= dashboardData.summary.revenueGrowth >= 0 ? 'increase' : 'decrease' %>">
-                    <i class="fas fa-arrow-<%= dashboardData.summary.revenueGrowth >= 0 ? 'up' : 'down' %>"></i>
-                    <span><%= Math.abs(dashboardData.summary.revenueGrowth) %>%</span>
-                </div>
+                <!-- <div class="summary-change <dashboardData.summary.revenueGrowth >= 0 ? 'increase' : 'decrease' %>">
+                    <i class="fas fa-arrow-< dashboardData.summary.revenueGrowth >= 0 ? 'up' : 'down' %>"></i>
+                    <span>< Math.abs(dashboardData.summary.revenueGrowth) %>%</span>
+                </div> -->
             </div>
             </a>
             <a href="/admin/customers" style="text-decoration: none; color: inherit;">
@@ -58,11 +58,11 @@
                     <h3><%= dashboardData.summary.totalCustomers.toLocaleString() %></h3>
                     <p>Total Customers</p>
                 </div>
-                <div class="summary-change <%= dashboardData.summary.customerGrowth >= 0 ? 'increase' : 'decrease' %>">
-                    <i class="fas fa-arrow-<%= dashboardData.summary.customerGrowth >= 0 ? 'up' : 'down' %>"></i>
-                    <span><%= Math.abs(dashboardData.summary.customerGrowth) %>%</span>
-                    <!-- <span>89%</span> -->
-                </div>
+                <!-- <div class="summary-change < dashboardData.summary.customerGrowth >= 0 ? 'increase' : 'decrease' %>">
+                    <i class="fas fa-arrow-< dashboardData.summary.customerGrowth >= 0 ? 'up' : 'down' %>"></i>
+                    <span><Math.abs(dashboardData.summary.customerGrowth) %>%</span>
+                     <span>89%</span> 
+                </div> -->
             </div>
             </a>
             <a href="/admin/orders" style="text-decoration: none; color: inherit;">
@@ -74,10 +74,10 @@
                     <h3><%= dashboardData.summary.totalOrders.toLocaleString() %></h3>
                     <p>Total Orders</p>
                 </div>
-                <div class="summary-change <%= dashboardData.summary.orderGrowth >= 0 ? 'increase' : 'decrease' %>">
-                    <i class="fas fa-arrow-<%= dashboardData.summary.orderGrowth >= 0 ? 'up' : 'down' %>"></i>
-                    <span><%= Math.abs(dashboardData.summary.orderGrowth) %>%</span>
-                </div>
+                <!-- <div class="summary-change < dashboardData.summary.orderGrowth >= 0 ? 'increase' : 'decrease' %>">
+                    <i class="fas fa-arrow-< dashboardData.summary.orderGrowth >= 0 ? 'up' : 'down' %>"></i>
+                    <span>< Math.abs(dashboardData.summary.orderGrowth) %>%</span>
+                </div> -->
             </div>
             </a>
         </div>

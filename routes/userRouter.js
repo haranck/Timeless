@@ -37,6 +37,7 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
     res.redirect('/')
 })
 
+
 router.get("/login", userController.loadLogin);
 router.post("/login", userController.login);
 router.get('/logout', userController.logout)
@@ -79,6 +80,7 @@ router.post("/addCheckoutAddress", userAuth, checkoutController.addCheckoutAddre
 router.get("/viewOrder/:orderId", userAuth, checkoutController.viewOrder)
 router.patch("/cancelOrder/:orderId", userAuth, checkoutController.cancelOrder)
 router.get('/invoice/:id', userAuth, checkoutController.generateInvoice);
+router.post("/validateCheckoutItems",userAuth, checkoutController.validateCheckoutItems)
 
 
 
