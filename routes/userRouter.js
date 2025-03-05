@@ -28,7 +28,6 @@ router.post("/filter", userController.filterProducts)
 
 router.get('/productDetails', userAuth, productController.productDetails)
 
-
 //google auth
 
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -36,7 +35,6 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
     req.session.user = req.session.passport.user
     res.redirect('/')
 })
-
 
 router.get("/login", userController.loadLogin);
 router.post("/login", userController.login);

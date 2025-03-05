@@ -240,11 +240,13 @@
                                     <label for="category" class="form-label">Category</label>
                                     <select name="category" class="form-select" id="category">
                                         <% cat.forEach(function(category) { %>
-                                            <option value="<%= category.name %>" <%= product.category.toString() === category._id.toString() ? 'selected' : '' %>>
+                                            <option value="<%= category._id %>" 
+                                                <%= product.category.toString() === category._id.toString() ? 'selected' : '' %>>
                                                 <%= category.name %>
                                             </option>
                                         <% }); %>
                                     </select>
+                                    <div id="category-error" class="error-message"></div>
                                 </div>
                                 <div class="col-lg-6 mb-4" id="flexy">
                                     <label for="quantity" class="form-label">Quantity</label>
@@ -260,6 +262,17 @@
                                 <div class="col-lg-4 mb-4" id="flexy">
                                     <label for="salePrice" class="form-label">Sale Price</label>
                                     <input type="number" placeholder="Enter sale price" name="salePrice" class="form-control" id="salePrice" value="<%= product.salePrice %>">
+                                </div>
+                                <div class="col-lg-6 mb-4" id="flexy">
+                                    <label for="brand" class="form-label">Brand</label>
+                                    <select name="brand" class="form-select" id="brand">
+                                        <% brand.forEach(function(brand) { %>
+                                            <option value="<%= brand.brandName %>"
+                                                <%= product.brand.toString() === brand._id.toString() ? 'selected' : '' %>>
+                                                <%= brand.brandName %>
+                                            </option>
+                                        <% }); %>
+                                    </select>
                                 </div>
                                 
                             </div>

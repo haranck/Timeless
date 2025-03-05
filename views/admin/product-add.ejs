@@ -115,7 +115,7 @@
 
         /* Button Styling */
         .btn {
-            background-color: #2ecc71;
+            background: linear-gradient(to right, #FFD700, #FF8C00);
             color: white;
             border: none;
             padding: 12px 25px;
@@ -123,12 +123,16 @@
             font-weight: 600;
             border-radius: 8px;
             letter-spacing: 0.5px;
-            transition: all 0.3s ease;
+            transition: all 0.3sease;
             text-transform: uppercase;
+            margin-left: 411px;
+            margin-top: 35px;
+            width: 193px;
+            height: 53px;
         }
 
         .btn:hover {
-            background-color: #27ae60;
+            background: linear-gradient(to right, #FFC300, #FF5733);
             transform: translateY(-3px);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
@@ -538,6 +542,15 @@
                 confirmButtonText: 'Yes, add it!'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Product Added',
+                        text: 'Product has been added successfully',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000
+                    })
                     document.getElementById('addProductForm').submit();
                 }
             });

@@ -706,16 +706,16 @@ const removeCoupon = async (req, res) => {
         });
     }
 }
+
+
 const generateInvoice = async (req, res) => {
     try {
         const orderId = req.params.id;
 
-        // Ensure the order ID is valid
         if (!orderId) {
             return res.status(400).send('Invalid Order ID');
         }
 
-        // Find the order and populate necessary fields
         const order = await Order.findById(orderId)
             .populate({
                 path: 'order_items.productId',
@@ -729,12 +729,10 @@ const generateInvoice = async (req, res) => {
             'Customer';
 
 
-        // Check if order exists
         if (!order) {
             return res.status(404).send('Order not found');
         }
 
-        // Ensure the invoices directory exists
         const invoiceDir = path.join(__dirname, '../../publics/invoices');
         if (!fs.existsSync(invoiceDir)) {
             fs.mkdirSync(invoiceDir, { recursive: true });
@@ -754,7 +752,6 @@ const generateInvoice = async (req, res) => {
         });
         doc.pipe(writeStream);
 
-        // Company Header
         doc.font('Helvetica-Bold')
             .fontSize(25)
             .text('Timeless Aura', { align: 'center' })
@@ -762,21 +759,18 @@ const generateInvoice = async (req, res) => {
             .text('Tax Invoice', { align: 'center' })
             .moveDown(1.5);
 
-        // Invoice Details
         doc.font('Helvetica')
             .fontSize(10)
             .text(`Invoice Number: ${order._id}`, { align: 'left' })
             .text(`Date of Issue: ${order.createdAt.toLocaleDateString()}`, { align: 'left' })
             .moveDown(1);
 
-        // Billing Details
         doc.font('Helvetica-Bold')
             .text('Billing Details:', { underline: false })
             .moveDown(0.5)
             .font('Helvetica')
             .text(`Customer Name: ${customerName}`, { align: 'left' })
             .moveDown(1);
-        // Payment Details
         doc.font('Helvetica-Bold')
             .text('Payment Details:', { underline: false })
             .moveDown(1)
@@ -787,12 +781,10 @@ const generateInvoice = async (req, res) => {
             .text(`Payment Status: ${order.status}`, { align: 'left' })
             .moveDown(1);
 
-        // Order Summary
         doc.font('Helvetica-Bold')
             .fontSize(12)
             .text('Order Summary', { underline: false });
 
-        // Table Header
         const startX = 50;
         const columnWidths = { product: 250, quantity: 80, price: 80, total: 80 };
         let y = doc.y + 10;
@@ -807,7 +799,6 @@ const generateInvoice = async (req, res) => {
             .lineTo(550, doc.y)
             .stroke();
 
-        // Populate Product Details
         let runningTotal = 0;
         order.order_items.forEach((item) => {
             y = doc.y + 5;
@@ -822,8 +813,7 @@ const generateInvoice = async (req, res) => {
                 .moveDown(0.5);
         });
 
-        // Financial Summary
-        // Financial Summary
+    
         doc.moveDown(1)
             .moveTo(startX, doc.y)
             .lineTo(550, doc.y)
@@ -833,24 +823,20 @@ const generateInvoice = async (req, res) => {
         const summaryStartY = doc.y; // Capture the starting Y position
         const lineHeight = 15; // Adjust as needed for spacing
 
-        // Subtotal
         doc.font('Helvetica-Bold').text('Subtotal', 400, summaryStartY, { width: 100, align: 'right' });
         doc.font('Helvetica').text(`₹${runningTotal.toFixed(2)}`, 500, summaryStartY, { width: 50, align: 'right' });
 
-        // Discount
         doc.font('Helvetica-Bold').text('Discount', 400, summaryStartY + lineHeight, { width: 100, align: 'right' });
         doc.font('Helvetica').text(`₹${order.discount.toFixed(2)}`, 500, summaryStartY + lineHeight, { width: 50, align: 'right' });
 
-        // Delivery Charge
         doc.font('Helvetica-Bold').text('Delivery Charge', 400, summaryStartY + lineHeight * 2, { width: 100, align: 'right' });
         doc.font('Helvetica').text('₹40.00', 500, summaryStartY + lineHeight * 2, { width: 50, align: 'right' });
 
-        // Grand Total
         doc.font('Helvetica-Bold').text('Grand Total', 400, summaryStartY + lineHeight * 3, { width: 100, align: 'right' });
         doc.font('Helvetica-Bold').text(`₹${(runningTotal - order.discount + 40)}`, 500, summaryStartY + lineHeight * 3, { width: 50, align: 'right' });
 
 
-        // Footer
+        
 
         doc.moveDown(3)
             .font('Helvetica')

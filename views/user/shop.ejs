@@ -480,7 +480,7 @@
 
 
                                 <!-- brand -->
-                                <div class="card">
+                                <!-- <div class="card">
                                     <div class="card-heading">
                                         <a data-toggle="collapse" data-target="#collapseTwo">Brands</a>
                                     </div>
@@ -488,27 +488,56 @@
                                         <div class="card-body">
                                             <div class="shop__sidebar__categories">
                                                 <ul class="nice-scroll">
-                                                    <% if (brand && brand.length> 0) { %>
-                                                        <% for (let i=0; i < brand.length; i++) { %>
+                                                    < if (brand && brand.length> 0) { %>
+                                                        < for (let i=0; i < brand.length; i++) { %>
                                                             <li>
                                                                 <label>
                                                                     <input type="checkbox" class="filter-category"
-                                                                        value="<%= brand[i]._id %>" />
-                                                                    <%= brand[i].brandName %> <img
+                                                                        value="<= brand[i]._id %>" />
+                                                                    <= brand[i].brandName %> <img
                                                                             style="margin-left: 5px; max-width: 42px; border-radius: 23px;"
-                                                                            src="/uploads/brands/<%= brand[i].brandImage %>"
-                                                                            alt="<%= brand[i].brandName %>">
+                                                                            src="/uploads/brands/<= brand[i].brandImage %>"
+                                                                            alt="<= brand[i].brandName >">
                                                                 </label>
                                                             </li>
-                                                            <% } %>
-                                                                <% } else { %>
+                                                            < } >
+                                                                < } else { >
                                                                     <li>No brands available</li>
-                                                                <% } %>
+                                                                < } >
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> -->
+
+
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseBrands">Brands</a>
+                                    </div>
+                                    <div id="collapseBrands" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__categories">
+                                                <ul class="nice-scroll">
+                                                    <% if (brand && brand.length > 0) { %>
+                                                        <% for (let i = 0; i < brand.length; i++) { %>
+                                                            <li>
+                                                                <label>
+                                                                    <input type="checkbox" class="filter-brand" 
+                                                                           value="<%= brand[i]._id %>" />
+                                                                    <%= brand[i].brandName %>
+                                                                </label>
+                                                            </li>
+                                                        <% } %>
+                                                    <% } else { %>
+                                                        <li>No brands available</li>
+                                                    <% } %>
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
 
                                 <div class="card">
                                     <div class="card-heading">
@@ -846,6 +875,7 @@
 
                 // Gather filter values
                 const selectedCategories = Array.from(document.querySelectorAll('.filter-category:checked')).map(cb => cb.value);
+                const selectedBrands = Array.from(document.querySelectorAll('.filter-brand:checked')).map(cb => cb.value);
                 const selectedPrice = document.querySelector('.filter-price:checked')?.value || "";
                 const sortBy = document.querySelector(".shop__product__option__right select").value;
                 const searchQuery = document.querySelector(".shop__sidebar__search input").value.trim()
@@ -858,6 +888,7 @@
                     body: JSON.stringify({
                         categories: selectedCategories,
                         priceRange: selectedPrice,
+                        brands: selectedBrands,
                         sortBy,
                         searchQuery,
                         page
