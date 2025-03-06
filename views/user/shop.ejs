@@ -7,450 +7,535 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
         /* Product Card Styles (same as home.ejs) */
-        .product-card {
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+         /* Product Card Styles (same as home.ejs) */
+    .product-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .product-card:hover {
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-5px);
+    }
+
+    .product-card__image {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .product-card__image img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-card__image img {
+        transform: scale(1.05);
+    }
+
+    .product-card__actions {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 10;
+    }
+
+    .product-card__wishlist-btn {
+        background-color: rgba(255, 255, 255, 0.9);
+        color: #000;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .product-card__wishlist-btn:hover {
+        background-color: #000;
+        color: #fff;
+    }
+
+    .product-card__details {
+        padding: 15px;
+    }
+
+    .product-card__title {
+        font-weight: bold;
+        margin-bottom: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: flex;
+        justify-content: center;
+    }
+
+    .product-card__pricing {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .product-card__sale-price {
+        font-weight: 700;
+        color: #000;
+        margin-right: 10px;
+    }
+
+    .product-card__regular-price {
+        text-decoration: line-through;
+        color: #888;
+        font-size: 0.9em;
+    }
+
+    .product-card__rating {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        justify-content: center;
+    }
+
+    .product-card__rating .fa-star {
+        color: #FFD700;
+        margin-right: 3px;
+    }
+
+    .product-card__rating .fa-star.active {
+        color: #FFD700;
+        /* Vibrant gold color */
+    }
+    
+
+    .product-card__rating-count {
+        color: #888;
+        font-size: 0.8em;
+        margin-left: 5px;
+    }
+
+    .product-card__cta {
+        width: 100%;
+    }
+
+    .product-card__cart-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 10px;
+        background-color: #000;
+        color: #fff;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .product-card__cart-btn i {
+        margin-right: 8px;
+    }
+
+    .product-card__cart-btn:hover {
+        background-color: #333;
+        transform: translateY(-2px);
+    }
+
+    /* Pagination Styles */
+    .shop-pagination .pagination {
+        margin-top: 30px;
+    }
+
+    .shop-pagination .page-link {
+        color: #000;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        margin: 0 5px;
+        padding: 10px 15px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .shop-pagination .page-link:hover {
+        background-color: #000;
+        color: #fff;
+        border-color: #000;
+    }
+
+    .shop-pagination .page-item.active .page-link {
+        background-color: #000;
+        color: #fff;
+        border-color: #000;
+    }
+
+    /* Filter Sidebar Styles */
+    .shop-filter-sidebar {
+        background-color: #fff;
+        padding: 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .shop-filter-sidebar__section {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .shop-filter-sidebar__section:last-child {
+        border-bottom: none;
+    }
+
+    .shop-filter-sidebar__title {
+        font-weight: 600;
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+
+    .shop-filter-sidebar__title i {
+        margin-right: 8px;
+        color: #666;
+    }
+
+    /* Search Input */
+    .shop-filter-sidebar__search {
+        margin-bottom: 10px;
+    }
+
+    .input-group {
+        display: flex;
+    }
+
+    .input-group input {
+        flex-grow: 1;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px 0 0 4px;
+    }
+
+    .input-group-append .btn {
+        padding: 8px 12px;
+        border-radius: 0 4px 4px 0;
+    }
+
+    /* Categories */
+    .shop-filter-sidebar__categories {
+        max-height: 250px;
+        overflow-y: auto;
+    }
+
+    .category-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .category-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .category-checkbox {
+        margin-right: 10px;
+    }
+
+    .category-item label {
+        flex-grow: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+    }
+
+    /* Price Range */
+    .shop-filter-sidebar__price-range {
+        margin-bottom: 10px;
+    }
+
+    .price-range-container {
+        width: 100%;
+    }
+
+    .price-range-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .price-range-wrapper {
+        position: relative;
+        width: 100%;
+        height: 5px;
+        background-color: #ddd;
+        border-radius: 3px;
+    }
+
+    .price-range-track {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .price-range-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 100%;
+        background-color: #000;
+        border-radius: 3px;
+    }
+
+    .price-range-slider input[type="range"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        background: transparent;
+        pointer-events: none;
+    }
+
+    .price-range-slider input[type="range"]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 5px;
+        background: #ddd;
+        border-radius: 3px;
+    }
+
+    .price-range-slider input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 15px;
+        height: 15px;
+        background: #000;
+        cursor: pointer;
+        border-radius: 50%;
+        pointer-events: all;
+    }
+
+    .price-range-values {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        color: #666;
+        margin-top: 10px;
+    }
+
+    /* Apply Filters Button */
+    #apply-filters {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        background-color: #000;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+
+    #apply-filters:hover {
+        background-color: #333;
+    }
+
+    /* Toast animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
         }
 
-        .product-card:hover {
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-            transform: translateY(-5px);
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .toastify {
+        animation: fadeInUp 0.5s ease-in-out;
+    }
+
+    /* Green tick animation */
+    @keyframes tickPop {
+        0% {
+            transform: scale(0);
+            opacity: 0;
         }
 
-        .product-card__image {
-            position: relative;
-            overflow: hidden;
+        50% {
+            transform: scale(1.3);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .toastify-avatar {
+        width: 24px;
+        /* Adjust icon size */
+        height: 24px;
+        animation: tickPop 0.5s ease-in-out;
+    }
+
+    .custom-quantity-input {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        overflow: hidden;
+        width: fit-content;
+    }
+
+    .quantity-btn {
+        background: #f8f9fa;
+        border: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.2s;
+    }
+
+    .quantity-btn:hover {
+        background: #e9ecef;
+    }
+
+    .quantity-value {
+        width: 40px;
+        text-align: center;
+        border: none;
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        padding: 8px 0;
+        font-size: 14px;
+    }
+
+    .quantity-value::-webkit-inner-spin-button,
+    .quantity-value::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Mobile responsiveness additions */
+    .filter-toggle-btn {
+        display: none;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        background-color: #000;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .filter-toggle-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-toggle-btn i {
+            margin-right: 8px;
+        }
+
+        .shop__sidebar {
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        .shop__sidebar.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .product-card__image img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            transition: transform 0.3s ease;
+            height: 200px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .category-item label {
+            max-width: 150px;
         }
 
-        .product-card:hover .product-card__image img {
-            transform: scale(1.05);
-        }
-
-        .product-card__actions {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 10;
-        }
-
-        .product-card__wishlist-btn {
-            background-color: rgba(255, 255, 255, 0.9);
-            color: #000;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .product-card__wishlist-btn:hover {
-            background-color: #000;
-            color: #fff;
-        }
-
-        .product-card__details {
-            padding: 15px;
-        }
-
-        .product-card__title {
-            font-weight: bold;
-            margin-bottom: 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: flex;
-            justify-content: center;
-        }
-
-        .product-card__pricing {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .product-card__sale-price {
-            font-weight: 700;
-            color: #000;
-            margin-right: 10px;
-        }
-
-        .product-card__regular-price {
-            text-decoration: line-through;
-            color: #888;
-            font-size: 0.9em;
-        }
-
-        .product-card__rating {
-            display: flex;
-            align-items: center;
+        .shop__product__option__left,
+        .shop__product__option__right {
+            text-align: center;
             margin-bottom: 15px;
-            justify-content: center;
         }
 
-        .product-card__rating .fa-star {
-            color: #FFD700;
-            margin-right: 3px;
-        }
-
-        .product-card__rating .fa-star.active {
-            color: #FFD700;
-            /* Vibrant gold color */
-        }
-        
-
-        .product-card__rating-count {
-            color: #888;
-            font-size: 0.8em;
-            margin-left: 5px;
-        }
-
-        .product-card__cta {
-            width: 100%;
-        }
-
-        .product-card__cart-btn {
+        .shop__product__option__right {
             display: flex;
-            align-items: center;
             justify-content: center;
-            width: 100%;
-            padding: 10px;
-            background-color: #000;
-            color: #fff;
-            border-radius: 6px;
-            transition: all 0.3s ease;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
-        .product-card__cart-btn i {
-            margin-right: 8px;
+        .shop__product__option__right p {
+            margin-right: 10px;
+            margin-bottom: 0;
         }
 
-        .product-card__cart-btn:hover {
-            background-color: #333;
-            transform: translateY(-2px);
+        .product-card {
+            margin-bottom: 20px;
         }
+    }
 
-        /* Pagination Styles */
-        .shop-pagination .pagination {
-            margin-top: 30px;
+    @media (max-width: 576px) {
+        .product-card__image img {
+            height: 180px;
         }
 
         .shop-pagination .page-link {
-            color: #000;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            margin: 0 5px;
-            padding: 10px 15px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .shop-pagination .page-link:hover {
-            background-color: #000;
-            color: #fff;
-            border-color: #000;
-        }
-
-        .shop-pagination .page-item.active .page-link {
-            background-color: #000;
-            color: #fff;
-            border-color: #000;
-        }
-
-        /* Filter Sidebar Styles */
-        .shop-filter-sidebar {
-            background-color: #fff;
-            padding: 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            max-width: 100%;
-            overflow: hidden;
-        }
-
-        .shop-filter-sidebar__section {
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .shop-filter-sidebar__section:last-child {
-            border-bottom: none;
-        }
-
-        .shop-filter-sidebar__title {
-            font-weight: 600;
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-        }
-
-        .shop-filter-sidebar__title i {
-            margin-right: 8px;
-            color: #666;
-        }
-
-        /* Search Input */
-        .shop-filter-sidebar__search {
-            margin-bottom: 10px;
-        }
-
-        .input-group {
-            display: flex;
-        }
-
-        .input-group input {
-            flex-grow: 1;
             padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px 0 0 4px;
+            margin: 0 3px;
         }
-
-        .input-group-append .btn {
-            padding: 8px 12px;
-            border-radius: 0 4px 4px 0;
-        }
-
-        /* Categories */
-        .shop-filter-sidebar__categories {
-            max-height: 250px;
-            overflow-y: auto;
-        }
-
-        .category-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .category-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .category-checkbox {
-            margin-right: 10px;
-        }
-
-        .category-item label {
-            flex-grow: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 200px;
-        }
-
-        /* Price Range */
-        .shop-filter-sidebar__price-range {
-            margin-bottom: 10px;
-        }
-
-        .price-range-container {
-            width: 100%;
-        }
-
-        .price-range-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .price-range-wrapper {
-            position: relative;
-            width: 100%;
-            height: 5px;
-            background-color: #ddd;
-            border-radius: 3px;
-        }
-
-        .price-range-track {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        .price-range-fill {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-            height: 100%;
-            background-color: #000;
-            border-radius: 3px;
-        }
-
-        .price-range-slider input[type="range"] {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-
-            background: transparent;
-            pointer-events: none;
-        }
-
-        .price-range-slider input[type="range"]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 5px;
-            background: #ddd;
-            border-radius: 3px;
-        }
-
-        .price-range-slider input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 15px;
-            height: 15px;
-            background: #000;
-            cursor: pointer;
-            border-radius: 50%;
-            pointer-events: all;
-        }
-
-        .price-range-values {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        /* Apply Filters Button */
-        #apply-filters {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            background-color: #000;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-
-        #apply-filters:hover {
-            background-color: #333;
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .shop-filter-sidebar {
-                margin-bottom: 20px;
-            }
-
-            .category-item label {
-                max-width: 150px;
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .toastify {
-            animation: fadeInUp 0.5s ease-in-out;
-        }
-
-        /* Green tick animation */
-        @keyframes tickPop {
-            0% {
-                transform: scale(0);
-                opacity: 0;
-            }
-
-            50% {
-                transform: scale(1.3);
-                opacity: 1;
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        .toastify-avatar {
-            width: 24px;
-            /* Adjust icon size */
-            height: 24px;
-            animation: tickPop 0.5s ease-in-out;
-        }
-
-        .custom-quantity-input {
-            display: flex;
-            align-items: center;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-            width: fit-content;
-        }
-
-        .quantity-btn {
-            background: #f8f9fa;
-            border: none;
-            padding: 8px 12px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.2s;
-        }
-
-        .quantity-btn:hover {
-            background: #e9ecef;
-        }
-
-        .quantity-value {
-            width: 40px;
-            text-align: center;
-            border: none;
-            border-left: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-            padding: 8px 0;
-            font-size: 14px;
-        }
-
-        .quantity-value::-webkit-inner-spin-button,
-        .quantity-value::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+    }
     </style>
     <section class="shop spad">
         <div class="container">
             <div class="row">
+                <!-- Mobile Filter Toggle Button -->
+                <div class="shop__sidebar__search" style="margin-left: 30px;">
+                    <form action="" method="post">
+                        <input type="text" placeholder="Search..." id="searchInput">
+                        <button type="submit"><i class="fa fa-search"></i></button>
+                    </form>
+                </div>
+                <div class="col-12">
+                    
+                    <button class="filter-toggle-btn" id="filterToggleBtn">
+                        <i class="fa fa-filter"></i> Show Filters
+                    </button>
+                </div>
+    
+                <!-- Filter Sidebar -->
                 <div class="col-lg-3">
-                    <div class="shop__sidebar">
-                        <div class="shop__sidebar__search">
-                            <form action="" method="post">
-                                <input type="text" placeholder="Search..." id="searchInput">
-                                <button type="submit"><i class="fa fa-search"></i></button>
-                            </form>
-                        </div>
+                    <div class="shop__sidebar" id="shopSidebar">
+                       
                         <div class="shop__sidebar__accordion">
                             <div class="accordion" id="accordionExample">
-
-
-                                <!-- category -->
+                                <!-- Category -->
                                 <div class="card">
                                     <div class="card-heading">
                                         <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
@@ -468,49 +553,17 @@
                                                                     <%= category[i].name %>
                                                                 </label>
                                                             </li>
-                                                            <% } %>
-                                                                <% } else { %>
-                                                                    <li>No categories available</li>
-                                                                    <% } %>
+                                                        <% } %>
+                                                    <% } else { %>
+                                                        <li>No categories available</li>
+                                                    <% } %>
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-
-                                <!-- brand -->
-                                <!-- <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseTwo">Brands</a>
-                                    </div>
-                                    <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__categories">
-                                                <ul class="nice-scroll">
-                                                    < if (brand && brand.length> 0) { %>
-                                                        < for (let i=0; i < brand.length; i++) { %>
-                                                            <li>
-                                                                <label>
-                                                                    <input type="checkbox" class="filter-category"
-                                                                        value="<= brand[i]._id %>" />
-                                                                    <= brand[i].brandName %> <img
-                                                                            style="margin-left: 5px; max-width: 42px; border-radius: 23px;"
-                                                                            src="/uploads/brands/<= brand[i].brandImage %>"
-                                                                            alt="<= brand[i].brandName >">
-                                                                </label>
-                                                            </li>
-                                                            < } >
-                                                                < } else { >
-                                                                    <li>No brands available</li>
-                                                                < } >
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> -->
-
-
+    
+                                <!-- Brands -->
                                 <div class="card">
                                     <div class="card-heading">
                                         <a data-toggle="collapse" data-target="#collapseBrands">Brands</a>
@@ -524,7 +577,7 @@
                                                             <li>
                                                                 <label>
                                                                     <input type="checkbox" class="filter-brand" 
-                                                                           value="<%= brand[i]._id %>" />
+                                                                            value="<%= brand[i]._id %>" />
                                                                     <%= brand[i].brandName %>
                                                                 </label>
                                                             </li>
@@ -537,8 +590,8 @@
                                         </div>
                                     </div>
                                 </div>
-
-
+    
+                                <!-- Price Filter -->
                                 <div class="card">
                                     <div class="card-heading">
                                         <a data-toggle="collapse" data-target="#collapseThree">Filter Price</a>
@@ -601,68 +654,19 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- end category -->
-                                <!-- start size -->
-                                <!-- <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseFour">Size</a>
-                                    </div>
-                                    <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__size">
-                                                <label for="xs">35mm
-                                                    <input type="checkbox" class="filter-size" value="xs" />
-                                                </label>
-                                                <label for="sm">37mm
-                                                    <input type="checkbox" class="filter-size" value="sm" />
-                                                </label>
-                                                <label for="md">40mm
-                                                    <input type="checkbox" class="filter-size" value="md" />
-                                                </label>
-                                                <label for="xl">42mm
-                                                    <input type="checkbox" class="filter-size" value="xl" />
-                                                </label>
-                                                <label for="2xl">45mm
-                                                    <input type="checkbox" class="filter-size" value="2xl" />
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> -->
-                                <!-- end size -->
-
-
-                                <!-- <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
-                                    </div>
-                                    <div id="collapseSix" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__tags">
-                                                <a href="#">Product</a>
-                                                <a href="#">Bags</a>
-                                                <a href="#">Shoes</a>
-                                                <a href="#">Fashio</a>
-                                                <a href="#">Clothing</a>
-                                                <a href="#">Hats</a>
-                                                <a href="#">Accessories</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> -->
-
+    
+                                <!-- Apply Filter Button -->
                                 <div class="apply-filter">
-                                    <button id="applyFilter" class="btn "
-                                        style="background-color: #0c0c0c; color: white;">Apply Filter</button>
+                                    <button id="applyFilter" class="btn" style="background-color: #0c0c0c; color: white;">
+                                        Apply Filter
+                                    </button>
                                 </div>
-
                             </div>
                         </div>
                     </div>
                 </div>
-
-
-
+    
+                <!-- Product Display Area -->
                 <div class="col-lg-9">
                     <div class="shop__product__option">
                         <div class="row">
@@ -677,9 +681,6 @@
                                     <select id="priceFilter" onchange="applyFilter()">
                                         <option value="price-low-high">Price: Low to High</option>
                                         <option value="price-high-low">Price: High to Low</option>
-                                        <!-- <option value="0-55">₹0 - ₹55</option>
-                                        <option value="55-100">₹55 - ₹100</option>
-                                        <option value="100">Above ₹100</option> -->
                                         <option value="new-arrivals">New Arrivals</option>
                                         <option value="a-z">A-Z</option>
                                         <option value="z-a">Z-A</option>
@@ -691,7 +692,7 @@
                     <div class="row product__filter">
                         <% if(products && products.length > 0) { %>
                         <% for (let i=0; i < products.length; i++) { %>
-                            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                            <div class="col-lg-4 col-md-6 col-sm-6 col-12 mb-4">
                                 <div class="product-card">
                                     <div class="product-card__image">
                                         <a href="/productDetails?id=<%= products[i]._id %>">
@@ -720,20 +721,18 @@
                                         
                                         <div class="product-card__rating">
                                             <% for(let j=0; j < 5; j++) { %>
-                                                <i
-                                                    class="fa-solid fa-star <%= j < Math.round(products[i].rating || 0) ? 'active' : '' %>"></i>
+                                                <i class="fa-solid fa-star <%= j < Math.round(products[i].rating || 0) ? 'active' : '' %>"></i>
+                                            <% } %>
+                                            <span class="product-card__rating-count">
+                                                (<%= products[i].rating || 0 %>/5)
+                                            </span>
+                                            <div>
+                                                <% if(products[i].quantity > 0){ %>
+                                                    <span style="color: rgb(0, 134, 18);">In Stock</span>
+                                                <% } else { %>
+                                                    <span style="color: red;">Out of stock</span>
                                                 <% } %>
-                                                    <span class="product-card__rating-count">
-                                                        (<%= products[i].rating || 0 %>/5)
-                                                        
-                                                    </span>
-                                                    <div>
-                                                        <% if(products[i].quantity > 0){ %>
-                                                            <span style="color: rgb(0, 134, 18);">In Stock</span>
-                                                            <% } else { %>
-                                                            <span style="color: red;">Out of stock</span>
-                                                            <% } %>
-                                                    </div>
+                                            </div>
                                         </div>
                                         <div class="product-card__cta">
                                             <button onclick="addToCart('<%= products[i]._id %>','<%= products[i].finalPrice %>')"
@@ -745,10 +744,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <% } %>
-                        <% }else{ %><p>No products found</p><% } %>
+                        <% } %>
+                        <% } else { %>
+                            <div class="col-12 text-center">
+                                <p>No products found</p>
+                            </div>
+                        <% } %>
                     </div>
-
+    
                     <!-- Pagination -->
                     <div class="row">
                         <div class="col-12">
@@ -772,6 +775,33 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
+
+
+             // Filter toggle functionality for mobile
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterToggleBtn = document.getElementById('filterToggleBtn');
+        const shopSidebar = document.getElementById('shopSidebar');
+        
+        // Toggle filter visibility when button is clicked
+        filterToggleBtn.addEventListener('click', function() {
+            shopSidebar.classList.toggle('active');
+            
+            // Update button text based on sidebar visibility
+            if (shopSidebar.classList.contains('active')) {
+                filterToggleBtn.innerHTML = '<i class="fa fa-times"></i> Hide Filters';
+            } else {
+                filterToggleBtn.innerHTML = '<i class="fa fa-filter"></i> Show Filters';
+            }
+        });
+        
+        // Close filter on window resize if in desktop mode
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 992) {
+                shopSidebar.classList.remove('active');
+                filterToggleBtn.innerHTML = '<i class="fa fa-filter"></i> Show Filters';
+            }
+        });
+    });
 
 
         async function addToCart(productId) {
@@ -930,7 +960,7 @@
 
             products.forEach(product => {
                 const productHTML = `
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+            <div class="col-lg-4 col-md-6 col-sm-6 col-6 mb-4">
                 <div class="product-card">
                     <div class="product-card__image">
                         <a href="/productDetails?id=${product._id}">
@@ -957,20 +987,19 @@
                             </span>
                         </div>
 
-                        <div style="color: red; font-weight: bold;display: flex;justify-content: center;font-weight:bold;">${product.appliedOffer}%OFF</div>
+                        <div style="color: red; font-weight: bold;display: flex;justify-content: center;font-weight:bold;">${product.appliedOffer}%OFF  
+                             <div >
+                          ${product.quantity > 0 
+                            ? '<span style="color: rgb(0, 134, 18);margin-left: 10px;">In Stock</span>'
+                            : '<span style="color: red;margin-left: 10px;">Out of stock</span>'
+                           }
+                            </div></div>
                        
                         <div class="product-card__rating">
                             ${generateRatingStars(product.rating)}
                             <span class="product-card__rating-count">
                                 (${product.rating || 5}/5)
                             </span>
-                            
-                            <div>
-                          ${product.quantity > 0 
-                            ? '<span style="color: rgb(0, 134, 18);">In Stock</span>'
-                            : '<span style="color: red;">Out of stock</span>'
-                        }
-                    </div>
                         </div>
                         <div class="product-card__cta">
                             <button onclick="addToCart('${product._id}')" 

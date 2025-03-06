@@ -5,6 +5,7 @@ const Category = require('../../models/categorySchema');
 const Order = require('../../models/orderSchema');
 const Product = require('../../models/productSchema');
 const moment = require('moment');
+const Brand = require('../../models/brandSchema')
 
 
 const loadLogin = (req, res) => {
@@ -128,7 +129,40 @@ const loadDashboard = async (req, res) => {
         { $limit: 5 }
     ]);
 
-       return res.render('dashboard', { dashboardData, orders, topSellingProducts, topSellingCategories });
+    const topSellingBrands = await Order.aggregate([
+        { $unwind: "$order_items" },
+        {
+            $lookup: {
+                from: "products",
+                localField: "order_items.productId",
+                foreignField: "_id",
+                as: "productDetails"
+            }
+        },
+        { $unwind: "$productDetails" },
+        {
+            $lookup: {
+                from: "brands",
+                localField: "productDetails.brand",
+                foreignField: "_id",
+                as: "brandDetails"
+            }
+        },
+        { $unwind: "$brandDetails" },
+        {
+            $group: {
+                _id: "$brandDetails._id",
+                brandName: { $first: "$brandDetails.brandName" },
+                brandImage: { $first: "$brandDetails.brandImage" },
+                totalSold: { $sum: "$order_items.quantity" }
+            }
+        },
+        { $sort: { totalSold: -1 } },
+        { $limit: 5 }
+   ]);
+
+
+       return res.render('dashboard', { dashboardData, orders, topSellingProducts, topSellingCategories, topSellingBrands});
    } catch (err) {
        console.log('Dashboard load error:', err);
        res.status(500).json({ error: 'Internal server error' });

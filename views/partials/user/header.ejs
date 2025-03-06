@@ -31,16 +31,12 @@
 
 
     <style>
-        /* Dropdown container styling */
-        /* Dropdown container */
         .dropdown {
             position: relative;
             display: inline-block;
             z-index: 10;
-            /* Ensure the dropdown has a high stacking context */
         }
 
-        /* Dropdown button/link */
         .dropdown-toggle {
             text-decoration: none;
             color: #333;
@@ -48,7 +44,6 @@
             cursor: pointer;
         }
 
-        /* Dropdown content */
         .dropdown-content {
             display: none;
             position: absolute;
@@ -56,16 +51,12 @@
             min-width: 150px;
             box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
             z-index: 1000;
-            /* Higher z-index to ensure it is above other elements */
             border-radius: 5px;
             overflow: hidden;
             top: 100%;
-            /* Position the dropdown below the button */
             left: 0;
-            /* Align it to the left of the dropdown */
         }
 
-        /* Dropdown links */
         .dropdown-content a {
             color: #333;
             padding: 10px 15px;
@@ -79,12 +70,10 @@
             background-color: #f1f1f1;
         }
 
-        /* Show dropdown content on hover */
         .dropdown:hover .dropdown-content {
             display: block;
         }
 
-        /* Additional styling for user options */
         .sign-in-link {
             color: #333;
             font-size: 16px;
@@ -95,43 +84,210 @@
         .sign-in-link:hover {
             text-decoration: underline;
         }
+        
+        /* Mobile menu styles */
+        .offcanvas-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            content: "";
+            z-index: 9;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .offcanvas-menu-overlay.active {
+            visibility: visible;
+        }
+        
+        .offcanvas-menu-wrapper {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: #ffffff;
+            z-index: 99;
+            overflow-y: auto;
+            transition: all 0.5s;
+            padding: 30px;
+        }
+        
+        .offcanvas-menu-wrapper.active {
+            right: 0;
+        }
+        
+        .canvas__open {
+            display: none;
+            cursor: pointer;
+        }
+        
+        /* Mobile responsive adjustments */
+        @media (max-width: 767px) {
+            .header__menu {
+                display: none;
+            }
+            
+            .canvas__open {
+                display: block;
+                font-size: 22px;
+                color: #111111;
+                height: 35px;
+                width: 35px;
+                line-height: 35px;
+                text-align: center;
+                border: 1px solid #111111;
+                border-radius: 2px;
+                cursor: pointer;
+                position: absolute;
+                right: 17px;
+                top: 14px;
+            }
+            
+            .mobile-menu-list {
+                list-style: none;
+                padding: 0;
+                margin-top: 20px;
+            }
+            
+            .mobile-menu-list li {
+                margin-bottom: 15px;
+            }
+            
+            .mobile-menu-list li a {
+                color: #333;
+                font-size: 16px;
+                font-weight: 600;
+                text-decoration: none;
+                display: block;
+                transition: all 0.3s;
+            }
+            
+            .mobile-menu-list li a:hover {
+                color: #e53637;
+            }
+            
+            .mobile-nav-options {
+                display: flex;
+                align-items: center;
+                margin-top: 20px;
+            }
+            
+            .mobile-nav-options a {
+                margin-right: 15px;
+            }
+            
+            .close-menu {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                font-size: 20px;
+                cursor: pointer;
+            }
+        }
+
+        /* Mobile fixed navigation bar styles */
+        @media (max-width: 767px) {
+            /* Mobile fixed navigation bar at bottom */
+            .mobile-fixed-nav {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: #fff;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+                z-index: 999;
+                justify-content: space-around;
+                padding: 10px 0;
+                border-top: 1px solid #eee;
+            }
+            
+            .mobile-fixed-nav a {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                color: #333;
+                text-decoration: none;
+                font-size: 12px;
+                font-weight: 600;
+            }
+            
+            .mobile-fixed-nav a i {
+                font-size: 18px;
+                margin-bottom: 4px;
+            }
+            
+            .mobile-fixed-nav a.active {
+                color: #e53637;
+            }
+            
+            /* Adjust body padding to account for fixed nav */
+            body {
+                padding-bottom: 60px;
+            }
+            
+            /* Hide the original mobile menu items that we're now showing in the fixed nav */
+            .mobile-menu-list li a[href="/"],
+            .mobile-menu-list li a[href="/shop"],
+            .mobile-menu-list li a[href="/wishlist"],
+            .mobile-menu-list li a[href="/cart"] {
+                display: none;
+            }
+            
+            /* Show user name in header for mobile */
+            .mobile-user-name {
+                display: block;
+                position: absolute;
+                left: 15px;
+                top: 30px;
+                font-size: 14px;
+                font-weight: 600;
+            }
+            
+            /* Adjust header logo for mobile */
+            .header__logo {
+                text-align: center;
+                padding: 15px 0;
+            }
+        }
     </style>
 </head>
 
 <body>
-    <!-- Page Preloder -->
+
     <div id="preloder">
         <div class="loader"></div>
     </div>
 
+    
     <!-- Offcanvas Menu Begin -->
-    <!-- <div class="offcanvas-menu-overlay"></div>
+    <div class="offcanvas-menu-overlay"></div>
     <div class="offcanvas-menu-wrapper">
-        <div class="offcanvas__option">
-            <div class="offcanvas__links">
-                <a href="#">Log i</a>
-                <a href="#">Fydrfg</a>
-            </div>
-            <div class="offcanvas__top__hover">
-                <span>Usd <i class="arrow_carrot-down"></i></span>
-                <ul>
-                    <li>USD</li>
-                    <li>EUR</li>
-                    <li>USD</li>
-                </ul>
-            </div>
+        <div class="close-menu">
+            <i class="fa fa-times"></i>
         </div>
-        <div class="offcanvas__nav__option">
-            <a href="#" class="search-switch"><img src="img/icon/search.png" alt=""></a>
-            <a href="#"><img src="img/icon/heart.png" alt=""></a>
-            <a href="#"><img src="img/icon/cart.png" alt=""> <span>0</span></a>
-            <div class="price">$0.00</div>
+        
+        <div class="mobile-menu-container">
+            
+            <ul class="mobile-menu-list">
+                <li><a href="/">Home</a></li>
+                <li><a href="/shop">Shop</a></li>
+                <li><a href="/cart">Cart</a></li>
+                <li><a href="./userProfile">Profile</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
         </div>
-        <div id="mobile-menu-wrap"></div>
-        <div class="offcanvas__text">
-            <p>Free shipping, 30-day return or refund guarantee.</p>
+        
+        <div class="mobile-nav-options">
+            <a style="text-decoration: none; color: #111111;" href="/wishlist"><img src="/img/icon/heart.png" alt="Wishlist">Wishlist</a>
+            <!-- <a href="/cart"><img src="/img/icon/cart.png" alt="Cart">Cart</a> -->
         </div>
-    </div> -->
+        
+    </div>
     <!-- Offcanvas Menu End -->
 
     <!-- Header Section Begin -->
@@ -148,25 +304,15 @@
                         <a href="/signup">
                             <!-- <div class="signin" style="color: white;"> >>>>>>> Sign in</div> -->
                         </a>
-                        <!-- <div class="header__top__hover">
-                                <span>Usd <i class="arrow_carrot-down"></i></span>
-                                <ul>
-                                    <li>USD</li>
-                                    <li>EUR</li>
-                                    <li>USD</li>
-                                </ul>
-                            </div> -->
                     </div>
                 </div>
             </div>
-        </div>
         </div>
         <div class="container">
             <div class="row">
                 <div class="col-lg-3 col-md-3">
                     <div class="header__logo">
-                        <a href=""><img src="/img/logo.png" alt=""
-                                style="margin-left: -27px;height: 30px;"></a>
+                        <a href=""><img src="/img/logo.png" alt="" style="margin-left: -27px;height: 30px;"></a>
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-6">
@@ -174,48 +320,94 @@
                         <ul>
                             <li class="active"><a href="/">Home</a></li>
                             <li><a href="/shop">Shop</a></li>
-                            <!-- <li><a href="#">Pages</a>
-                                <ul class="dropdown">
-                                    <li><a href="./about.html">About Us</a></li>
-                                    <li><a href="./shop-details.html">Shop Details</a></li>
-                                    <li><a href="./shopping-cart.html">Shopping Cart</a></li>
-                                    <li><a href="./checkout.html">Check Out</a></li>
-                                    <li><a href="./blog-details.html">Blog Details</a></li>
-                                </ul>
-                            </li> -->
                             <li><a href="/cart">Cart</a></li>
-                            <!-- <li><a href="/signup">SIGN-IN</a></li> -->
                             <li><a href="./userProfile">Profile</a></li>
-
                         </ul>
                     </nav>
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="header__nav__option" style="margin-right: -100px; margin-top: 9px;">
                         <% var user=user || null; %>
-                            <% if (user) { %>
-                                <div class="dropdown">
-                                    <a href="#" class="sign-in-link dropdown-toggle" id="userDropdown">
-                                        <%= user.name %>
-                                    </a>
-                                    <div class="dropdown-content" id="userDropdownContent">
-                                        <a href="/userProfile">Profile</a>
-                                        <a href="/logout">Logout</a>
-                                    </div>
+                        <% if (user) { %>
+                            <div class="dropdown">
+                                <a href="#" class="sign-in-link dropdown-toggle" id="userDropdown">
+                                    <%= user.name %>
+                                </a>
+                                <div class="dropdown-content" id="userDropdownContent">
+                                    <a href="/userProfile">Profile</a>
+                                    <a href="/logout">Logout</a>
                                 </div>
-                                <% } else { %>
-                                    <a href="/signup" class="sign-in-link">Sign Up</a>
-                                    <a href="/login" class="sign-in-link">Login</a>
-                                    <% } %>
-
-                                        <!-- <a href="#" class="search-switch"><img src="img/icon/search.png" alt=""></a> -->
-                                        <a href="/wishlist"><img src="/img/icon/heart.png" alt=""></a>
-                                        <a href="/cart"><img src="/img/icon/cart.png" alt=""> <span></span></a>
-                                        <div class="price">₹0.00 </div>
+                            </div>
+                        <% } else { %>
+                            <a href="/signup" class="sign-in-link">Sign Up</a>
+                            <a href="/login" class="sign-in-link">Login</a>
+                        <% } %>
+                        <a href="/wishlist"><img src="/img/icon/heart.png" alt=""></a>
+                        <a href="/cart"><img src="/img/icon/cart.png" alt=""> <span></span></a>
+                        <div class="price">₹0.00</div>
                     </div>
                 </div>
-
             </div>
+            
             <div class="canvas__open"><i class="fa fa-bars"></i></div>
         </div>
     </header>
+
+    <div class="mobile-fixed-nav d-md-none">
+        <a href="/" class="<%= typeof path !== 'undefined' && path === '/' ? 'active' : '' %>">
+            <i class="fa fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="/shop" class="<%= typeof path !== 'undefined' && path === '/shop' ? 'active' : '' %>">
+            <i class="fa fa-shopping-bag"></i>
+            <span>Shop</span>
+        </a>
+        <a href="/cart" class="<%= typeof path !== 'undefined' && path === '/cart' ? 'active' : '' %>">
+            <i class="fa fa-shopping-cart"></i>
+            <span>Cart</span>
+        </a>
+        <a href="/wishlist" class="<%= typeof path !== 'undefined' && path === '/wishlist' ? 'active' : '' %>">
+            <i class="fa fa-heart"></i>
+            <span>Wishlist</span>
+        </a>
+        <% if (user) { %>
+            <a href="/userProfile" class="<%= typeof path !== 'undefined' && path === '/userProfile' ? 'active' : '' %>">
+                <i class="fa fa-user" style="color: #4d540e;"></i>
+                <span style=" font-weight: bolder;"><%= user.name %></span>
+            </a>
+        <% } else { %>
+            <a href="/login">
+                <i class="fa fa-sign-in-alt"></i>
+                <span>Login</span>
+            </a>
+        <% } %>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Mobile menu toggle functionality
+            $('.canvas__open').on('click', function() {
+                $('.offcanvas-menu-wrapper').addClass('active');
+                $('.offcanvas-menu-overlay').addClass('active');
+            });
+            
+            $('.close-menu').on('click', function() {
+                $('.offcanvas-menu-wrapper').removeClass('active');
+                $('.offcanvas-menu-overlay').removeClass('active');
+            });
+            
+            $('.offcanvas-menu-overlay').on('click', function() {
+                $('.offcanvas-menu-wrapper').removeClass('active');
+                $('.offcanvas-menu-overlay').removeClass('active');
+            });
+            
+            // Preloader
+            $(window).on('load', function() {
+                $("#preloder").fadeOut();
+            });
+        });
+    </script>
+
+</body>
+</html>

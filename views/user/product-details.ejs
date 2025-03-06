@@ -49,7 +49,6 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -66,12 +65,10 @@
                 transform: scale(0);
                 opacity: 0;
             }
-
             50% {
                 transform: scale(1.3);
                 opacity: 1;
             }
-
             100% {
                 transform: scale(1);
             }
@@ -79,9 +76,42 @@
 
         .toastify-avatar {
             width: 24px;
-            /* Adjust icon size */
             height: 24px;
             animation: tickPop 0.5s ease-in-out;
+        }
+
+        /* Improved quantity and add to cart section */
+        .product-actions-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        @media (min-width: 768px) {
+            .product-actions-container {
+                flex-direction: row;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+        }
+
+        .buy-now-btn {
+            padding: 15px 80px;
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #ffffff;
+            background: #000000;
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
         }
 
         .custom-quantity-input {
@@ -91,7 +121,13 @@
             border-radius: 4px;
             overflow: hidden;
             width: fit-content;
-            margin-left: 217px;
+            margin: 0 auto 15px;
+        }
+
+        @media (min-width: 768px) {
+            .custom-quantity-input {
+                margin: 0;
+            }
         }
 
         .quantity-btn {
@@ -123,27 +159,231 @@
             margin: 0;
         }
 
-        .buy-now-btn {
-            padding-right: 80px;
-            padding-left: 80px;
-            padding-top: 15px;
-            padding-bottom: 15px;
-            display: inline-block;
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: #ffffff;
-            background: #000000;
-            letter-spacing: 4px;
-            margin-bottom: 12px;
+        .add-to-cart-btn {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+
+        .add-to-cart-btn:hover {
+            background: #333;
+        }
+
+        /* Wishlist button styling */
+        .wishlist-btn {
+            display: inline-flex;
+            align-items: center;
+            margin: 10px auto 20px;
+            color: #666;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .wishlist-btn:hover {
+            color: #ff3e6c;
+            text-decoration: none;
+        }
+
+        .wishlist-btn i {
+            margin-right: 5px;
+            font-size: 16px;
+        }
+
+        /* Related products styling */
+        .related-products-container {
+            /* display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            width: 100%; */
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Default to 2 columns for mobile */
+            gap: 10px; 
+            width: 100%;
+        }
+
+        .product__item {
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #fff;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product__item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .product__item__pic {
+            position: relative;
+            padding-top: 100%; /* 1:1 Aspect Ratio */
+            overflow: hidden;
+        }
+
+        .product__item__pic img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product__item:hover .product__item__pic img {
+            transform: scale(1.05);
+        }
+
+        .product__item__text {
+            padding: 15px;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product__item__text h6 {
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1.4;
+            height: 40px;
+            overflow: hidden;
+        }
+
+        .product__item .rating {
+            margin-bottom: 8px;
+        }
+
+        .product__item .rating i {
+            color: #f8b500;
+            font-size: 12px;
+        }
+
+        .product__item__text p {
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .product__item__text .add-cart-btn {
             background-color: black;
             color: white;
+            border: none;
+            padding: 8px 15px;
             border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            margin-top: auto;
         }
+
+        .product__item__text .add-cart-btn:hover {
+            background-color: #333;
+        }
+
+        .label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #ff3e6c;
+            color: #fff;
+            padding: 3px 8px;
+            font-size: 12px;
+            border-radius: 3px;
+            z-index: 1;
+        }
+
+        /* Thumbnail navigation for mobile */
+        @media (max-width: 767px) {
+            .product-thumbs-container {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            
+            .product-thumb {
+                width: 60px;
+                height: 60px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                overflow: hidden;
+                cursor: pointer;
+            }
+            
+            .product-thumb.active {
+                border: 2px solid #000;
+            }
+            
+            .product-thumb img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            
+            .nav-tabs {
+                display: none;
+            }
+        }
+        @media (max-width: 767px) {
+            .product__details__pic__item img {
+                touch-action: pinch-zoom;
+            }
+        }
+        /* Medium screens */
+@media (min-width: 768px) {
+    .related-products-container {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns for medium screens */
+        gap: 15px;
+    }
+}
+
+/* Large screens */
+@media (min-width: 992px) {
+    .related-products-container {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Original behavior for larger screens */
+        gap: 20px;
+    }
+}
+
+/* Make product items more compact on mobile */
+@media (max-width: 767px) {
+    .product__item__text h6 {
+        font-size: 12px;
+        height: 34px;
+    }
+    
+    .product__item__text p {
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+    
+    .product__item__text .add-cart-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    
+    .product__item .rating i {
+        font-size: 10px;
+    }
+}
     </style>
 
     <!-- Shop Details Section Begin -->
-    <section class="shop-details" style="    overflow-x: hidden;">
+    <!-- Shop Details Section Begin -->
+    <section class="shop-details" style="overflow-x: hidden;">
         <div class="product__details__pic">
             <div class="container">
                 <div class="row">
@@ -156,7 +396,19 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-3 col-md-3">
+                    <!-- Mobile view thumbnails -->
+                    <div class="col-12 d-md-none">
+                        <div class="product-thumbs-container">
+                            <% for (let i=0; i < product.productImages.length; i++) { %>
+                                <div class="product-thumb <%= i === 0 ? 'active' : '' %>" data-target="#tabs-<%= i + 1 %>">
+                                    <img src="uploads/product-images/<%= product.productImages[i] %>" alt="product thumbnail">
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                    
+                    <!-- Desktop side thumbnails -->
+                    <div class="col-lg-3 col-md-3 d-none d-md-block">
                         <ul class="nav nav-tabs" role="tablist">
                             <% for (let i=0; i < product.productImages.length; i++) { %>
                                 <li class="nav-item">
@@ -168,10 +420,10 @@
                                         </div>
                                     </a>
                                 </li>
-                                <% } %>
+                            <% } %>
                         </ul>
                     </div>
-                    <div class="col-lg-6 col-md-9">
+                    <div class="col-lg-6 col-md-9 col-12">
                         <div class="tab-content">
                             <% for (let i=0; i < product.productImages.length; i++) { %>
                                 <div class="tab-pane <%= i === 0 ? 'active' : '' %>" id="tabs-<%= i + 1 %>"
@@ -181,21 +433,19 @@
                                             alt="product image" class="img-fluid">
                                     </div>
                                 </div>
-                                <% } %>
+                            <% } %>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
+        
         <div class="product__details__content">
             <div class="container">
                 <div class="row d-flex justify-content-center">
                     <div class="col-lg-8">
                         <div class="product__details__text">
-                            <h4>
-                                <%= product.productName %>
-                            </h4>
+                            <h4><%= product.productName %></h4>
                             <div class="rating">
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
@@ -204,95 +454,65 @@
                                 <i class="fa fa-star-o"></i>
                                 <span> - 5 Reviews</span>
                             </div>
-                            <h3>₹<%= product.finalPrice.toLocaleString('en-IN') %> <span>₹<%=
-                                            product.regularPrice.toLocaleString('en-IN') %></span></h3>
-                            <p>
-                                <%= product.description %>
-                            </p>
-                            <!-- <div class="product__details__option">
-                                <div class="product__details__option__size">
-                                    <span>Size:</span>
-                                    <label for="xxl">30mm
-                                        <input type="radio" id="xxl">
-                                    </label>
-                                    <label class="active" for="xl">32mm
-                                        <input type="radio" id="xl">
-                                    </label>
-                                    <label for="l">35mm
-                                        <input type="radio" id="l">
-                                    </label>
-                                    <label for="sm">38mm
-                                        <input type="radio" id="sm">
-                                    </label>
-                                </div>
-                               
-                            </div> -->
-
-                            <!-- <div class="product__details__cart__option">
-                                <div class="quantity">
-                                    <div class="pro-qty">
-                                        <input type="text" value="1">
+                            <h3>₹<%= product.finalPrice.toLocaleString('en-IN') %> 
+                                <span>₹<%= product.regularPrice.toLocaleString('en-IN') %></span>
+                            </h3>
+                            <p><%= product.description %></p>
+                            
+                            <!-- Improved product actions container -->
+                            <div class="product-actions-container">
+                                <!-- <a href="#" class="buy-now-btn">Buy Now</a> -->
+                                
+                                <div class="d-flex align-items-center">
+                                    <div class="custom-quantity-input">
+                                        <button class="quantity-btn" onclick="updateQuantity('decrease')">-</button>
+                                        <input type="number" class="quantity-value" id="product-quantity" value="1" min="1"
+                                            max="5" readonly>
+                                        <button class="quantity-btn" onclick="updateQuantity('increase')">+</button>
                                     </div>
-                            </div> -->
-
-                            <!-- <td class="quantity__item"> -->
-                            <div>
-                                <button class="buy-now-btn">Buy Now </button></a>
+                                    
+                                    <button onclick="addToCart('<%= product._id %>', '<%= product.finalPrice %>')" class="add-to-cart-btn">
+                                        Add to Cart
+                                    </button>
+                                </div>
                             </div>
-                            <div class="custom-quantity-input">
-                                <button class="quantity-btn" onclick="updateQuantity('decrease')">-</button>
-                                <input type="number" class="quantity-value" id="product-quantity" value="1" min="1"
-                                    max="5" readonly>
-                                <button class="quantity-btn" onclick="updateQuantity('increase')">+</button>
-
-
-                                <button onclick="addToCart('<%= product._id %>', '<%= product.finalPrice %>')" class="primary-btn"
-                                    style="margin-left: 20px;">
-                                    Add to Cart
-                                </button>
-
+                            
+                            <div class="text-center">
+                                <a href="javascript:void(0);" onclick="addToWishlist('<%= product._id %>')" class="wishlist-btn">
+                                    <i class="fa fa-heart"></i> Add to wishlist
+                                </a>
                             </div>
-                            <!-- </td> -->
-
-
-                            <!-- <a href="#" class="primary-btn">add to cart</a> -->
-
-
-
-                        </div>
-                        <div class="product__details__btns__option">
-                            <a href="javascript:void(0);" onclick="addToWishlist('<%= product._id %>')" style="
-                            padding-left: 284px;
-                            padding-top: 15px;"><i class="fa fa-heart"></i> add to wishlist</a>
-                            <!-- <a href="#"><i class="fa fa-exchange"></i> Add To Compare</a> -->
-                        </div>
-                        <div class="product__details__last__option">
-                            <h5 style="padding-left: 202px;"><span>Guaranteed Safe Checkout</span></h5>
-                            <img src="img/shop-details/details-payment.png" alt="" style="padding-left: 147px;">
-                            <ul>
-                                <% if(product.quantity> 0){ %>
-                                    <li style="color: rgb(0, 134, 18);"><span>Availability:</span>
-                                        <%= product.quantity %> in stock
-                                    </li>
+                            
+                            <div class="product__details__last__option">
+                                <h5 class="text-center"><span>Guaranteed Safe Checkout</span></h5>
+                                <div class="text-center mb-3">
+                                    <img src="img/shop-details/details-payment.png" alt="" class="img-fluid" style="max-width: 300px;">
+                                </div>
+                                <ul class="pl-0">
+                                    <% if(product.quantity > 0){ %>
+                                        <li style="color: rgb(0, 134, 18);"><span>Availability:</span>
+                                            <%= product.quantity %> in stock
+                                        </li>
                                     <% } else { %>
                                         <li style="color: red;"><span>Availability:</span>
                                             Out of stock
                                         </li>
-                                        <% } %>
-                                            <li><span>Categories:</span>
-                                                <%= product.category.name %>
-                                            </li>
-                                            <% if (product.brand && product.brand.brandName) { %>
-                                                <li><span>Brand:</span>
-                                                    <%= product.brand.brandName %>
-                                                </li>
-                                                <% } %>
-                                                    <!-- <li><span>Tag:</span> Clothes, Skin, Body</li> -->
-                            </ul>
+                                    <% } %>
+                                    <li><span>Categories:</span>
+                                        <%= product.category.name %>
+                                    </li>
+                                    <% if (product.brand && product.brand.brandName) { %>
+                                        <li><span>Brand:</span>
+                                            <%= product.brand.brandName %>
+                                        </li>
+                                    <% } %>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            
             <div class="row">
                 <div class="col-lg-12">
                     <div class="product__details__tab">
@@ -304,43 +524,21 @@
                                 <a class="nav-link" data-toggle="tab" href="#tabs-6" role="tab">Customer
                                     Reviews(5)</a>
                             </li>
-                            <!-- <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" href="#tabs-7" role="tab">Additional
-                                        information</a>
-                                </li> -->
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane active" id="tabs-5" role="tabpanel">
                                 <div class="product__details__tab__content">
-                                    <!-- <p class="note">Nam tempus turpis at metus scelerisque placerat nulla deumantos
-                                            solicitud felis. Pellentesque diam dolor, elementum etos lobortis des mollis
-                                            ut risus. Sedcus faucibus an sullamcorper mattis drostique des commodo
-                                            pharetras loremos.</p> -->
                                     <div class="product__details__tab__content__item">
-                                        <h5>Products Infomation</h5>
-                                        <p>
-                                            <%= product.description %>
-                                        </p>
-                                        <p>
-                                            <%= product.category.description %>
-                                        </p>
+                                        <h5>Products Information</h5>
+                                        <p><%= product.description %></p>
+                                        <p><%= product.category.description %></p>
                                     </div>
-                                    <!-- <div class="product__details__tab__content__item">
-                                            <h5>Material used</h5>
-                                            <p>Polyester is deemed lower quality due to its none natural quality’s. Made
-                                                from synthetic materials, not natural like wool. Polyester suits become
-                                                creased easily and are known for not being breathable. Polyester suits
-                                                tend to have a shine to them compared to wool and cotton suits, this can
-                                                make the suit look cheap. The texture of velvet is luxurious and
-                                                breathable. Velvet is a great choice for dinner party jacket and can be
-                                                worn all year round.</p>
-                                        </div> -->
                                 </div>
                             </div>
                             <div class="tab-pane" id="tabs-6" role="tabpanel">
                                 <div class="product__details__tab__content">
                                     <div class="product__details__tab__content__item">
-                                        <h5>Products Infomation</h5>
+                                        <h5>Products Information</h5>
                                         <p>A Pocket PC is a handheld computer, which features many of the same
                                             capabilities as a modern PC. These handy little devices allow
                                             individuals to retrieve and store e-mail messages, create a contact
@@ -367,54 +565,16 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane" id="tabs-7" role="tabpanel">
-                                <div class="product__details__tab__content">
-                                    <p class="note">Nam tempus turpis at metus scelerisque placerat nulla deumantos
-                                        solicitud felis. Pellentesque diam dolor, elementum etos lobortis des mollis
-                                        ut risus. Sedcus faucibus an sullamcorper mattis drostique des commodo
-                                        pharetras loremos.</p>
-                                    <div class="product__details__tab__content__item">
-                                        <h5>Products Infomation</h5>
-                                        <p>A Pocket PC is a handheld computer, which features many of the same
-                                            capabilities as a modern PC. These handy little devices allow
-                                            individuals to retrieve and store e-mail messages, create a contact
-                                            file, coordinate appointments, surf the internet, exchange text messages
-                                            and more. Every product that is labeled as a Pocket PC must be
-                                            accompanied with specific software to operate the unit and must feature
-                                            a touchscreen and touchpad.</p>
-                                        <p>As is the case with any new technology product, the cost of a Pocket PC
-                                            was substantial during it’s early release. For approximately $700.00,
-                                            consumers could purchase one of top-of-the-line Pocket PCs in 2003.
-                                            These days, customers are finding that prices have become much more
-                                            reasonable now that the newness is wearing off. For approximately
-                                            $350.00, a new Pocket PC can now be purchased.</p>
-                                    </div>
-                                    <div class="product__details__tab__content__item">
-                                        <h5>Material used</h5>
-                                        <p>Polyester is deemed lower quality due to its none natural quality’s. Made
-                                            from synthetic materials, not natural like wool. Polyester suits become
-                                            creased easily and are known for not being breathable. Polyester suits
-                                            tend to have a shine to them compared to wool and cotton suits, this can
-                                            make the suit look cheap. The texture of velvet is luxurious and
-                                            breathable. Velvet is a great choice for dinner party jacket and can be
-                                            worn all year round.</p>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
     </section>
     <!-- Shop Details Section End -->
 
-
-
-
-
     <!-- Related Section Begin -->
+     
     <section class="related spad">
         <div class="container">
             <div class="row">
@@ -422,59 +582,36 @@
                     <h3 class="related-title">Related Products</h3>
                 </div>
             </div>
-            <div class="row">
+            <div class="related-products-container">
                 <% for (let i=0; i < relatedProducts.length; i++) { %>
-                    <div class="col-lg-3 col-md-4 col-sm-6">
-                        <!-- 4 items per row on large screens, 3 items on medium, 2 items on small -->
-                        <div class="product__item">
-                            <a href="/productDetails?id=<%= relatedProducts[i]._id %>">
-                                <div class="product__item__pic set-bg"
-                                    data-setbg="uploads/product-images/<%= relatedProducts[i].productImages[0] %>">
-                                    <span class="label">New</span>
-                                </div>
-                            </a>
-                            <div class="product__item__text">
-                                <h6>
-                                    <%= relatedProducts[i].productName %>
-                                </h6>
-
-                                <div class="rating">
-                                    <i class="fa fa-star"></i>
-                                    <i class="fa fa-star"></i>
-                                    <i class="fa fa-star"></i>
-                                    <i class="fa fa-star"></i>
-                                    <i class="fa fa-star"></i>
-                                </div>
-                                <p>Price: ₹<%= relatedProducts[i].finalPrice %>
-                                        <span class="text-muted">
-                                            <strike>₹ <%= relatedProducts[i].salePrice.toLocaleString('en-IN') %>
-                                            </strike>
-                                        </span>
-                                </p>
-                                <button style="margin-left: 54px;background-color: black; color: white;"
-                                    onclick="addToCart('<%= product._id %>')">
-                                    + Add to Cart
-                                </button>
-
-                                <!-- <button class="add-cart" onclick="addToCart('<%= product._id %>')">+ Add To Cart</button> -->
-                                <!-- <div class="product__color__select">
-                                    <label for="pc-1">
-                                        <input type="radio" id="pc-1">
-                                    </label>
-                                    <label class="active black" for="pc-2">
-                                        <input type="radio" id="pc-2">
-                                    </label>
-                                    <label class="grey" for="pc-3">
-                                        <input type="radio" id="pc-3">
-                                    </label>
-                                </div> -->
+                    <div class="product__item">
+                        <a href="/productDetails?id=<%= relatedProducts[i]._id %>">
+                            <div class="product__item__pic">
+                                <span class="label">New</span>
+                                <img src="uploads/product-images/<%= relatedProducts[i].productImages[0] %>" alt="<%= relatedProducts[i].productName %>">
                             </div>
+                        </a>
+                        <div class="product__item__text">
+                            <h6><%= relatedProducts[i].productName %></h6>
+                            <div class="rating">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <p>Price: ₹<%= relatedProducts[i].finalPrice %>
+                                <span class="text-muted">
+                                    <strike>₹ <%= relatedProducts[i].salePrice.toLocaleString('en-IN') %></strike>
+                                </span>
+                            </p>
+                            <button class="add-cart-btn" onclick="addToCart('<%= relatedProducts[i]._id %>')">
+                                + Add to Cart
+                            </button>
                         </div>
                     </div>
-                    <% } %>
+                <% } %>
             </div>
-
-
         </div>
     </section>
     <!-- Related Section End -->
@@ -483,6 +620,104 @@
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // Add this to your JavaScript file or in a <script> tag at the bottom of the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle mobile thumbnail clicks
+            const mobileThumbs = document.querySelectorAll('.product-thumb');
+            mobileThumbs.forEach(thumb => {
+                thumb.addEventListener('click', function() {
+                    // Remove active class from all thumbnails
+                    mobileThumbs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked thumbnail
+                    this.classList.add('active');
+                    
+                    // Get the target tab
+                    const targetTab = this.getAttribute('data-target');
+                    
+                    // Hide all tab panes
+                    document.querySelectorAll('.tab-pane').forEach(pane => {
+                        pane.classList.remove('active');
+                    });
+                    
+                    // Show the target tab pane
+                    document.querySelector(targetTab).classList.add('active');
+                });
+            });
+        });
+
+        // Add this to your JavaScript file or in a <script> tag
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile zoom functionality
+            const productImages = document.querySelectorAll('.product__details__pic__item img');
+            
+            productImages.forEach(img => {
+                // For mobile devices
+                if (window.innerWidth <= 767) {
+                    let startX, startY, endX, endY;
+                    let scale = 1;
+                    
+                    img.addEventListener('touchstart', function(e) {
+                        if (e.touches.length === 2) {
+                            // Get initial finger positions
+                            startX = (e.touches[0].pageX + e.touches[1].pageX) / 2;
+                            startY = (e.touches[0].pageY + e.touches[1].pageY) / 2;
+                        }
+                    });
+                    
+                    img.addEventListener('touchmove', function(e) {
+                        if (e.touches.length === 2) {
+                            // Prevent scrolling
+                            e.preventDefault();
+                            
+                            // Calculate distance between fingers
+                            const dist = Math.hypot(
+                                e.touches[0].pageX - e.touches[1].pageX,
+                                e.touches[0].pageY - e.touches[1].pageY
+                            );
+                            
+                            // Update scale (between 1 and 3)
+                            scale = Math.min(Math.max(1, scale * (dist / prevDist)), 3);
+                            prevDist = dist;
+                            
+                            // Apply transform
+                            img.style.transform = `scale(${scale})`;
+                        }
+                    });
+                    
+                    img.addEventListener('touchend', function() {
+                        // Reset transform after delay
+                        setTimeout(() => {
+                            img.style.transform = 'scale(1)';
+                            scale = 1;
+                        }, 300);
+                    });
+                }
+            });
+            
+            // Handle mobile thumbnail clicks (from previous solution)
+            const mobileThumbs = document.querySelectorAll('.product-thumb');
+            mobileThumbs.forEach(thumb => {
+                thumb.addEventListener('click', function() {
+                    // Remove active class from all thumbnails
+                    mobileThumbs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked thumbnail
+                    this.classList.add('active');
+                    
+                    // Get the target tab
+                    const targetTab = this.getAttribute('data-target');
+                    
+                    // Hide all tab panes
+                    document.querySelectorAll('.tab-pane').forEach(pane => {
+                        pane.classList.remove('active');
+                    });
+                    
+                    // Show the target tab pane
+                    document.querySelector(targetTab).classList.add('active');
+                });
+            });
+        });
 
         async function addToCart(productId) {
             try {

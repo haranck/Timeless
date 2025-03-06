@@ -208,6 +208,36 @@
                     </table>
                 </div>
             </div>
+
+            <div class="card brand-card">
+                <div class="card-header">
+                    <h3 class="card-title">Top Selling Brands</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Brand Logo</th>
+                                <th>Brand</th>
+                                <th>Sold</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% topSellingBrands.forEach(brand => { %>
+                                <tr>
+                                    <td>
+                                        <img class="brand-image" src="/uploads/brands/<%= brand.brandImage %>" 
+                                             alt="<%= brand.brandName %>" 
+                                             class="brand-image">
+                                    </td>
+                                    <td><%= brand.brandName %></td>
+                                    <td><%= brand.totalSold %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
 

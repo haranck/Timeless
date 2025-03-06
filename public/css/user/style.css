@@ -138,7 +138,7 @@ ol {
 }
 
 .spad {
-	padding-top: 100px;
+	padding-top: 50px;
 	padding-bottom: 100px;
 }
 
@@ -328,6 +328,7 @@ ol {
 	color: #ffffff;
 	margin-bottom: 0;
 	text-decoration: none;
+	width: max-content;
 }
 
 .header__top__right {
@@ -486,6 +487,7 @@ ol {
 	font-weight: 600;
 	position: relative;
 	padding: 3px 0;
+	text-decoration: none;
 }
 
 .header__menu ul li a:after {
@@ -751,6 +753,58 @@ ol {
 	transition: all, 0.3s;
 }
 
+
+
+/*  */
+
+.banner__item:hover .banner__item__text2 a:after {
+	width: 40px;
+	background: #e53637;
+}
+.banner__item.banner__item--middle .banner__item__text2 {
+	position: relative;
+	top: 0;
+	left: 0;
+	max-width: 100%;
+	padding-top: 22px;
+}
+.banner__item__text2 {
+	max-width: 300px;
+    position: absolute;
+    left: 324px;
+    top: 10px;
+}
+
+.banner__item__text2 h2 {
+	color: #111111;
+	font-weight: 700;
+	line-height: 46px;
+	margin-bottom: 10px;
+}
+
+.banner__item__text2 a {
+	display: inline-block;
+	color: #111111;
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	padding: 3px 0;
+	position: relative;
+}
+
+.banner__item__text2 a:after {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 2px;
+	background: #111111;
+	content: "";
+	-webkit-transition: all, 0.3s;
+	-o-transition: all, 0.3s;
+	transition: all, 0.3s;
+}
 /*---------------------
   Categories
 -----------------------*/
@@ -930,12 +984,13 @@ ol {
 
 .filter__controls li {
 	color: #b7b7b7;
-	font-size: 24px;
-	font-weight: 700;
-	list-style: none;
-	display: inline-block;
-	margin-right: 88px;
-	cursor: pointer;
+    font-size: 37px;
+    font-weight: 700;
+    list-style: none;
+    display: inline-block;
+    margin-right: 88px;
+    cursor: pointer;
+    margin-top: 16px;
 }
 
 .filter__controls li:last-child {
@@ -1949,118 +2004,134 @@ ol {
   Footer
 -----------------------*/
 
+/* Base footer styles */
 .footer {
-	background: #111111;
-	padding-top: 70px;
+    background: #111111;
+    padding-top: 40px; /* Reduced padding for mobile */
 }
 
 .footer__about {
-	margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .footer__about .footer__logo {
-	margin-bottom: 30px;
-}
-
-.footer__about .footer__logo a {
-	display: inline-block;
+    margin-bottom: 15px; /* Reduced margin for mobile */
 }
 
 .footer__about p {
-	color: #b7b7b7;
-	margin-bottom: 30px;
+    color: #b7b7b7;
+    margin-bottom: 20px;
+    font-size: 14px; /* Slightly smaller text on mobile */
 }
 
+/* Widget styles */
 .footer__widget {
-	margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .footer__widget h6 {
-	color: #ffffff;
-	font-size: 15px;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 2px;
-	margin-bottom: 20px;
+    color: #ffffff;
+    font-size: 14px; /* Smaller heading on mobile */
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px; /* Reduced letter spacing */
+    margin-bottom: 15px;
+}
+
+.footer__widget ul {
+    padding-left: 0; /* Remove default padding */
 }
 
 .footer__widget ul li {
-	line-height: 36px;
-	list-style: none;
+    line-height: 28px; /* Reduced line height */
+    list-style: none;
 }
 
 .footer__widget ul li a {
-	color: #b7b7b7;
-	font-size: 15px;
+    color: #b7b7b7;
+    font-size: 13px; /* Smaller font size */
 }
 
+/* Newsletter styles */
 .footer__widget .footer__newslatter p {
-	color: #b7b7b7;
-}
-
-.footer__widget .footer__newslatter form {
-	position: relative;
+    color: #b7b7b7;
+    font-size: 13px; /* Smaller font */
 }
 
 .footer__widget .footer__newslatter form input {
-	width: 100%;
-	font-size: 15px;
-	color: #3d3d3d;
-	background: transparent;
-	border: none;
-	padding: 15px 0;
-	border-bottom: 2px solid #ffffff;
+    width: 100%;
+    font-size: 14px;
+    color: #3d3d3d;
+    background: transparent;
+    border: none;
+    padding: 10px 0; /* Reduced padding */
+    border-bottom: 2px solid #ffffff;
 }
 
-.footer__widget .footer__newslatter form input::-webkit-input-placeholder {
-	color: #3d3d3d;
-}
-
-.footer__widget .footer__newslatter form input::-moz-placeholder {
-	color: #3d3d3d;
-}
-
-.footer__widget .footer__newslatter form input:-ms-input-placeholder {
-	color: #3d3d3d;
-}
-
-.footer__widget .footer__newslatter form input::-ms-input-placeholder {
-	color: #3d3d3d;
-}
-
-.footer__widget .footer__newslatter form input::placeholder {
-	color: #3d3d3d;
-}
-
-.footer__widget .footer__newslatter form button {
-	color: #b7b7b7;
-	font-size: 16px;
-	position: absolute;
-	right: 5px;
-	top: 0;
-	height: 100%;
-	background: transparent;
-	border: none;
-}
-
+/* Footer copyright section */
 .footer__copyright__text {
-	border-top: 1px solid rgba(255, 255, 255, 0.1);
-	padding: 20px 0;
-	margin-top: 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 15px 0; /* Reduced padding */
+    margin-top: 20px; /* Reduced margin */
 }
 
 .footer__copyright__text p {
-	color: #b7b7b7;
-	margin-bottom: 0;
+    color: #b7b7b7;
+    margin-bottom: 0;
+    font-size: 12px; /* Smaller copyright text */
 }
 
-.footer__copyright__text p i {
-	color: #e53637;
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+    .footer {
+        padding-top: 30px;
+    }
+    
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .footer .row {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .footer__about,
+    .footer__widget {
+        margin-bottom: 15px;
+    }
+    
+    .footer__logo img {
+        max-width: 50%; /* Further reduced logo size */
+        height: auto;
+    }
+    
+    .footer__widget h6 {
+        margin-top: 10px;
+    }
+    
+    .footer__copyright__text {
+        padding: 10px 0;
+        margin-top: 15px;
+    }
+    
+    .footer__copyright__text p {
+        font-size: 11px;
+        line-height: 1.4;
+    }
 }
 
-.footer__copyright__text p a {
-	color: #e53637;
+/* Even smaller screens */
+@media (max-width: 480px) {
+    .footer__logo img {
+        max-width: 40%; /* Even smaller logo for very small screens */
+    }
 }
+
+/* Ensure footer logo is responsive */
+
 
 /*---------------------
   Breadcrumb

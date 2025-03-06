@@ -480,11 +480,8 @@
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    // Process only the first file for now
-    // Later you can implement a queue system for multiple files
     const file = files[0];
 
-    // Validate file type
     const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
     if (!validTypes.includes(file.type)) {
         Swal.fire({
@@ -496,13 +493,11 @@
         return;
     }
 
-    // Read file
     const reader = new FileReader();
     reader.onload = function(e) {
         const cropperImage = document.getElementById('cropperImage');
         cropperImage.src = e.target.result;
 
-        // Destroy existing cropper if any
         if (cropper) {
             cropper.destroy();
         }
@@ -603,7 +598,6 @@
             cropper = null;
         }
 
-        // Clear file input
         document.getElementById('imageUpload').value = '';
     }
 
