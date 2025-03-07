@@ -6,8 +6,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
-        /* Product Card Styles (same as home.ejs) */
-         /* Product Card Styles (same as home.ejs) */
+     
     .product-card {
         border: 1px solid #e0e0e0;
         border-radius: 12px;
@@ -18,7 +17,7 @@
 
     .product-card:hover {
         box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-        transform: translateY(-5px);
+        transform: translateY(-10px);
     }
 
     .product-card__image {
@@ -246,6 +245,79 @@
     .category-checkbox {
         margin-right: 10px;
     }
+    /* Base Styling for Custom Checkbox */
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    position: relative;
+    font-size: 1rem; /* Adjust font size */
+    color: #333; /* Dark text color */
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+    gap: 10px;
+}
+
+/* Hide Default Checkbox */
+.custom-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Custom Checkbox Look */
+.checkmark {
+    width: 20px;
+    height: 20px;
+    background: #eee; /* Light grey background */
+    border-radius: 5px; /* Rounded edges */
+    position: relative;
+    transition: all 0.3s ease;
+    border: 2px solid #ccc;
+}
+
+/* On Checkbox Checked */
+.custom-checkbox input:checked + .checkmark {
+    background: #000000ec; /* Change to primary color */
+    border-color: #000000;
+}
+
+/* Checkmark Tick */
+.checkmark::after {
+    content: "";
+    position: absolute; 
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+/* Show Checkmark When Checked */
+.custom-checkbox input:checked + .checkmark::after {
+    display: block;
+}
+
+/* Hover Effect */
+.custom-checkbox:hover .checkmark {
+    border-color: #000000;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .custom-checkbox {
+        font-size: 0.9rem;
+    }
+    
+    .checkmark {
+        width: 18px;
+        height: 18px;
+    }
+}
+
 
     .category-item label {
         flex-grow: 1;
@@ -547,11 +619,12 @@
                                                     <% if (category && category.length> 0) { %>
                                                         <% for (let i=0; i < category.length; i++) { %>
                                                             <li>
-                                                                <label>
-                                                                    <input type="checkbox" class="filter-category"
-                                                                        value="<%= category[i]._id %>" />
+                                                                <label class="custom-checkbox">
+                                                                    <input type="checkbox" class="filter-category" value="<%= category[i]._id %>" />
+                                                                    <span class="checkmark"></span>
                                                                     <%= category[i].name %>
                                                                 </label>
+                                                                
                                                             </li>
                                                         <% } %>
                                                     <% } else { %>
@@ -575,11 +648,12 @@
                                                     <% if (brand && brand.length > 0) { %>
                                                         <% for (let i = 0; i < brand.length; i++) { %>
                                                             <li>
-                                                                <label>
-                                                                    <input type="checkbox" class="filter-brand" 
-                                                                            value="<%= brand[i]._id %>" />
+                                                                <label class="custom-checkbox">
+                                                                    <input type="checkbox" class="filter-brand" value="<%= brand[i]._id %>" />
+                                                                    <span class="checkmark"></span>
                                                                     <%= brand[i].brandName %>
                                                                 </label>
+                                                                
                                                             </li>
                                                         <% } %>
                                                     <% } else { %>

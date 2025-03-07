@@ -277,34 +277,187 @@
 </section>
 
 <script>
-  function confirmDelete(brandId, brandName) {
-    Swal.fire({
-      title: 'Delete Brand?',
-      html: `Are you sure you want to delete <strong>${brandName}</strong>?<br>This action cannot be undone.`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#dc3545',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel',
-      reverseButtons: true
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Show loading state
+    document.addEventListener("DOMContentLoaded", function () {
+  // Add Brand Form Submission
+  document.querySelector(".brand-form form").addEventListener("submit", async function (event) {
+    event.preventDefault();
+    
+    const formData = new FormData(this);
+    try {
+      const response = await fetch("/admin/addBrand", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await response.json();
+      
+      if (result.success) {
         Swal.fire({
-          title:'Success!',
-          text: 'Deleted successfully!',
-          icon: 'success',
+          title: "Success!",
+          text: result.message,
+          icon: "success",
           showConfirmButton: false,
           timer: 1500
-        })
+        });
         
-        // Redirect to delete URL
-        window.location.href = `/admin/deleteBrand?id=${brandId}`;
+        // Add the new brand to the table without reloading
+        if (result.brand) {
+          addBrandToTable(result.brand);
+          // Reset the form
+          this.reset();
+        }
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: result.message,
+          icon: "error",
+        });
       }
-    });
-    return false;
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        title: "Error!",
+        text: "Something went wrong. Please try again.",
+        icon: "error",
+      });
+    }
+  });
+  
+  // Function to add a new brand to the table
+  function addBrandToTable(brand) {
+    const tbody = document.querySelector(".brand-table table tbody");
+    const newRow = document.createElement("tr");
+    
+    newRow.innerHTML = `
+      <td>${brand.brandName}</td>
+      <td>
+        <div class="brand-logo">
+          <img src="/uploads/brands/${brand.brandImage}" alt="${brand.brandName}" />
+        </div>
+      </td>
+      <td>
+        <span class="badge alert-success">Active</span>
+      </td>
+      <td class="actions-cell">
+        <a href="#" onclick="blockBrand('${brand._id}', this)" class="btn-action btn-danger">Block</a>
+        <a href="#" onclick="confirmDelete('${brand._id}', '${brand.brandName}')" class="btn-action btn-danger">Delete</a>
+      </td>
+    `;
+    
+    tbody.appendChild(newRow);
   }
+});
+
+// Block/Unblock brand function
+function blockBrand(brandId, element) {
+  const action = element.textContent === "Block" ? "blockBrand" : "unblockBrand";
+  
+  fetch(`/admin/${action}?id=${brandId}`, {
+    method: "GET"
+  })
+  .then(response => response.json())
+  .then(result => {
+    if (result.success) {
+      const row = element.closest("tr");
+      const statusCell = row.querySelector("td:nth-child(3) span");
+      
+      if (action === "blockBrand") {
+        statusCell.className = "badge alert-danger";
+        statusCell.textContent = "Blocked";
+        element.textContent = "Unblock";
+        element.className = "btn-action btn-success";
+        element.onclick = function() { blockBrand(brandId, element); };
+      } else {
+        statusCell.className = "badge alert-success";
+        statusCell.textContent = "Active";
+        element.textContent = "Block";
+        element.className = "btn-action btn-danger";
+        element.onclick = function() { blockBrand(brandId, element); };
+      }
+      
+      Swal.fire({
+        title: "Success!",
+        text: result.message,
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    } else {
+      Swal.fire({
+        title: "Error!",
+        text: result.message || "Operation failed",
+        icon: "error"
+      });
+    }
+  })
+  .catch(error => {
+    console.error(error);
+    Swal.fire({
+      title: "Error!",
+      text: "Something went wrong. Please try again.",
+      icon: "error"
+    });
+  });
+  
+  return false;
+}
+
+// Delete brand function
+function confirmDelete(brandId, brandName) {
+  Swal.fire({
+    title: 'Delete Brand?',
+    html: `Are you sure you want to delete <strong>${brandName}</strong>?<br>This action cannot be undone.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc3545',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+    reverseButtons: true
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Send delete request via fetch
+      fetch(`/admin/deleteBrand?id=${brandId}`, {
+        method: "GET"
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          // Find and remove the row from the table
+          const rows = document.querySelectorAll(".brand-table table tbody tr");
+          for (let row of rows) {
+            if (row.querySelector(`a[onclick*="${brandId}"]`)) {
+              row.remove();
+              break;
+            }
+          }
+          
+          Swal.fire({
+            title: 'Success!',
+            text: 'Deleted successfully!',
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 1500
+          });
+        } else {
+          Swal.fire({
+            title: "Error!",
+            text: result.message || "Delete operation failed",
+            icon: "error"
+          });
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        Swal.fire({
+          title: "Error!",
+          text: "Something went wrong during deletion. Please try again.",
+          icon: "error"
+        });
+      });
+    }
+  });
+  return false;
+}
 </script>
 
 <%- include("../../views/partials/admin/footer") %>

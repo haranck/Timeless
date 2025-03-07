@@ -21,10 +21,11 @@ const categoryInfo = async (req, res) => {
    }
 }
 const addCategory = async (req, res) => {
-   const { name, description , categoryOffer} = req.body
+   const {description , categoryOffer} = req.body
+   const name = req.body.name.trim();
 
    try {
-      const existingCategory = await Category.findOne({ name })
+      const existingCategory = await Category.findOne({name:{$regex: `^${name}$`, $options: "i"} })
       if (existingCategory) {
          return res.status(400).json({ message: "Category already exists" })
 

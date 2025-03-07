@@ -39,14 +39,26 @@
     }
 
     .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-    }
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive two-column layout */
+    gap: 10px;
+}
 
-    .info-item {
-        margin-bottom: 1rem;
+.info-item {
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+    /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+    text-align: center; /* Centers content */
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr); /* Stack items in a single column for smaller screens */
     }
+}
+
 
     .info-label {
         color: #666;
@@ -421,7 +433,7 @@
     <% if (order) { %>
         <!-- Order Information Section -->
         <div class="card">
-            <div style="display: flex; justify-content: space-between;">   
+            <div style="display: flex; justify-content: space-between;">
             <h2 class="section-title">Order Information</h2>
             <% if(order.orderStatus === 'delivered' || order.orderStatus === 'Return rejected' || order.orderStatus === 'Return approved' || order.orderStatus === 'Return requested'){  %> 
                 <a href="/invoice/<%= order._id %>" class="btn btn-dark invoice-btn">Invoice</a>

@@ -1,42 +1,30 @@
-
 document.addEventListener('DOMContentLoaded', function() {
     // Chart instances
     let salesChart, customersChart, ordersChart, categoryChart;
 
     const urlParams = new URLSearchParams(window.location.search);
-    const initialTimeFilter = urlParams.get('timeFilter', 'weekly') || 'weekly';
+    const initialTimeFilter = urlParams.get('timeFilter') || 'weekly';
 
-    // Set all dropdowns to the initial value
-    syncAllFilters(initialTimeFilter);
+    // Set the sales filter dropdown to the initial value
+    document.getElementById('salesChartFilter').value = initialTimeFilter;
     
     // Initialize charts with the correct time filter
     initializeCharts(initialTimeFilter);
     
-    // Add event listeners to chart filter dropdowns
-    const filters = ['sales', 'customers', 'orders', 'category'];
-    filters.forEach(type => {
-        document.getElementById(`${type}ChartFilter`).addEventListener('change', function() {
-            const newTimeFilter = this.value;
-            syncAllFilters(newTimeFilter);
-            updateAllCharts(newTimeFilter);
-        });
+    // Add event listener to the sales chart filter dropdown
+    document.getElementById('salesChartFilter').addEventListener('change', function() {
+        const newTimeFilter = this.value;
+        updateAllCharts(newTimeFilter);
     });
     
-    function syncAllFilters(timeFilter) {
-        const filters = ['sales'];
-        filters.forEach(type => {
-            document.getElementById(`${type}ChartFilter`).value = timeFilter;
-        });
-    }
-    
     function updateAllCharts(timeFilter) {
-        console.log("time filter ", timeFilter)
+        console.log("time filter ", timeFilter);
         // Update URL
         const currentUrl = new URL(window.location.href);
         currentUrl.searchParams.set('timeFilter', timeFilter);
         window.history.replaceState({}, '', currentUrl);
 
-        console.log("currentUrl",currentUrl)
+        console.log("currentUrl", currentUrl);
         
         // Show loading state on all charts
         const containers = document.querySelectorAll('.chart-container');
@@ -47,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 // Update all charts with new data
-                console.log("data",data)
+                console.log("data", data);
                 updateSalesChart(data.sales);
                 updateCustomersChart(data.customers);
                 updateOrdersChart(data.orders);
@@ -66,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     text: 'Error updating chart data. Please try again.',
                     showConfirmButton: false,
                     timer: 1500
-                })
+                });
             });
     }
     
@@ -247,22 +235,27 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update Total Revenue
         document.querySelector('.summary-card:nth-child(1) .summary-info h3').textContent = 
             '₹' + Math.round(summaryData.totalRevenue).toLocaleString();
+            
+        // The growth indicators are commented out in the HTML, so we don't need to update them
+        // Uncomment the below if you re-enable growth indicators in the HTML
+        /*
         const revenueChangeEl = document.querySelector('.summary-card:nth-child(1) .summary-change');
-        revenueChangeEl.innerHTML = getGrowthHTML(summaryData.revenueGrowth);
+        if (revenueChangeEl) {
+            revenueChangeEl.innerHTML = getGrowthHTML(summaryData.revenueGrowth);
+        }
+        */
         
         // Update Total Customers
-        // console.log(summaryData)
-        // document.querySelector('.summary-card:nth-child(2) .summary-info h3').textContent = summaryData.totalCustomers
-        // document.querySelector('.summary-card:nth-child(2) .summary-info h3').textContent = summaryData.totalCustomers.toLocaleString();
-        // const customerChangeEl = document.querySelector('.summary-card:nth-child(2) .summary-change');
-        // const customerChangeEl = document.querySelector('.summary-card:nth-child(2) .summary-change');
-        // customerChangeEl.innerHTML = getGrowthHTML(summaryData.customerGrowth);
+        const customerElement = document.querySelector('.summary-card:nth-child(2) .summary-info h3');
+        if (customerElement && summaryData.totalCustomers) {
+            customerElement.textContent = summaryData.totalCustomers.toLocaleString();
+        }
         
         // Update Total Orders
-        // document.querySelector('.summary-card:nth-child(3) .summary-info h3').textContent = 
-        //     summaryData.totalOrders.toLocaleString();
-        // const orderChangeEl = document.querySelector('.summary-card:nth-child(3) .summary-change');
-        // orderChangeEl.innerHTML = getGrowthHTML(summaryData.orderGrowth);
+        const orderElement = document.querySelector('.summary-card:nth-child(3) .summary-info h3');
+        if (orderElement && summaryData.totalOrders) {
+            orderElement.textContent = summaryData.totalOrders.toLocaleString();
+        }
     }
     
     function getGrowthHTML(growthPercent) {

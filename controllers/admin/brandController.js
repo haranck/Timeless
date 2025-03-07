@@ -6,7 +6,7 @@ const Product = require('../../models/productSchema')
 const getBrandPage = async (req,res) =>{
     try {
         const page = parseInt(req.query.page) || 1
-        const limit = 4
+        const limit = 10
         const skip = (page - 1) * limit
         const brandData = await Brand.find({}).sort({createdAt:-1}).skip(skip).limit(limit)
         const totalBrands = await Brand.countDocuments()
@@ -24,30 +24,51 @@ const getBrandPage = async (req,res) =>{
         res.redirect('/pageNotFound')
     }
 }
-const addBrand = async (req,res) =>{
+const addBrand = async (req, res) => {
     try {
-        const brand = req.body.name
-        const findBrand = await Brand.findOne({brand})
-        if(!findBrand){
-            const image = req.file.filename
+        const brand = req.body.name.trim();
+        console.log("Brand name:", brand);
 
-            const newBrand = new Brand({brandName:brand,brandImage:image})
-            
-            await newBrand.save()
-            res.redirect('/admin/brands')
+        const findBrand = await Brand.findOne({ brandName: { $regex: `^${brand}$`, $options: "i" } });
+        if (findBrand) {
+            return res.status(400).json({ success: false, message: "Brand already exists" });
         }
+
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ success: false, message: "Please upload a brand image" });
+        }
+
+        const image = req.files[0].filename;
+        console.log("Image:", image);
+
+        const newBrand = new Brand({ brandName: brand, brandImage: image });
+        await newBrand.save();
+
+        res.json({
+            success: true,
+            message: "Brand added successfully",
+            brand: {
+              _id: newBrand._id,
+              brandName: newBrand.brandName, 
+              brandImage: newBrand.brandImage,
+              isBlocked: false
+            }
+          });
     } catch (error) {
-        res.redirect('/pageNotFound')
+        console.log(error);
+        return res.status(500).json({ success: false, message: "Something went wrong. Please try again." });
     }
-}
+};
+
 
 const blockBrand = async (req,res) =>{
     try {
         const id = req.query.id
         await Brand.updateOne({_id:id},{$set:{isBlocked:true}})
-        res.redirect('/admin/brands')
+        return res.status(200).json({ success: true, message: "Brand blocked successfully" });
     } catch (error) {
-       res.redirect('/pageNotFound')
+       console.log("error in block brand",error)
+       return res.status(500).json({ success: false, message: "Something went wrong. Please try again." });
     }
 }
 
@@ -55,9 +76,10 @@ const unblockBrand= async (req,res) =>{
     try {
         const id = req.query.id
         await Brand.updateOne({_id:id},{$set:{isBlocked:false}})
-        res.redirect('/admin/brands')
+        return res.status(200).json({ success: true, message: "Brand unblocked successfully" });
     } catch (error) {
-       res.redirect('/pageNotFound')
+       console.log("error in unblock brand",error)
+       return res.status(500).json({ success: false, message: "Something went wrong. Please try again." });
     }
 }
 
@@ -65,13 +87,13 @@ const deleteBrand = async (req,res) =>{
     try {
         const {id} = req.query
         if(!id){
-            return res.status(404).redirect('/pageNotFound')
+            return res.status(404).json({ success: false, message: "Brand not found" });
         }
         await Brand.deleteOne({_id:id})
-        res.redirect('/admin/brands')
+        return res.status(200).json({ success: true, message: "Brand deleted successfully" });
     } catch (error) {
         console.log("error in delete brand",error)
-        return res.status(500).redirect('/pageNotFound')
+        return res.status(500).json({ success: false, message: "Something went wrong. Please try again." });
     }
 }
 
