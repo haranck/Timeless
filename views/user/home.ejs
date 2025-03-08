@@ -7,9 +7,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/elegant-icons.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script> -->
     <style>
         /* Product Card Styles */
-        .product-card {
+        .produc t-card {
             border: 1px solid #e0e0e0;
             border-radius: 12px;
             overflow: hidden;
@@ -350,27 +357,27 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="hero__items set-bg" data-setbg="img/hero/hero-2.jpg">
+            <div class="hero__items set-bg" data-setbg="img/hero/hero-2.jpg">
                 <div class="container">
                     <div class="row">
                         <div class="col-xl-5 col-lg-7 col-md-8">
                             <div class="hero__text">
                                 <h6>Summer Collection</h6>
-                                <h2>Fall - Winter Collections 2030</h2>
+                                <h2>Fall - Winter Collections 2025</h2>
                                 <p>A specialist label creating luxury essentials. Ethically crafted with an unwavering
                                     commitment to exceptional quality.</p>
-                                <a href="#" class="primary-btn">Shop now <span class="arrow_right"></span></a>
+                                <a href="/shop" class="primary-btn" style="background-color: white;color: black;">Shop now </a>
                                 <div class="hero__social">
-                                    <a href="#"><i class="fa fa-facebook"></i></a>
-                                    <a href="#"><i class="fa fa-twitter"></i></a>
-                                    <a href="#"><i class="fa fa-pinterest"></i></a>
-                                    <a href="#"><i class="fa fa-instagram"></i></a>
+                                    <a href="#"><i class="fa-brands fa-facebook" style="color: #ffffff;"></i></a>
+                                    <a href="#"><i class="fa-brands fa-twitter" style="color: #ffffff;"></i></a>
+                                    <a href="#"><i class="fa-brands fa-pinterest" style="color: #ffffff;"></i></a>
+                                    <a href="#"><i class="fa-brands fa-instagram" style="color: #ffffff;"></i></a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div> -->
+            </div>
         </div>
     </section>
     <!-- Hero Section End -->
@@ -614,6 +621,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
     <script>
 
         async function addToWishlist(productId){
@@ -774,6 +783,32 @@
                 }
             }).showToast();
         }
+
+          // This ensures the script runs after the page is fully loaded
+  $(document).ready(function() {
+    // First destroy any existing carousel to prevent conflicts
+    if ($('.hero__slider').hasClass('owl-loaded')) {
+      $('.hero__slider').owlCarousel('destroy');
+    }
+    
+    // Initialize with your desired settings
+    $('.hero__slider').owlCarousel({
+      loop: true,
+      margin: 0,
+      items: 1,
+      dots: true,
+      nav: false, // Remove navigation arrows
+      animateOut: 'fadeOut',
+      animateIn: 'fadeIn',
+      smartSpeed: 1200,
+      autoHeight: false,
+      autoplay: true,
+      autoplayTimeout: 5000, // 5 seconds per slide
+      autoplayHoverPause: true
+    });
+    
+    console.log('Owl Carousel initialized with autoplay and 5-second interval');
+  });
     </script>
 
     <%- include("../../views/partials/user/footer") %>

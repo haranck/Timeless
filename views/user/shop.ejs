@@ -246,6 +246,19 @@
         margin-right: 10px;
     }
     /* Base Styling for Custom Checkbox */
+    .custom-checkboxc{
+        display: flex;
+    align-items: center;
+    position: relative;
+    font-size: 1rem;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+    gap: 11px;
+    margin-bottom: 27px;
+    margin-top: 17px;
+    }
 .custom-checkbox {
     display: flex;
     align-items: center;
@@ -264,6 +277,11 @@
     opacity: 0;
     cursor: pointer;
 }
+.custom-checkboxc input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
 
 /* Custom Checkbox Look */
 .checkmark {
@@ -278,6 +296,10 @@
 
 /* On Checkbox Checked */
 .custom-checkbox input:checked + .checkmark {
+    background: #000000ec; /* Change to primary color */
+    border-color: #000000;
+}
+.custom-checkboxc input:checked + .checkmark {
     background: #000000ec; /* Change to primary color */
     border-color: #000000;
 }
@@ -300,15 +322,24 @@
 .custom-checkbox input:checked + .checkmark::after {
     display: block;
 }
+.custom-checkboxc input:checked + .checkmark::after {
+    display: block;
+}
 
 /* Hover Effect */
 .custom-checkbox:hover .checkmark {
+    border-color: #000000;
+}
+.custom-checkboxc:hover .checkmark {
     border-color: #000000;
 }
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .custom-checkbox {
+        font-size: 0.9rem;
+    }
+    .custom-checkboxc {
         font-size: 0.9rem;
     }
     
@@ -583,6 +614,20 @@
             margin: 0 3px;
         }
     }
+    .brand-item {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+    padding: 4px;
+}
+
+.brand-logo {
+    width: 40px; /* Adjust size */
+    height: 40px;
+    object-fit: contain;
+    border-radius: 5px;
+}
+
     </style>
     <section class="shop spad">
         <div class="container">
@@ -619,7 +664,7 @@
                                                     <% if (category && category.length> 0) { %>
                                                         <% for (let i=0; i < category.length; i++) { %>
                                                             <li>
-                                                                <label class="custom-checkbox">
+                                                                <label class="custom-checkboxc">
                                                                     <input type="checkbox" class="filter-category" value="<%= category[i]._id %>" />
                                                                     <span class="checkmark"></span>
                                                                     <%= category[i].name %>
@@ -647,19 +692,20 @@
                                                 <ul class="nice-scroll">
                                                     <% if (brand && brand.length > 0) { %>
                                                         <% for (let i = 0; i < brand.length; i++) { %>
-                                                            <li>
+                                                            <li class="brand-item">
                                                                 <label class="custom-checkbox">
                                                                     <input type="checkbox" class="filter-brand" value="<%= brand[i]._id %>" />
                                                                     <span class="checkmark"></span>
+                                                                    <img src="/uploads/brands/<%= brand[i].brandImage %>" alt="<%= brand[i].brandName %>" class="brand-logo">
                                                                     <%= brand[i].brandName %>
                                                                 </label>
-                                                                
                                                             </li>
                                                         <% } %>
                                                     <% } else { %>
                                                         <li>No brands available</li>
                                                     <% } %>
                                                 </ul>
+                                                
                                             </div>
                                         </div>
                                     </div>

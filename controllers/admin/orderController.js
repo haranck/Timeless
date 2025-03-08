@@ -346,7 +346,7 @@ const getSalesReportPDF = async (req, res) => {
             .text('Summary', 60, doc.y + 10)
             .fontSize(10)
             .text(`Total Orders: ${totalOrders}`, 60, doc.y + 5)
-            .text(`Total Sales: ₹${totalSales.toLocaleString()}.00`, 60, doc.y + 5)
+            .text(`Total Sales: RS.${totalSales.toLocaleString()}.00`, 60, doc.y + 5)
             .moveDown(2);
 
         const tableTop = doc.y;
@@ -415,7 +415,7 @@ const getSalesReportPDF = async (req, res) => {
             });
 
             xPosition += columnWidths[3];
-            doc.text(`₹${order.total.toLocaleString()}.00`, xPosition, yPosition, {
+            doc.text(`RS.${order.total.toLocaleString()}.00`, xPosition, yPosition, {
                 width: columnWidths[4],
                 align: 'right'
             });
@@ -525,7 +525,7 @@ const getSalesReportExcel = async (req, res) => {
         rowIndex++;
 
         worksheet.mergeCells(`A${rowIndex}:C${rowIndex}`);
-        worksheet.getCell(`A${rowIndex}`).value = `Total Sales: ₹${totalSales.toLocaleString()}.00`;
+        worksheet.getCell(`A${rowIndex}`).value = `Total Sales: RS.${totalSales.toLocaleString()}.00`;
         rowIndex += 2;
 
         const headers = ['Order ID', 'Date', 'Customer Name', 'Product', 'Status', 'Amount'];
@@ -552,7 +552,7 @@ const getSalesReportExcel = async (req, res) => {
                 order.user_id.name,
                 order.order_items[0].productId.productName,
                 order.status,
-                `₹${(order.finalAmount || order.total).toFixed(2)}`
+                `RS.${(order.finalAmount || order.total).toFixed(2)}`
             ]);
 
             if (index % 2 === 0) {

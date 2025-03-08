@@ -808,8 +808,8 @@ const generateInvoice = async (req, res) => {
             doc.font('Helvetica')
                 .text(item.productName, startX, y, { width: columnWidths.product })
                 .text(`${item.quantity}`, startX + columnWidths.product, y, { width: columnWidths.quantity, align: 'right' })
-                .text(`₹${item.price.toFixed(2)}`, startX + columnWidths.product + columnWidths.quantity, y, { width: columnWidths.price, align: 'right' })
-                .text(`₹${itemTotal.toFixed(2)}`, startX + columnWidths.product + columnWidths.quantity + columnWidths.price, y, { width: columnWidths.total, align: 'right' })
+                .text(`RS.${item.price.toFixed(2)}`, startX + columnWidths.product + columnWidths.quantity, y, { width: columnWidths.price, align: 'right' })
+                .text(`RS.${itemTotal.toFixed(2)}`, startX + columnWidths.product + columnWidths.quantity + columnWidths.price, y, { width: columnWidths.total, align: 'right' })
                 .moveDown(0.5);
         });
 
@@ -824,16 +824,16 @@ const generateInvoice = async (req, res) => {
         const lineHeight = 15; // Adjust as needed for spacing
 
         doc.font('Helvetica-Bold').text('Subtotal', 400, summaryStartY, { width: 100, align: 'right' });
-        doc.font('Helvetica').text(`₹${runningTotal.toFixed(2)}`, 500, summaryStartY, { width: 50, align: 'right' });
+        doc.font('Helvetica').text(`RS.${runningTotal.toFixed(2)}`, 500, summaryStartY, { width: 50, align: 'right' });
 
         doc.font('Helvetica-Bold').text('Discount', 400, summaryStartY + lineHeight, { width: 100, align: 'right' });
-        doc.font('Helvetica').text(`₹${order.discount.toFixed(2)}`, 500, summaryStartY + lineHeight, { width: 50, align: 'right' });
+        doc.font('Helvetica').text(`RS.${order.discount.toFixed(2)}`, 500, summaryStartY + lineHeight, { width: 50, align: 'right' });
 
         doc.font('Helvetica-Bold').text('Delivery Charge', 400, summaryStartY + lineHeight * 2, { width: 100, align: 'right' });
-        doc.font('Helvetica').text('₹40.00', 500, summaryStartY + lineHeight * 2, { width: 50, align: 'right' });
+        doc.font('Helvetica').text('RS.40.00', 500, summaryStartY + lineHeight * 2, { width: 50, align: 'right' });
 
         doc.font('Helvetica-Bold').text('Grand Total', 400, summaryStartY + lineHeight * 3, { width: 100, align: 'right' });
-        doc.font('Helvetica-Bold').text(`₹${(runningTotal - order.discount + 40)}`, 500, summaryStartY + lineHeight * 3, { width: 50, align: 'right' });
+        doc.font('Helvetica-Bold').text(`RS.${(runningTotal - order.discount + 40)}`, 500, summaryStartY + lineHeight * 3, { width: 50, align: 'right' });
 
 
         
