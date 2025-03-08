@@ -466,10 +466,8 @@
     <script>
        document.addEventListener('DOMContentLoaded', function() {
         
-    // Make sure Cropper is loaded properly
     if (typeof Cropper === 'undefined') {
         console.error('Cropper library is not loaded');
-        // Add a more visible error message for admin
         const errorMsg = document.createElement('div');
         errorMsg.className = 'alert alert-danger';
         errorMsg.textContent = 'Error: Cropper.js library could not be loaded. Please check your internet connection.';
@@ -480,13 +478,12 @@
     let deletedImages = [];
     let croppers = {};
 
-    // Form validation function
     function validateForm() {
         let isValid = true;
         const errors = {};
 
         // Basic field validation
-        const requiredFields = ['productName', 'description', 'regularPrice', 'category'];
+        const requiredFields = ['productName', 'description', 'regularPrice', 'category','salePrice','quantity'];
         requiredFields.forEach(field => {
             const input = document.querySelector(`[name="${field}"]`);
             if (!input || !input.value.trim()) {

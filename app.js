@@ -7,7 +7,7 @@ const db = require('./config/db');
 const flash = require("connect-flash");
 const nocache = require('nocache')
 db()
- 
+  
 require('events').EventEmitter.defaultMaxListeners = 20;
 // const csrf = require('csurf');
 const userRouter = require('./routes/userRouter');
