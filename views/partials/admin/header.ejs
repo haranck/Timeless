@@ -31,16 +31,17 @@
             text-decoration: none;
             transition: all 0.3s;
             border-left: 3px solid transparent;
+            margin-bottom: 12px;
         }
 
         .nav-item:hover {
             background: rgba(255, 255, 255, 0.1);
-            border-left-color: #3498db;
+            border-left-color: #db3434;
         }
 
         .nav-item.active {
             background: rgba(255, 255, 255, 0.1);
-            border-left-color: #3498db;
+            border-left-color: #1f60b6;
         }
 
         .nav-item i {
@@ -74,7 +75,7 @@
         .logo-text {
             font-size: 24px;
             font-weight: 700;
-            background: linear-gradient(45deg, #7b3333, #db3434);
+            background: linear-gradient(45deg, #ff5757, #b71111);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-transform: uppercase;
@@ -83,6 +84,7 @@
             padding-left: 21px;
             margin-bottom: 45px;
             margin-top: -44px;
+            
         }
 
         /* .logo-text::before {
@@ -265,6 +267,10 @@
             <a href="/admin/salesReport" class="nav-item">
                 <i class="fas fa-chart-line"></i>
                 salesReport
+            </a>
+            <a href="/admin/logout" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
             </a>
         </nav>
     </div>

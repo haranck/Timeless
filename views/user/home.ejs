@@ -16,7 +16,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script> -->
     <style>
         /* Product Card Styles */
-        .produc t-card {
+        .product-card {
             border: 1px solid #e0e0e0;
             border-radius: 12px;
             overflow: hidden;
@@ -784,20 +784,18 @@
             }).showToast();
         }
 
-          // This ensures the script runs after the page is fully loaded
   $(document).ready(function() {
-    // First destroy any existing carousel to prevent conflicts
+
     if ($('.hero__slider').hasClass('owl-loaded')) {
       $('.hero__slider').owlCarousel('destroy');
     }
     
-    // Initialize with your desired settings
     $('.hero__slider').owlCarousel({
       loop: true,
       margin: 0,
       items: 1,
       dots: true,
-      nav: false, // Remove navigation arrows
+      nav: false, 
       animateOut: 'fadeOut',
       animateIn: 'fadeIn',
       smartSpeed: 1200,
