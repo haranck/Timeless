@@ -548,7 +548,7 @@
                                             class="fa-solid fa-star <%= j < Math.round(products[i].rating || 0) ? 'active' : '' %>"></i>
                                         <% } %>
                                             <span class="product-card__rating-count">
-                                                (<%= products[i].rating || 0 %>/5)
+                                                (5/5)
                                             </span>
                                 </div>
                                 <button onclick="addToCart('<%= products[i]._id %>')" class="product-card__cart-btn">
@@ -569,24 +569,26 @@
     <!-- Categories Section End -->
 
     <!-- Brands Section Begin -->
-
+    <a href="/shop">
     <div class="image-container"
-    style="    display: flex;
-        justify-content: center;
-        gap: 80px;
-        flex-wrap: wrap;
-        margin-top: 48px;">
+            style="
+                display: flex;
+                justify-content: center;
+                gap: 80px;
+                flex-wrap: wrap;
+                margin-top: 48px;">
 
-    <div class="col-lg-12">
-        <ul class="filter__controls">
-            <li data-filter=".new-arrivals">BRANDS</li>
-        </ul>
-    </div>
-    <% brands.forEach(brand => { %> 
-        <img src="/uploads/brands/<%= brand.brandImage %>" alt="<%= brand.brandName %>" style="    width: 210px;
-    height: 183px;">
-    <% }); %>
-</div>
+            <div class="col-lg-12">
+                <ul class="filter__controls">
+                    <li data-filter=".new-arrivals">BRANDS</li>
+                </ul>
+            </div>  
+            <% brands.forEach(brand => { %> 
+                <img src="/uploads/brands/<%= brand.brandImage %>" alt="<%= brand.brandName %>" style="    width: 210px;
+                height: 183px;">
+            <% }); %>
+        </div>
+    </a>
     <!-- Brands Section End -->
 
 

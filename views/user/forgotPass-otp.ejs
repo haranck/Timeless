@@ -179,23 +179,39 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        document.getElementById("otp").focus();
+       document.getElementById("otp").focus();
 
         let timer = 60;
         let timerInterval;
+        const resendButton = document.querySelector('.btn-secondary');
+
+        resendButton.disabled = true;
+        resendButton.style.backgroundColor = '#d3d3d3';
+        resendButton.style.cursor = 'not-allowed';
 
         function startTimer() {
+            resendButton.disabled = true;
+            resendButton.style.backgroundColor = '#d3d3d3';
+            resendButton.style.cursor = 'not-allowed';
+
             timerInterval = setInterval(() => {
                 timer--;
                 document.getElementById("timerValue").textContent = timer;
+
                 if (timer <= 0) {
                     clearInterval(timerInterval);
                     document.getElementById("timerValue").classList.add("expired");
                     document.getElementById("timerValue").textContent = "Expired";
+
+                    resendButton.disabled = false;
+                    resendButton.style.backgroundColor = '#6c757d';
+                    resendButton.style.cursor = 'pointer';
+
                     document.getElementById("otp").disabled = true;
                 }
             }, 1000);
         }
+
         startTimer();
 
         function validateOTPForm() {
@@ -207,13 +223,13 @@
                 success: function(response) {
                     if(response.success) {
                         Swal.fire({
-                            title: "otp verifies successfully",
+                            title: "OTP verified successfully",
                             text: response.message,
                             icon: "success",
                             showConfirmButton: false,
                             timer: 1500
                         }).then(function() {
-                            window.location.href = response.redirectUrl ;
+                            window.location.href = response.redirectUrl;
                         });
                     } else {
                         Swal.fire({
@@ -235,10 +251,8 @@
 
             return false;
         }
-        
-        function resendOTP() {
 
-            
+        function resendOTP() {
             $.ajax({
                 type: "POST",
                 url: "/resend-forgot-otp",
