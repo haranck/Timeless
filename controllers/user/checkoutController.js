@@ -168,145 +168,6 @@ const addCheckoutAddress = async (req, res) => {
     }
 }
 
-// const placeOrder = async (req, res) => {
-//     try {
-//         const userId = req.session.user;
-//         console.log("placeOrder", req.body)
-//         const { shippingAddress, paymentMethod, totalAmount, couponCode, discountAmount } = req.body;
-
-//         console.log("shippingAddress", shippingAddress)
-
-//         if (totalAmount < 0) {
-//             return res.status(400).json({ success: false, error: "Some products are not available and have been removed from your cart." });
-//         }
-
-//         if (paymentMethod === "cod" && totalAmount > 1000) {
-//             return res.status(400).json({ success: false, error: "Minimum order amount for COD is ₹1000" });
-//         }
-
-//         const address = await Address.findOne({
-//              userId,
-//             'address._id': shippingAddress
-//         });
-//         console.log("address", address)
-
-//         if (!address) {
-//             return res.status(400).json({ success: false, message: 'Invalid shipping address' });
-//         }
-
-//         const orderAddress = address.address.find(addr => addr._id.toString() === shippingAddress);
-
-//         console.log("orderAddress", orderAddress)
-
-
-//         const orderedItems = JSON.parse(JSON.stringify(req.body.orderedItems));
-
-//         let coupon = "";
-//         if (couponCode) {
-//             coupon = await Coupon.findOne({ couponCode: couponCode });
-//             if (!coupon) {
-//                 return res.status(400).json({ success: false, error: "Invalid coupon code" });
-//             }
-//         }
-
-//         const cleanedTotal = parseFloat(totalAmount);
-//         const cleanedDiscount = parseFloat(discountAmount);
-//         // console.log("cleanedDiscount",cleanedDiscount)
-
-//         if (isNaN(cleanedTotal)) {
-//             return res.status(400).json({ success: false, error: "Invalid total amount" });
-//         }
-
-//         if (!userId || !shippingAddress || !paymentMethod || !totalAmount || !orderedItems) {
-//             return res.status(400).json({ success: false, error: "Please fill all the fields" });
-//         }
-
-//         const orderedItemsWithDetails = await Promise.all(orderedItems.map(async (item) => {
-//             const product = await Product.findById(item.productId);
-
-//             if (!product) {
-//                 throw new Error(`Product not found for ID: ${item.productId}`);
-//             }
-
-//             return {
-//                 productId: product._id,
-//                 quantity: item.quantity,
-//                 price: product.salePrice,
-//                 productName: product.productName,
-//             };
-//         }));
-
-
-//         const formattedItems = orderedItemsWithDetails.map(item => ({
-//             productId: item.productId,
-//             quantity: item.quantity,
-//             price: item.price,
-//             productName: item.productName,
-
-
-//         }));
-
-//         const newOrder = new Order({
-//             user_id: userId,
-//             address_id: shippingAddress,
-//             shippingAddress:{
-//                 addressType: orderAddress.addressType,
-//                 name: orderAddress.name,
-//                 city: orderAddress.city,
-//                 landMark: orderAddress.landMark,
-//                 state: orderAddress.state,
-//                 pincode: orderAddress.pincode,
-//                 phone: orderAddress.phone,
-//                 altPhone: orderAddress.altPhone
-//             },
-//             payment_method: paymentMethod,
-//             finalAmount: cleanedTotal,
-//             order_items: formattedItems,
-//             status: "pending",
-//             total: cleanedTotal,
-//             couponCode: couponCode || null,
-//             couponApplied: !!coupon,
-//             discount: cleanedDiscount
-
-//         });
-
-//         if (coupon) {
-//             await Coupon.findOneAndUpdate(
-//                 { couponCode },
-//                 { $inc: { usageCount: 1 } }
-//             );
-//         }
-
-//         await newOrder.save();
-
-
-
-//         orderedItems.forEach(async (item) => {
-//             await Product.updateOne(
-//                 { _id: item.productId._id },
-//                 { $inc: { quantity: -item.quantity } }
-//             );
-//         });
-
-//         await Cart.findOneAndUpdate(
-//             { userId },
-//             { $set: { items: [] } }
-//         );
-
-//         return res.status(200).json({
-//             success: true,
-//             orderId: newOrder._id,
-//             message: 'Order placed successfully'
-//         });
-
-//     } catch (error) {
-//         console.error('Order placement error:', error);
-//         res.status(500).json({
-//             success: false,
-//             error: "Failed to place order. Please try again."
-//         });
-//     }
-// }
 
 const placeOrder = async (req, res) => {
     try {
@@ -317,8 +178,8 @@ const placeOrder = async (req, res) => {
             return res.status(400).json({ success: false, error: "Some products are not available and have been removed from your cart." });
         }
 
-        if (paymentMethod === "cod" && totalAmount > 1000) {
-            return res.status(400).json({ success: false, error: "Maximum order amount for COD is ₹1000" });
+        if (paymentMethod === "cod" && totalAmount > 10000) {
+            return res.status(400).json({ success: false, error: "Maximum order amount for COD is ₹10000" });
         }
 
         const address = await Address.findOne({
