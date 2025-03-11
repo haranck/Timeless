@@ -20,9 +20,9 @@ const loadCheckout = async (req, res) => {
             populate: { path: "category" }
         });
 
-        if (!cart || cart.items.length === 0) {
-            return res.status(400).json({ success: false, message: "Cart is empty" });
-        }
+        // if (!cart || cart.items.length === 0) {
+        //     return res.status(400).json({ success: false, message: "Cart is empty" });
+        // }
 
         const availableItems = cart.items.filter(item =>
             item.productId.isListed &&
