@@ -259,9 +259,9 @@
               </td>
               <td class="actions-cell">
                 <% if(!brand.isBlocked) { %>
-                  <a href="/admin/blockBrand?id=<%=brand._id%>" class="btn-action btn-danger">Block</a>
+                  <a href="#" onclick="blockBrand('<%=brand._id%>', this)" class="btn-action btn-danger">Block</a>
                 <% } else { %>
-                  <a href="/admin/unblockBrand?id=<%=brand._id%>" class="btn-action btn-success">Unblock</a>
+                  <a href="#" onclick="unblockBrand('<%=brand._id%>', this)" class="btn-action btn-success">Unblock</a>
                 <% } %>
                 <a href="#" 
                    onclick="confirmDelete('<%=brand._id%>', '<%=brand.brandName%>')" 
