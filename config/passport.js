@@ -2,6 +2,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/userSchema');
 const env = require('dotenv').config()
+const axios = require('axios');
 
 passport.use(new GoogleStrategy({
    clientID:process.env.GOOGLE_CLIENT_ID,
@@ -9,7 +10,7 @@ passport.use(new GoogleStrategy({
    callbackURL:process.env.GOOGLE_REDIRECT_URI, // Ensure this matches
 },
 
-async (accessToken, refreshToken, profile, done) => {
+async (accessToken, refreshToken, profile, done) => { 
    try {
       let user = await User.findOne({googleId:profile.id})
       if(user){
