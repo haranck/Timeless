@@ -89,7 +89,6 @@ const editCheckoutAddress = async (req, res) => {
             return res.status(404).json({ error: "Address not found" });
         }
 
-        // Find and update the specific address in the array
 
         const addressIndex = address.address.findIndex(addr => addr._id.toString() === address_id);
         if (addressIndex === -1) {
@@ -307,7 +306,6 @@ const placeOrder = async (req, res) => {
 
         await newOrder.save();
 
-        // Update product quantities
         for (const item of orderedItems) {
             await Product.updateOne(
                 { _id: item.productId._id },
@@ -546,12 +544,10 @@ const removeCoupon = async (req, res) => {
             return res.json({ success: false, message: 'Invalid coupon' });
         }
 
-        // Restore the coupon limit
         coupon.limit += 1;
         coupon.usageCount -= 1;
         await coupon.save();
 
-        // Return the original subtotal as cartTotal since we're removing the coupon
         const cartTotal = subtotal;
 
         res.json({
@@ -681,8 +677,8 @@ const generateInvoice = async (req, res) => {
             .stroke()
             .moveDown(0.5);
 
-        const summaryStartY = doc.y; // Capture the starting Y position
-        const lineHeight = 15; // Adjust as needed for spacing
+        const summaryStartY = doc.y; 
+        const lineHeight = 15; 
 
         doc.font('Helvetica-Bold').text('Subtotal', 400, summaryStartY, { width: 100, align: 'right' });
         doc.font('Helvetica').text(`RS.${runningTotal.toFixed(2)}`, 500, summaryStartY, { width: 50, align: 'right' });

@@ -189,28 +189,6 @@ const verifyPayment = async (req, res) => {
     }
 }
 
-// const paymentFailed = async (req, res) => {
-//     try {
-//         const orderId = req.params.orderId;
-//         let order = await Order.findById(orderId);
-
-//         if (!order || order.user_id.toString() !== req.session.user) {
-//             return res.redirect('/orders');
-//         }
-
-//         res.render("failure", { 
-//             order,
-//             user: {
-//                 name: req.session.username,
-//                 email: req.session.email,
-//                 phone: req.session.phone || ""
-//             }
-//         });
-//     } catch (error) {
-//         console.error("Error rendering failure page:", error);
-//         res.redirect('/orders');
-//     }
-// }
 const paymentFailed = async (req, res) => {
     try {
         const orderId = req.params.orderId;
@@ -312,14 +290,6 @@ const   verifyRetryPayment = async (req, res) => {
             }
 
             await cart.save();
-
-            // orderedItems.forEach(async (item) => {
-            //     await Product.updateOne(
-            //         { _id: item.productId._id },
-            //         { $inc: { quantity: -item.quantity } }
-            //     )
-            // })
-
 
             if (failedOrder.order_items && failedOrder.order_items.length > 0) {
                 for (const item of failedOrder.order_items) {

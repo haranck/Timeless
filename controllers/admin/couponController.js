@@ -22,7 +22,6 @@ const addCoupon = async (req, res) => {
     try {
         const { couponCode, couponType, discount, minPurchase,maxDiscount, expiryDate, usageLimit } = req.body;
 
-        // Validate input fields
         if (!couponCode || !couponType || !discount || !minPurchase || !expiryDate || !maxDiscount || !usageLimit) {
             return res.status(400).json({
                 success: false,
@@ -59,7 +58,7 @@ const addCoupon = async (req, res) => {
         const parsedMaxDiscount = parseFloat(maxDiscount);
         const parsedUsageLimit = parseFloat(usageLimit);
 
-        // Validate discount based on coupon type
+
         if (isNaN(parsedDiscount) || parsedDiscount <= 0) {
             return res.status(400).json({
                 success: false,
@@ -67,7 +66,6 @@ const addCoupon = async (req, res) => {
             });
         }
 
-        // Additional validation for percentage and fixed discounts
         if (couponType === 'percentage') {
             if (parsedDiscount > 100) {
                 return res.status(400).json({

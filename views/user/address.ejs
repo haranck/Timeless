@@ -249,11 +249,11 @@
 
         const form = document.getElementById("editAddressForm");
 
-        // Remove previous event listeners to avoid duplicates
+ 
         form.removeEventListener("submit", handleEditAddressSubmit);
         form.addEventListener("submit", handleEditAddressSubmit);
 
-        // Display the modal
+       
         const modal = document.getElementById("editAddressModal");
         modal.style.display = "flex";
         document.body.style.overflow = 'hidden';
@@ -261,7 +261,7 @@
 }
 
 async function handleEditAddressSubmit(event) {
-    event.preventDefault(); // Prevent form submission
+    event.preventDefault();
 
     let isValid = true;
 
@@ -340,10 +340,9 @@ async function handleEditAddressSubmit(event) {
     }
 
     if (!isValid) {
-        return; // Stop execution if validation fails
+        return; 
     }
 
-    // If validation passes, send the request
     const addressId = document.getElementById("edit_address_id").value;
     const formDataObject = {
         addressType,

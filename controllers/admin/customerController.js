@@ -56,25 +56,6 @@ const customerInfo = async (req, res) => {
    }
 }
 
-// const customerBlocked = async (req, res) => {
-//    try {
-//       let id = req.query.id
-//       await User.updateOne({ _id: id }, { $set: { isblocked: true } })
-//       res.redirect('/admin/customers')
-//    } catch (error) {
-//       res.redirect('/pageerror')
-//    }
-// }
-
-// const customerunBlocked = async (req, res) => {
-//    try {
-//       let id = req.query.id
-//       await User.updateOne({ _id: id }, { $set: { isblocked: false } })
-//       res.redirect("/admin/customers")
-//    } catch (error) {
-//       res.redirect("/pageerror")
-//    }
-// }
 
 
 const toggleBlock = async (req, res) => {
@@ -92,6 +73,5 @@ const toggleBlock = async (req, res) => {
 module.exports = {
    customerInfo,
    toggleBlock,
-   // customerBlocked,
-   // customerunBlocked
+
 }

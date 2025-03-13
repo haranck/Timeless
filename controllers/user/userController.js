@@ -263,7 +263,6 @@ const loadShoppingPage = async (req, res) => {
       const limit = 9
       const skip = (page - 1) * limit;
       
-      // Modify query to include all listed products
       const query = {
          isListed: true,
          quantity: { $gt: 0 }
@@ -323,7 +322,7 @@ const loadShoppingPage = async (req, res) => {
 const filterProducts = async (req, res) => {
    try {
        const { categories, priceRange, searchQuery, sortBy, page = 1 } = req.body;
-       const limit = 12; // Products per page
+       const limit = 12; 
        const skip = (page - 1) * limit;
 
        let filter = { 
@@ -334,7 +333,6 @@ const filterProducts = async (req, res) => {
        const listedCategories = await Category.find({ isListed: true }).lean()
        const listedBrands = await Brand.find({ isBlocked: false }).lean()
 
-       // Category filtering
        if (categories && categories.length > 0) {
            const filteredCategories = listedCategories.filter((cat) => 
                categories.includes(cat._id.toString())
@@ -342,7 +340,6 @@ const filterProducts = async (req, res) => {
            filter.category = { $in: filteredCategories.map(cat => cat._id), $ne: null };
        }
 
-       // Brand filtering
        if (req.body.brands && req.body.brands.length > 0) {
            const filteredBrands = listedBrands.filter((brand) => 
                req.body.brands.includes(brand._id.toString())

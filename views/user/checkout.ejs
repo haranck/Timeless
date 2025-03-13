@@ -987,7 +987,19 @@
 
             async function placeOrder() {
                 try {
-                    const shippingAddress = document.querySelector('input[name="shipping_address"]:checked').value;
+                    const shippingAddressElement = document.querySelector('input[name="shipping_address"]:checked')
+
+                    if(!shippingAddressElement){
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Please add a shipping address.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+
+                    const shippingAddress = shippingAddressElement.value;
                     const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
                     const sanitizedOrderItems = sanitizeQuotes(<%- JSON.stringify(cart.items) %>);
@@ -999,6 +1011,16 @@
                     const discountText = document.getElementById("discount").innerText.replace("₹", "").replace("-", "").trim();
                     const discountAmount = parseFloat(discountText) || 0;
                     const appliedCouponCode = currentCouponCode;
+
+                    if(!shippingAddress) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Please select a shipping address.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
 
                     if (totalAmount <= 0) {
                         Swal.fire({

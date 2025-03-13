@@ -2,12 +2,11 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/userSchema');
 const env = require('dotenv').config()
-const axios = require('axios');
 
 passport.use(new GoogleStrategy({
    clientID:process.env.GOOGLE_CLIENT_ID,
    clientSecret:process.env.GOOGLE_CLIENT_SECRET,
-   callbackURL:process.env.GOOGLE_REDIRECT_URI, // Ensure this matches
+   callbackURL:process.env.GOOGLE_REDIRECT_URI, 
 },
 
 async (accessToken, refreshToken, profile, done) => { 

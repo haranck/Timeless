@@ -576,19 +576,15 @@ const getSalesReportExcel = async (req, res) => {
             });
         });
 
-        // Adjust column widths
         worksheet.columns.forEach(column => {
             column.width = 20;
         });
 
-        // Set the filename
         const fileName = 'TIMELESS_AURA_sales_report.xlsx';
         
-        // Set the content type and headers
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
 
-        // Write to response
         await workbook.xlsx.write(res);
         res.end();
 

@@ -9,7 +9,6 @@ const loadCart = async (req, res) => {
     try {
         const userId = req.session.user;
 
-        // Fetch the cart for the user
         let cart = await Cart.findOne({ userId }).populate({
             path: "items.productId", 
             populate: { path: "category" }
@@ -76,14 +75,6 @@ const addToCart = async (req, res) => {
             });
         }
 
-        // let validFinalPrice = product.salePrice || product.regularPrice||0
-
-        // if (validFinalPrice <= 0) {
-        //     return res.status(400).json({ 
-        //         success: false,
-        //         message: "Invalid product price" 
-        //     });
-        // }
         
         const itemQuantity = parseInt(quantity) || 1;
 

@@ -183,7 +183,6 @@ const toggleProductList = async (req, res) => {
       const productId = req.params.id;
       const { isListed } = req.body;
 
-      // Find the product
       const productToToggle = await Product.findById(productId);
 
       if (!productToToggle) {
@@ -380,14 +379,12 @@ const deleteSingleImage = async (req, res) => {
    try {
       const { imageNameToServer, productIdToServer } = req.body
 
-      //Finding  exist cheytha product
       const product = await Product.findById(productIdToServer)
       if (!product) {
          return res.status(404).send({ status: false, message: 'Product not found' })
       }
 
 
-      // Remove the image from the product's images array
       const imageRemoved = await Product.findByIdAndUpdate(
          productIdToServer,
          { $pull: { productImages: imageNameToServer } },
@@ -451,7 +448,6 @@ const deleteProduct = async (req, res) => {
    try {
       const productId = req.params.id;
 
-      // Find the product first to check if it exists
       const product = await Product.findById(productId);
 
       if (!product) {
@@ -461,7 +457,6 @@ const deleteProduct = async (req, res) => {
          });
       }
 
-      // Delete product images from file system if they exist
       if (product.productImages && product.productImages.length > 0) {
          const fs = require('fs');
          const path = require('path');
@@ -469,7 +464,6 @@ const deleteProduct = async (req, res) => {
          product.productImages.forEach(imageName => {
             const imagePath = path.join(__dirname, '../../public/uploads/products', imageName);
 
-            // Check if file exists before attempting to delete
             if (fs.existsSync(imagePath)) {
                try {
                   fs.unlinkSync(imagePath);
@@ -481,10 +475,8 @@ const deleteProduct = async (req, res) => {
          });
       }
 
-      // Delete the product from the database
       await Product.findByIdAndDelete(productId);
 
-      // Return success response
       return res.status(200).json({
          status: true,
          message: 'Product deleted successfully'

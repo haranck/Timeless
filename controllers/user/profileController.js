@@ -47,7 +47,6 @@ const sendVerificationEmail = async (email, otp) => {
             html: `<b>Your OTP is ${otp}</b>`
         };
         const info = await transporter.sendMail(mailOptions);
-        // return info.response;
         return true
 
     } catch (error) {
@@ -130,7 +129,6 @@ const resendtOTP = async (req, res) => {
             return res.status(400).json({success:false,message:"Email not found in session"})
         }
 
-        // console.log("resending otp", otp)
 
         const emailSent = await sendVerificationEmail(email, otp);
         if (emailSent) {
@@ -212,7 +210,7 @@ const userProfile = async (req, res) => {
             user: userData, 
             userAddress: addressData, 
             orders, 
-            wallet: walletData, // Transactions now sorted in descending order
+            wallet: walletData, 
             currentPage: page, 
             totalPages 
         });
@@ -239,18 +237,6 @@ const updateProfile = async (req, res) => {
                 message: 'Please enter a valid 10-digit phone number'
             });
         }
-
-        // const existingUser = await User.findOne({ 
-        //     phone: phone,
-        //     _id: { $ne: userId } 
-        // });
-
-        // if (existingUser) {
-        //     return res.status(400).json({
-        //         success: false,
-        //         message: 'This phone number is already in use by another account'
-        //     });
-        // }
 
         const updatedUser = await User.findByIdAndUpdate(
             userId,
@@ -316,7 +302,6 @@ const verifyCurrentPassword = async (req, res) => {
             });
         }
 
-        // Verify current password
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
             return res.status(400).json({ 
